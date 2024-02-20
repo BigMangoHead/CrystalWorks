@@ -95,24 +95,5 @@ public class CrystalWorksMod
         {
             
         }
-
-        /*
-        @SubscribeEvent
-        public void sapphireSquare(BlockEvent.EntityMultiPlaceEvent event) {
-            BlockState IBlockState  = event.getPlacedBlock();
-            BlockPos pos = event.getPos();
-            Player player = Minecraft.getInstance().player;
-
-            if (player != null) {
-                if (player.position().equals(BlockPos)) {
-                    PlayerChatMessage chatMessage = PlayerChatMessage.unsigned(player.getUUID(), "You placed a sapphire block!");
-                    player.createCommandSourceStack().sendChatMessage(new OutgoingChatMessage.Player(chatMessage), false, ChatType.bind(ChatType.CHAT, player));
-                } else {
-                    PlayerChatMessage chatMessage = PlayerChatMessage.unsigned(player.getUUID(), "...");
-                    player.createCommandSourceStack().sendChatMessage(new OutgoingChatMessage.Player(chatMessage), false, ChatType.bind(ChatType.CHAT, player));
-                }
-
-            }
-        } */
     }
 }

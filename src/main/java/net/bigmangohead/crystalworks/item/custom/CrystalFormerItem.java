@@ -12,6 +12,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gameevent.GameEvent;
 
 public class CrystalFormerItem extends Item {
     public CrystalFormerItem(Properties pProperties) { super(pProperties); }
@@ -25,7 +26,9 @@ public class CrystalFormerItem extends Item {
             Player player = pContext.getPlayer();
             if (isMachine(blockClicked)) {
                 if (isStructure(positionClicked, level)) {
-                    level.setBlock(positionClicked.above(1), Blocks.DIAMOND_BLOCK.defaultBlockState(), 0);
+                    level.setBlockAndUpdate(positionClicked.above(1), Blocks.DIAMOND_BLOCK.defaultBlockState());
+                    level.gameEvent(player, GameEvent.BLOCK_PLACE, positionClicked.above(1));
+
                     player.sendSystemMessage(Component.literal("Structure formed!"));
                     return InteractionResult.SUCCESS;
                 }
@@ -40,7 +43,7 @@ public class CrystalFormerItem extends Item {
         BlockPos startingPosition = positionClicked.below(1).east(1).north(1);
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
-                for (int z = 0; y < 3; y++) {
+                for (int z = 0; z < 3; z++) {
                     if (!validBlock(startingPosition.below(y).west(x).south(z), level)) {
                         return false;
                     }
