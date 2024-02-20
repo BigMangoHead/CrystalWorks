@@ -1,10 +1,15 @@
 package net.bigmangohead.crystalworks;
 
-//List of imports
-//#region
 import com.mojang.logging.LogUtils;
+import net.bigmangohead.crystalworks.block.CrystalBlocks;
+import net.bigmangohead.crystalworks.item.ModCreativeModTabs;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.chat.OutgoingChatMessage;
+import net.minecraft.network.chat.PlayerChatMessage;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -13,10 +18,12 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -26,11 +33,13 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.internal.TextComponentMessageFormatHandler;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
-//#endregion
+
+import net.bigmangohead.crystalworks.item.CrystalItems;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(CrystalWorksMod.MOD_ID)
@@ -45,6 +54,9 @@ public class CrystalWorksMod
     {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
+        CrystalItems.register(modEventBus);
+        CrystalBlocks.register(modEventBus);
+
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
 
@@ -52,6 +64,7 @@ public class CrystalWorksMod
         MinecraftForge.EVENT_BUS.register(this);
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
+        ModCreativeModTabs.register(modEventBus);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)
@@ -60,9 +73,10 @@ public class CrystalWorksMod
     }
 
     // Add the example block item to the building blocks tab
-    private void addCreative(BuildCreativeModeTabContentsEvent event)
-    {
-        
+    private void addCreative(BuildCreativeModeTabContentsEvent event) {
+        if(event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
+            event.accept(CrystalItems.SAPPHIRE);
+        }
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
@@ -81,5 +95,24 @@ public class CrystalWorksMod
         {
             
         }
+
+        /*
+        @SubscribeEvent
+        public void sapphireSquare(BlockEvent.EntityMultiPlaceEvent event) {
+            BlockState IBlockState  = event.getPlacedBlock();
+            BlockPos pos = event.getPos();
+            Player player = Minecraft.getInstance().player;
+
+            if (player != null) {
+                if (player.position().equals(BlockPos)) {
+                    PlayerChatMessage chatMessage = PlayerChatMessage.unsigned(player.getUUID(), "You placed a sapphire block!");
+                    player.createCommandSourceStack().sendChatMessage(new OutgoingChatMessage.Player(chatMessage), false, ChatType.bind(ChatType.CHAT, player));
+                } else {
+                    PlayerChatMessage chatMessage = PlayerChatMessage.unsigned(player.getUUID(), "...");
+                    player.createCommandSourceStack().sendChatMessage(new OutgoingChatMessage.Player(chatMessage), false, ChatType.bind(ChatType.CHAT, player));
+                }
+
+            }
+        } */
     }
 }
