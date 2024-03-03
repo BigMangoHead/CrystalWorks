@@ -9,7 +9,9 @@
     "block.crystalworks.sapphire_ore": "Sapphire Ore",
     "block.crystalworks.deepslate_sapphire_ore": "Deepslate Sapphire Ore",
 
+    "block.crystalworks.gem_polishing_station": "Gem Polishing Station",
+
     "tooltip.crystalworks.metal_detector.tooltip": "Detects valuables underground.",
 
-    "creativetab.tutorial_tab": "CrystalWorks Gems"
+    "creativetab.crystalworks_tab": "CrystalWorks Gems"
 }

@@ -17,9 +17,9 @@ public class ModCreativeModTabs {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = 
                 DeferredRegister.create(Registries.CREATIVE_MODE_TAB, CrystalWorksMod.MOD_ID);
 
-    public static final RegistryObject<CreativeModeTab> TUTORIAL_TAB = CREATIVE_MODE_TABS.register("tutorial_tab",
+    public static final RegistryObject<CreativeModeTab> CRYSTALWORKS_TAB = CREATIVE_MODE_TABS.register("crystalworks_tab",
             () -> CreativeModeTab.builder().icon(() -> new ItemStack(Items.AMETHYST_SHARD))
-                    .title(Component.translatable("creativetab.tutorial_tab"))
+                    .title(Component.translatable("creativetab.crystalworks_tab"))
                     .displayItems((pParameters, pOutput) -> {
                         pOutput.accept(CrystalItems.SAPPHIRE.get());
                         pOutput.accept(CrystalBlocks.SAPPHIRE_BLOCK.get());

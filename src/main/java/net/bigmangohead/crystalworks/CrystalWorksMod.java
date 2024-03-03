@@ -2,6 +2,7 @@ package net.bigmangohead.crystalworks;
 
 import com.mojang.logging.LogUtils;
 import net.bigmangohead.crystalworks.block.CrystalBlocks;
+import net.bigmangohead.crystalworks.block.entity.ModBlockEntities;
 import net.bigmangohead.crystalworks.item.ModCreativeModTabs;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -56,6 +57,8 @@ public class CrystalWorksMod
 
         CrystalItems.register(modEventBus);
         CrystalBlocks.register(modEventBus);
+
+        ModBlockEntities.register(modEventBus);
 
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);

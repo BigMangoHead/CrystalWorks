@@ -1,6 +1,7 @@
 package net.bigmangohead.crystalworks.block;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
+import net.bigmangohead.crystalworks.block.custom.GemPolishingStationBlock;
 import net.bigmangohead.crystalworks.block.custom.SapphireBlock;
 import net.bigmangohead.crystalworks.item.CrystalItems;
 import net.minecraft.util.valueproviders.UniformInt;
@@ -31,6 +32,9 @@ public class CrystalBlocks {
     public static final RegistryObject<Block> DEEPSLATE_SAPPHIRE_ORE = registerBlock("deepslate_sapphire_ore",
             () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.DEEPSLATE)
                      .strength(3f).requiresCorrectToolForDrops(), UniformInt.of(4, 7)));
+
+    public static final RegistryObject<Block> GEM_POLISHING_STATION = registerBlock("gem_polishing_station",
+            () -> new GemPolishingStationBlock(BlockBehaviour.Properties.copy(Blocks.DIAMOND_BLOCK).noOcclusion()));
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         RegistryObject<T> toReturn = BLOCKS.register(name, block);

@@ -1,0 +1,7 @@
+// 1.20.2	2024-02-21T21:42:19.3115909	Tags for minecraft:block mod id crystalworks
+2c1b62bb68f923da32bcabaa6599efc83557ffd0 data/crystalworks/tags/blocks/crystal_matrix_blocks.json
+35133e95f1c8fdd7a1c21afcc231fc0bffefb9a8 data/forge/tags/blocks/needs_netherite_tool.json
+5685464fdb33299505af3bf7109448b3661a5472 data/minecraft/tags/blocks/mineable/pickaxe.json
+b603b840dba71051fc32ebcd6d01ee559062b4cc data/minecraft/tags/blocks/needs_diamond_tool.json
+cd1898c20c514abed795f9de9095094cea285fe0 data/minecraft/tags/blocks/needs_iron_tool.json
+35133e95f1c8fdd7a1c21afcc231fc0bffefb9a8 data/minecraft/tags/blocks/needs_stone_tool.json
