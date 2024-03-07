@@ -16,6 +16,7 @@ import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class ModRecipeProvider extends RecipeProvider implements IConditionBuilder {
     private static final List<ItemLike> SAPPHIRE_SMELTABLES = List.of(
@@ -27,7 +28,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
     }
 
     @Override
-    protected void buildRecipes(RecipeOutput recipeOutput) {
+    protected void buildRecipes(Consumer<FinishedRecipe> recipeOutput) {
         oreBlasting(recipeOutput, SAPPHIRE_SMELTABLES, RecipeCategory.MISC, CrystalItems.SAPPHIRE.get(), 0.25f, 200, "sapphire");
         oreSmelting(recipeOutput, SAPPHIRE_SMELTABLES, RecipeCategory.MISC, CrystalItems.SAPPHIRE.get(), 0.25f, 100, "sapphire");
 
@@ -40,15 +41,15 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 
 
 
-    protected static void oreSmelting(RecipeOutput pRecipeOutput, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult, float pExperience, int pCookingTime, String pGroup) {
+    protected static void oreSmelting(Consumer<FinishedRecipe> pRecipeOutput, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult, float pExperience, int pCookingTime, String pGroup) {
         oreCooking(pRecipeOutput, RecipeSerializer.SMELTING_RECIPE, pIngredients, pCategory, pResult, pExperience, pCookingTime, pGroup, "_from_smelting");
     }
 
-    protected static void oreBlasting(RecipeOutput pRecipeOutput, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult, float pExperience, int pCookingTime, String pGroup) {
+    protected static void oreBlasting(Consumer<FinishedRecipe> pRecipeOutput, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult, float pExperience, int pCookingTime, String pGroup) {
         oreCooking(pRecipeOutput, RecipeSerializer.BLASTING_RECIPE, pIngredients, pCategory, pResult, pExperience, pCookingTime, pGroup, "_from_blasting");
     }
 
-    private static void oreCooking(RecipeOutput pRecipeOutput, RecipeSerializer<? extends AbstractCookingRecipe> pSerializer, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult, float pExperience, int pCookingTime, String pGroup, String pSuffix) {
+    protected static void oreCooking(Consumer<FinishedRecipe> pRecipeOutput, RecipeSerializer<? extends AbstractCookingRecipe> pSerializer, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult, float pExperience, int pCookingTime, String pGroup, String pSuffix) {
         Iterator var9 = pIngredients.iterator();
 
         while(var9.hasNext()) {
@@ -58,7 +59,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 
     }
 
-    private static void blockRecipe(RecipeOutput recipeOutput, Item item, Block block) {
+    private static void blockRecipe(Consumer<FinishedRecipe> recipeOutput, Item item, Block block) {
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block)
                 .pattern("XXX")
                 .pattern("XXX")
