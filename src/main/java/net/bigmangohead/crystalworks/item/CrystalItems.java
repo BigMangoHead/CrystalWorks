@@ -17,6 +17,8 @@ public class CrystalItems {
     public static final RegistryObject<Item> SAPPHIRE = ITEMS.register("sapphire", 
             () -> new Item(new Item.Properties()));
 
+
+
     public static final RegistryObject<Item> METAL_DETECTOR = ITEMS.register("metal_detector",
             () -> new MetalDetectorItem(new Item.Properties().durability(100)));
     public static final RegistryObject<Item> CRYSTAL_FORMER = ITEMS.register("crystal_former",

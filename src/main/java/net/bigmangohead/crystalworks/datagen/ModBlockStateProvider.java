@@ -22,7 +22,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
         blockWithItem(CrystalBlocks.SAPPHIRE_ORE);
         blockWithItem(CrystalBlocks.DEEPSLATE_SAPPHIRE_ORE);
 
-        simpleBlock(CrystalBlocks.GEM_POLISHING_STATION.get(),
+        simpleBlockWithItem(CrystalBlocks.GEM_POLISHING_STATION.get(),
                 new ModelFile.UncheckedModelFile(modLoc("block/gem_polishing_station")));
     }
 

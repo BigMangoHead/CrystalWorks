@@ -27,6 +27,8 @@ public class ModCreativeModTabs {
                         pOutput.accept(CrystalBlocks.SAPPHIRE_ORE.get());
                         pOutput.accept(CrystalBlocks.DEEPSLATE_SAPPHIRE_ORE.get());
 
+                        pOutput.accept(CrystalBlocks.GEM_POLISHING_STATION.get());
+
                         pOutput.accept(CrystalItems.METAL_DETECTOR.get());
                         pOutput.accept(CrystalItems.CRYSTAL_FORMER.get());
                     }).build());

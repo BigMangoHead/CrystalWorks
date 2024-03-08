@@ -2,6 +2,8 @@ package net.bigmangohead.crystalworks.block.entity;
 
 import com.mojang.serialization.Decoder;
 import net.bigmangohead.crystalworks.block.custom.GemPolishingStationBlock;
+import net.bigmangohead.crystalworks.item.CrystalItems;
+import net.bigmangohead.crystalworks.screen.GemPolishingStationMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -13,6 +15,10 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -36,8 +42,8 @@ public class GemPolishingStationBlockEntity extends BlockEntity implements MenuP
     private int progress = 0;
     private int maxProgress = 78; //Represents total amount of ticks per recipe
 
-    public GemPolishingStationBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
-        super(, pPos, pBlockState);
+    public GemPolishingStationBlockEntity(BlockPos pPos, BlockState pBlockState) {
+        super(ModBlockEntities.GEM_POLISHING_BE.get(), pPos, pBlockState);
         this.data = new ContainerData() {
             @Override
             public int get(int pIndex) {
@@ -103,7 +109,7 @@ public class GemPolishingStationBlockEntity extends BlockEntity implements MenuP
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        return
+        return new GemPolishingStationMenu(i, inventory, this, this.data);
     }
 
     @Override
@@ -119,5 +125,47 @@ public class GemPolishingStationBlockEntity extends BlockEntity implements MenuP
         super.load(pTag);
         itemHandler.deserializeNBT(pTag.getCompound("inventory"));
         progress = pTag.getInt("gem_polishing_station.progress");
+    }
+
+    public void tick(Level level, BlockPos blockPos, BlockState blockState) {
+        if(hasRecipe()) {
+            progress ++;
+            setChanged(level, blockPos, blockState);
+
+            if(hasProgressFinished()) {
+                craftItem();
+                progress = 0;
+            }
+        } else {
+            progress = 0;
+        }
+    }
+
+    private void craftItem() { //Note that this is hard-coding the recipe - not recommended!
+        ItemStack result = new ItemStack(CrystalItems.SAPPHIRE.get(), 1);
+        this.itemHandler.extractItem(INPUT_SLOT, 1, false);
+
+        this.itemHandler.setStackInSlot(OUTPUT_SLOT, new ItemStack(result.getItem(),
+                this.itemHandler.getStackInSlot(OUTPUT_SLOT).getCount() + result.getCount()));
+    }
+
+    private boolean canInsertItemIntoOutputSlot(Item item) {
+        return this.itemHandler.getStackInSlot(OUTPUT_SLOT).isEmpty() || this.itemHandler.getStackInSlot(OUTPUT_SLOT).is(item);
+    }
+
+    private boolean canInsertAmountIntoOutputSlot(int count) {
+        return this.itemHandler.getStackInSlot(OUTPUT_SLOT).getCount() + count <= this.itemHandler.getStackInSlot(OUTPUT_SLOT).getMaxStackSize();
+    }
+
+    private boolean hasProgressFinished() {
+        return progress >= maxProgress;
+    }
+
+    private boolean hasRecipe() {
+        boolean hasCraftingItem = this.itemHandler.getStackInSlot(INPUT_SLOT).getItem() == Blocks.DIAMOND_BLOCK.asItem();
+
+        ItemStack result = new ItemStack(CrystalItems.SAPPHIRE.get());
+
+        return hasCraftingItem && canInsertAmountIntoOutputSlot(result.getCount()) && canInsertItemIntoOutputSlot(result.getItem());
     }
 }

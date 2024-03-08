@@ -4,7 +4,10 @@ import com.mojang.logging.LogUtils;
 import net.bigmangohead.crystalworks.block.CrystalBlocks;
 import net.bigmangohead.crystalworks.block.entity.ModBlockEntities;
 import net.bigmangohead.crystalworks.item.ModCreativeModTabs;
+import net.bigmangohead.crystalworks.screen.GemPolishingStationScreen;
+import net.bigmangohead.crystalworks.screen.ModMenuTypes;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.ChatType;
@@ -59,6 +62,7 @@ public class CrystalWorksMod
         CrystalBlocks.register(modEventBus);
 
         ModBlockEntities.register(modEventBus);
+        ModMenuTypes.register(modEventBus);
 
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
@@ -96,7 +100,9 @@ public class CrystalWorksMod
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
         {
-            
+
+
+            MenuScreens.register(ModMenuTypes.GEM_POLISHING_MENU.get(), GemPolishingStationScreen::new);
         }
     }
 }

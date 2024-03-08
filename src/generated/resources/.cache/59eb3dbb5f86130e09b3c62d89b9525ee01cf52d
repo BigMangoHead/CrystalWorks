@@ -1,4 +1,5 @@
-// 1.20.2	2024-02-21T21:42:19.3095964	Loot Tables
+// 1.20.1	2024-03-06T23:10:14.1041094	Loot Tables
 5e2797025eb8f0ba7a2b1b5155629fb9084932a1 data/crystalworks/loot_tables/blocks/deepslate_sapphire_ore.json
+f4034cd26a8306d4b7b8717710b4ff0d91915ee8 data/crystalworks/loot_tables/blocks/gem_polishing_station.json
 8122aa4fb03b9e966058eafa22129a8474575034 data/crystalworks/loot_tables/blocks/sapphire_block.json
 22fd2536cdcf55debcfd39bd06f1904890848bf9 data/crystalworks/loot_tables/blocks/sapphire_ore.json
