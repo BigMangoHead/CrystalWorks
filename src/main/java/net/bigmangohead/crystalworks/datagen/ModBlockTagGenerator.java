@@ -33,7 +33,8 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
 
         this.tag(BlockTags.NEEDS_IRON_TOOL)
                 .add(CrystalBlocks.SAPPHIRE_BLOCK.get(),
-                        CrystalBlocks.SAPPHIRE_ORE.get());
+                        CrystalBlocks.SAPPHIRE_ORE.get(),
+                        CrystalBlocks.CRUSHER.get());
 
         this.tag(BlockTags.NEEDS_DIAMOND_TOOL)
                 .add(CrystalBlocks.DEEPSLATE_SAPPHIRE_ORE.get());

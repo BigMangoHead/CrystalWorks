@@ -24,6 +24,23 @@ public class CrystalItems {
     public static final RegistryObject<Item> CRYSTAL_FORMER = ITEMS.register("crystal_former",
             () -> new CrystalFormerItem(new Item.Properties()));
 
+    public static final RegistryObject<Item> IRON_DUST = ITEMS.register("iron_dust",
+            () -> new CrystalFormerItem(new Item.Properties()));
+    public static final RegistryObject<Item> GOLD_DUST = ITEMS.register("gold_dust",
+            () -> new CrystalFormerItem(new Item.Properties()));
+    public static final RegistryObject<Item> DIAMOND_DUST = ITEMS.register("diamond_dust",
+            () -> new CrystalFormerItem(new Item.Properties()));
+    public static final RegistryObject<Item> EMERALD_DUST = ITEMS.register("emerald_dust",
+            () -> new CrystalFormerItem(new Item.Properties()));
+    public static final RegistryObject<Item> LAPIS_DUST = ITEMS.register("lapis_dust",
+            () -> new CrystalFormerItem(new Item.Properties()));
+    public static final RegistryObject<Item> NETHERITE_DUST = ITEMS.register("netherite_dust",
+            () -> new CrystalFormerItem(new Item.Properties()));
+    public static final RegistryObject<Item> COPPER_DUST = ITEMS.register("copper_dust",
+            () -> new CrystalFormerItem(new Item.Properties()));
+    public static final RegistryObject<Item> QUARTZ_DUST = ITEMS.register("quartz_dust",
+            () -> new CrystalFormerItem(new Item.Properties()));
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }

@@ -1,17 +1,20 @@
-package net.bigmangohead.crystalworks.datagen;
+package net.bigmangohead.crystalworks.datagen.recipe;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
 import net.bigmangohead.crystalworks.block.CrystalBlocks;
+import net.bigmangohead.crystalworks.datagen.recipe.builder.CrushingRecipeBuilder;
 import net.bigmangohead.crystalworks.item.CrystalItems;
+import net.bigmangohead.crystalworks.recipe.CrusherRecipe;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.AbstractCookingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 
 import java.util.Iterator;
@@ -36,6 +39,10 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         blockRecipe(recipeOutput, CrystalItems.SAPPHIRE.get(), CrystalBlocks.SAPPHIRE_BLOCK.get());
 
 
+        crusherRecipe(recipeOutput, Items.IRON_INGOT, 1, CrystalItems.IRON_DUST.get(), 1, 1, "dust");
+        crusherRecipe(recipeOutput, Items.GOLD_INGOT, 2, CrystalItems.GOLD_DUST.get(), 3, 2, "dust");
+
+
     }
 
 
@@ -57,6 +64,10 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
             SimpleCookingRecipeBuilder.generic(Ingredient.of(new ItemLike[]{itemlike}), pCategory, pResult, pExperience, pCookingTime, pSerializer).group(pGroup).unlockedBy(getHasName(itemlike), has(itemlike)).save(pRecipeOutput, CrystalWorksMod.MOD_ID + ":" + getItemName(pResult) + pSuffix + "_" + getItemName(itemlike));
         }
 
+    }
+
+    protected static void crusherRecipe(Consumer<FinishedRecipe> pRecipeOutput, ItemLike itemLike, int ingredientCount, ItemLike pResult, int resultCount, double pRecipeTimeModifier, String pGroup) {
+        CrushingRecipeBuilder.create(Ingredient.of(itemLike), ingredientCount, pResult, resultCount, pRecipeTimeModifier, CrusherRecipe.CrushingRecipeSerializer.INSTANCE).group(pGroup).unlockedBy(getHasName(itemLike), has(itemLike)).save(pRecipeOutput, CrystalWorksMod.MOD_ID + ":" + getItemName(pResult) + "_from_crushing_" + getItemName(itemLike));
     }
 
     private static void blockRecipe(Consumer<FinishedRecipe> recipeOutput, Item item, Block block) {

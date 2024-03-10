@@ -19,6 +19,15 @@ public class ModItemModelProvider extends ItemModelProvider {
     protected void registerModels() {
         simpleItem(CrystalItems.SAPPHIRE);
 
+        simpleItem(CrystalItems.IRON_DUST);
+        simpleItem(CrystalItems.GOLD_DUST);
+        simpleItem(CrystalItems.DIAMOND_DUST);
+        simpleItem(CrystalItems.QUARTZ_DUST);
+        simpleItem(CrystalItems.NETHERITE_DUST);
+        simpleItem(CrystalItems.EMERALD_DUST);
+        simpleItem(CrystalItems.COPPER_DUST);
+        simpleItem(CrystalItems.LAPIS_DUST);
+
         simpleItem(CrystalItems.METAL_DETECTOR);
         simpleItem(CrystalItems.CRYSTAL_FORMER);
     }

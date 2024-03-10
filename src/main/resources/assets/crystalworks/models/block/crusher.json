@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [64, 64],
 	"textures": {
-		"3": "tutorialmod:block/gem_polishing_station_texture",
-		"particle": "tutorialmod:block/gem_polishing_station_texture"
+		"3": "crystalworks:block/crusher",
+		"particle": "crystalworks:block/crusher"
 	},
 	"elements": [
 		{

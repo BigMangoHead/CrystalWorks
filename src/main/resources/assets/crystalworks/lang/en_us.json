@@ -1,6 +1,16 @@
 {
     "item.crystalworks.sapphire": "Sapphire",
 
+    "item.crystalworks.iron_dust": "Iron Dust",
+    "item.crystalworks.diamond_dust": "Diamond Dust",
+    "item.crystalworks.gold_dust": "Gold Dust",
+    "item.crystalworks.emerald_dust": "Emerald Dust",
+    "item.crystalworks.lapis_dust": "Lapis Dust",
+    "item.crystalworks.netherite_dust": "Netherite Dust",
+    "item.crystalworks.quartz_dust": "Quartz Dust",
+    "item.crystalworks.copper_dust": "Copper Dust",
+
+
     "item.crystalworks.metal_detector": "Metal Detector",
     "item.crystalworks.crystal_former": "Crystal Former",
 
@@ -9,7 +19,7 @@
     "block.crystalworks.sapphire_ore": "Sapphire Ore",
     "block.crystalworks.deepslate_sapphire_ore": "Deepslate Sapphire Ore",
 
-    "block.crystalworks.gem_polishing_station": "Gem Polishing Station",
+    "block.crystalworks.crusher": "Crusher",
 
     "tooltip.crystalworks.metal_detector.tooltip": "Detects valuables underground.",
 

@@ -1,6 +1,7 @@
 package net.bigmangohead.crystalworks.screen;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
+import net.bigmangohead.crystalworks.screen.machine.CrusherMenu;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.common.extensions.IForgeMenuType;
@@ -14,8 +15,8 @@ public class ModMenuTypes {
     public static final DeferredRegister<MenuType<?>> MENUS =
             DeferredRegister.create(ForgeRegistries.MENU_TYPES, CrystalWorksMod.MOD_ID);
 
-    public static final RegistryObject<MenuType<GemPolishingStationMenu>> GEM_POLISHING_MENU =
-            registerMenuType("gem_polishing_menu", GemPolishingStationMenu::new);
+    public static final RegistryObject<MenuType<CrusherMenu>> CRUSHER_MENU =
+            registerMenuType("gem_polishing_menu", CrusherMenu::new);
 
     private static <T extends AbstractContainerMenu>RegistryObject<MenuType<T>> registerMenuType(String name, IContainerFactory<T> factory) {
         return MENUS.register(name, () -> IForgeMenuType.create(factory));

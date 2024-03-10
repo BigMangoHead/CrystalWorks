@@ -1,7 +1,8 @@
-package net.bigmangohead.crystalworks.screen;
+package net.bigmangohead.crystalworks.screen.machine;
 
 import net.bigmangohead.crystalworks.block.CrystalBlocks;
-import net.bigmangohead.crystalworks.block.entity.GemPolishingStationBlockEntity;
+import net.bigmangohead.crystalworks.block.entity.CrusherBlockEntity;
+import net.bigmangohead.crystalworks.screen.ModMenuTypes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -12,19 +13,19 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.SlotItemHandler;
 
-public class GemPolishingStationMenu extends AbstractContainerMenu {
-    public final GemPolishingStationBlockEntity blockEntity;
+public class CrusherMenu extends AbstractContainerMenu {
+    public final CrusherBlockEntity blockEntity;
     private final Level level;
     private final ContainerData data;
 
-    public GemPolishingStationMenu(int pContainerId, Inventory inv, FriendlyByteBuf extraData) {
+    public CrusherMenu(int pContainerId, Inventory inv, FriendlyByteBuf extraData) {
         this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(2));
     }
 
-    public GemPolishingStationMenu(int pContainerId, Inventory inv, BlockEntity entity, ContainerData data) {
-        super(ModMenuTypes.GEM_POLISHING_MENU.get(), pContainerId);
+    public CrusherMenu(int pContainerId, Inventory inv, BlockEntity entity, ContainerData data) {
+        super(ModMenuTypes.CRUSHER_MENU.get(), pContainerId);
         checkContainerSize(inv, 2);
-        blockEntity = ((GemPolishingStationBlockEntity) entity);
+        blockEntity = ((CrusherBlockEntity) entity);
         this.level = inv.player.level();
         this.data = data;
 
@@ -46,7 +47,7 @@ public class GemPolishingStationMenu extends AbstractContainerMenu {
     public int getScaledProgress() {
         int progress = this.data.get(0);
         int maxProgress = this.data.get(1);  // Max Progress
-        int progressArrowSize = 26; // This is the height in pixels of your arrow
+        int progressArrowSize = 22; // This is the height in pixels of your arrow
 
         return maxProgress != 0 && progress != 0 ? progress * progressArrowSize / maxProgress : 0;
     }
@@ -108,7 +109,7 @@ public class GemPolishingStationMenu extends AbstractContainerMenu {
     @Override
     public boolean stillValid(Player player) {
         return stillValid(ContainerLevelAccess.create(level, blockEntity.getBlockPos()),
-                player, CrystalBlocks.GEM_POLISHING_STATION.get());
+                player, CrystalBlocks.CRUSHER.get());
     }
 
     private void addPlayerInventory(Inventory playerInventory) {

@@ -1,9 +1,8 @@
 package net.bigmangohead.crystalworks.block.entity;
 
-import com.mojang.serialization.Decoder;
-import net.bigmangohead.crystalworks.block.custom.GemPolishingStationBlock;
 import net.bigmangohead.crystalworks.item.CrystalItems;
-import net.bigmangohead.crystalworks.screen.GemPolishingStationMenu;
+import net.bigmangohead.crystalworks.recipe.CrusherRecipe;
+import net.bigmangohead.crystalworks.screen.machine.CrusherMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -20,7 +19,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
@@ -30,7 +28,9 @@ import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class GemPolishingStationBlockEntity extends BlockEntity implements MenuProvider {
+import java.util.Optional;
+
+public class CrusherBlockEntity extends BlockEntity implements MenuProvider {
     private final ItemStackHandler itemHandler = new ItemStackHandler(2); //Represents amount of slots in inventory
 
     private static final int INPUT_SLOT = 0;
@@ -40,16 +40,17 @@ public class GemPolishingStationBlockEntity extends BlockEntity implements MenuP
 
     protected final ContainerData data;
     private int progress = 0;
-    private int maxProgress = 78; //Represents total amount of ticks per recipe
+    private int defaultMaxProgress = 78; //Represents total amount of ticks per recipe by default
+    private int maxProgress = 78; //Represents total amount of ticks in a recipe after recipe modifier is applied
 
-    public GemPolishingStationBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.GEM_POLISHING_BE.get(), pPos, pBlockState);
+    public CrusherBlockEntity(BlockPos pPos, BlockState pBlockState) {
+        super(ModBlockEntities.CRUSHER_BE.get(), pPos, pBlockState);
         this.data = new ContainerData() {
             @Override
             public int get(int pIndex) {
                 return switch (pIndex) {
-                    case 0 -> GemPolishingStationBlockEntity.this.progress;
-                    case 1 -> GemPolishingStationBlockEntity.this.maxProgress;
+                    case 0 -> CrusherBlockEntity.this.progress;
+                    case 1 -> CrusherBlockEntity.this.maxProgress;
                     default -> 0;
                 };
             }
@@ -57,8 +58,8 @@ public class GemPolishingStationBlockEntity extends BlockEntity implements MenuP
             @Override
             public void set(int pIndex, int pValue) {
                 switch (pIndex) {
-                    case 0 -> GemPolishingStationBlockEntity.this.progress = pValue;
-                    case 1 -> GemPolishingStationBlockEntity.this.maxProgress = pValue;
+                    case 0 -> CrusherBlockEntity.this.progress = pValue;
+                    case 1 -> CrusherBlockEntity.this.maxProgress = pValue;
                 }
 
             }
@@ -103,19 +104,19 @@ public class GemPolishingStationBlockEntity extends BlockEntity implements MenuP
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable("block.crystalworks.gem_polishing_station");
+        return Component.translatable("block.crystalworks.crusher");
     }
 
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        return new GemPolishingStationMenu(i, inventory, this, this.data);
+        return new CrusherMenu(i, inventory, this, this.data);
     }
 
     @Override
     protected void saveAdditional(CompoundTag pTag) {
         pTag.put("inventory", itemHandler.serializeNBT());
-        pTag.putInt("gem_polishing_station.progress", progress);
+        pTag.putInt("crusher.progress", progress);
 
         super.saveAdditional(pTag);
     }
@@ -124,10 +125,11 @@ public class GemPolishingStationBlockEntity extends BlockEntity implements MenuP
     public void load(CompoundTag pTag) {
         super.load(pTag);
         itemHandler.deserializeNBT(pTag.getCompound("inventory"));
-        progress = pTag.getInt("gem_polishing_station.progress");
+        progress = pTag.getInt("crusher.progress");
     }
 
     public void tick(Level level, BlockPos blockPos, BlockState blockState) {
+        //TODO: More robust method of checking recipes to optimize more
         if(hasRecipe()) {
             progress ++;
             setChanged(level, blockPos, blockState);
@@ -141,15 +143,17 @@ public class GemPolishingStationBlockEntity extends BlockEntity implements MenuP
         }
     }
 
-    private void craftItem() { //Note that this is hard-coding the recipe - not recommended!
-        ItemStack result = new ItemStack(CrystalItems.SAPPHIRE.get(), 1);
-        this.itemHandler.extractItem(INPUT_SLOT, 1, false);
+    private void craftItem() {
+        Optional<CrusherRecipe> recipe = getCurrentRecipe();
+        ItemStack result = recipe.get().getResultItem(null);
+
+        this.itemHandler.extractItem(INPUT_SLOT, recipe.get().getInputCount(), false);
 
         this.itemHandler.setStackInSlot(OUTPUT_SLOT, new ItemStack(result.getItem(),
                 this.itemHandler.getStackInSlot(OUTPUT_SLOT).getCount() + result.getCount()));
     }
 
-    private boolean canInsertItemIntoOutputSlot(Item item) {
+    private boolean canInsertItemIntoOutputSlot(Item item) { //TODO: Prevent placing random items in the output area
         return this.itemHandler.getStackInSlot(OUTPUT_SLOT).isEmpty() || this.itemHandler.getStackInSlot(OUTPUT_SLOT).is(item);
     }
 
@@ -157,15 +161,36 @@ public class GemPolishingStationBlockEntity extends BlockEntity implements MenuP
         return this.itemHandler.getStackInSlot(OUTPUT_SLOT).getCount() + count <= this.itemHandler.getStackInSlot(OUTPUT_SLOT).getMaxStackSize();
     }
 
+    private boolean enoughInputItems(CrusherRecipe recipe, int inputCount) {
+        return (recipe.getInputCount() <= inputCount);
+    }
+
     private boolean hasProgressFinished() {
         return progress >= maxProgress;
     }
 
     private boolean hasRecipe() {
-        boolean hasCraftingItem = this.itemHandler.getStackInSlot(INPUT_SLOT).getItem() == Blocks.DIAMOND_BLOCK.asItem();
+        Optional<CrusherRecipe> recipe = getCurrentRecipe();
 
-        ItemStack result = new ItemStack(CrystalItems.SAPPHIRE.get());
+        if (recipe.isEmpty()) {
+            return false;
+        }
 
-        return hasCraftingItem && canInsertAmountIntoOutputSlot(result.getCount()) && canInsertItemIntoOutputSlot(result.getItem());
+        ItemStack result = recipe.get().getResultItem(null);
+
+        // Note for max progress: Always rounds recipe progress up
+        // This makes it harder to get a 1 tick machine
+        this.maxProgress = (int) Math.ceil(recipe.get().getRecipeTimeModifier() * defaultMaxProgress);
+
+        return enoughInputItems(recipe.get(), this.itemHandler.getStackInSlot(INPUT_SLOT).getCount()) && canInsertAmountIntoOutputSlot(result.getCount()) && canInsertItemIntoOutputSlot(result.getItem());
+    }
+
+    private Optional<CrusherRecipe> getCurrentRecipe() {
+        SimpleContainer inventory = new SimpleContainer(this.itemHandler.getSlots());
+        for(int i = 0; i < itemHandler.getSlots(); i++) {
+            inventory.setItem(i, this.itemHandler.getStackInSlot(i));
+        }
+
+        return this.level.getRecipeManager().getRecipeFor(CrusherRecipe.Type.INSTANCE, inventory, level); //Can be optimized by also sending in the last recipe
     }
 }

@@ -1,0 +1,13 @@
+{
+  "type": "crystalworks:crushing",
+  "group": "dust",
+  "ingredient": {
+    "item": "minecraft:gold_ingot"
+  },
+  "ingredientcount": 2,
+  "recipetimemodifier": 2.0,
+  "result": {
+    "count": 3,
+    "item": "crystalworks:gold_dust"
+  }
+}

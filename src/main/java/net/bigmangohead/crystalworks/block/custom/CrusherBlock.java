@@ -1,6 +1,6 @@
 package net.bigmangohead.crystalworks.block.custom;
 
-import net.bigmangohead.crystalworks.block.entity.GemPolishingStationBlockEntity;
+import net.bigmangohead.crystalworks.block.entity.CrusherBlockEntity;
 import net.bigmangohead.crystalworks.block.entity.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,10 +22,10 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.Nullable;
 
-public class GemPolishingStationBlock extends BaseEntityBlock {
+public class CrusherBlock extends BaseEntityBlock {
     public static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 12, 16);
 
-    public GemPolishingStationBlock(Properties pProperties) {
+    public CrusherBlock(Properties pProperties) {
         super(pProperties);
     }
 
@@ -43,8 +43,8 @@ public class GemPolishingStationBlock extends BaseEntityBlock {
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pMovedByPiston) {
         if (pState.getBlock() != pNewState.getBlock()) {
             BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
-            if (blockEntity instanceof GemPolishingStationBlockEntity) {
-                ((GemPolishingStationBlockEntity) blockEntity).drops();
+            if (blockEntity instanceof CrusherBlockEntity) {
+                ((CrusherBlockEntity) blockEntity).drops();
             }
         }
 
@@ -55,8 +55,8 @@ public class GemPolishingStationBlock extends BaseEntityBlock {
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         if (!pLevel.isClientSide()) {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
-            if(entity instanceof GemPolishingStationBlockEntity) {
-                NetworkHooks.openScreen(((ServerPlayer)pPlayer), (GemPolishingStationBlockEntity)entity, pPos);
+            if(entity instanceof CrusherBlockEntity) {
+                NetworkHooks.openScreen(((ServerPlayer)pPlayer), (CrusherBlockEntity)entity, pPos);
             } else {
                 throw new IllegalStateException("Our Container provider is missing!");
             }
@@ -68,7 +68,7 @@ public class GemPolishingStationBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-        return new GemPolishingStationBlockEntity(blockPos, blockState);
+        return new CrusherBlockEntity(blockPos, blockState);
     }
 
     @Nullable
@@ -78,7 +78,7 @@ public class GemPolishingStationBlock extends BaseEntityBlock {
             return null;
         }
 
-        return createTickerHelper(pBlockEntityType, ModBlockEntities.GEM_POLISHING_BE.get(),
-                (level, blockPos, blockState, gemPolishingStationBlockEntity) -> gemPolishingStationBlockEntity.tick(level, blockPos, blockState));
+        return createTickerHelper(pBlockEntityType, ModBlockEntities.CRUSHER_BE.get(),
+                (level, blockPos, blockState, crusherBlockEntity) -> crusherBlockEntity.tick(level, blockPos, blockState));
     }
 }

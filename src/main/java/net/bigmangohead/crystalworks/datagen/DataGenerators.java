@@ -1,8 +1,7 @@
 package net.bigmangohead.crystalworks.datagen;
 
-import io.netty.util.concurrent.CompleteFuture;
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.datagen.loot.ModBlockLootTables;
+import net.bigmangohead.crystalworks.datagen.recipe.ModRecipeProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;

@@ -1,4 +1,4 @@
-package net.bigmangohead.crystalworks.screen;
+package net.bigmangohead.crystalworks.screen.machine;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.bigmangohead.crystalworks.CrystalWorksMod;
@@ -9,11 +9,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-public class GemPolishingStationScreen extends AbstractContainerScreen<GemPolishingStationMenu> {
+public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
     private static final ResourceLocation TEXTURE =
-            new ResourceLocation(CrystalWorksMod.MOD_ID, "textures/gui/gem_polishing_station_gui.png");
+            new ResourceLocation(CrystalWorksMod.MOD_ID, "textures/gui/crusher_gui.png");
 
-    public GemPolishingStationScreen(GemPolishingStationMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
+    public CrusherScreen(CrusherMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);
     }
 
@@ -39,7 +39,7 @@ public class GemPolishingStationScreen extends AbstractContainerScreen<GemPolish
 
     private void renderProgressArrow(GuiGraphics guiGraphics, int x, int y) {
         if(menu.isCrafting()) {
-            guiGraphics.blit(TEXTURE, x + 85, y + 30, 176, 0, 8, menu.getScaledProgress());
+            guiGraphics.blit(TEXTURE, x + 72, y + 33, 176, 0, 32, menu.getScaledProgress());
         }
     }
 
