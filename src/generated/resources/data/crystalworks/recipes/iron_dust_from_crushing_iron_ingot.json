@@ -2,9 +2,9 @@
   "type": "crystalworks:crushing",
   "group": "dust",
   "ingredient": {
+    "count": 1,
     "item": "minecraft:iron_ingot"
   },
-  "ingredientcount": 1,
   "recipetimemodifier": 1.0,
   "result": {
     "count": 1,

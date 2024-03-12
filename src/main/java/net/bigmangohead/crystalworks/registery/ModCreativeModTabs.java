@@ -1,7 +1,6 @@
-package net.bigmangohead.crystalworks.item;
+package net.bigmangohead.crystalworks.registery;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.block.CrystalBlocks;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -17,7 +16,7 @@ public class ModCreativeModTabs {
 
     public static final RegistryObject<CreativeModeTab> CRYSTALWORKS_TAB = CREATIVE_MODE_TABS.register("crystalworks_tab",
             () -> CreativeModeTab.builder().icon(() -> new ItemStack(Items.AMETHYST_SHARD))
-                    .title(Component.translatable("creativetab.crystalworks_tab"))
+                    .title(Component.translatable("creativetab." + CrystalWorksMod.MOD_ID + "_tab"))
                     .displayItems((pParameters, pOutput) -> {
                         pOutput.accept(CrystalItems.SAPPHIRE.get());
                         pOutput.accept(CrystalBlocks.SAPPHIRE_BLOCK.get());

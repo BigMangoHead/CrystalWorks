@@ -1,7 +1,7 @@
 package net.bigmangohead.crystalworks.block.custom;
 
 import net.bigmangohead.crystalworks.block.entity.CrusherBlockEntity;
-import net.bigmangohead.crystalworks.block.entity.ModBlockEntities;
+import net.bigmangohead.crystalworks.registery.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -52,13 +52,13 @@ public class CrusherBlock extends BaseEntityBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
-        if (!pLevel.isClientSide()) {
+    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand hand, BlockHitResult pHit) {
+        if (!pLevel.isClientSide() && hand == InteractionHand.MAIN_HAND) {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
             if(entity instanceof CrusherBlockEntity) {
                 NetworkHooks.openScreen(((ServerPlayer)pPlayer), (CrusherBlockEntity)entity, pPos);
             } else {
-                throw new IllegalStateException("Our Container provider is missing!");
+                throw new IllegalStateException("Container provider at is missing!");
             }
         }
 

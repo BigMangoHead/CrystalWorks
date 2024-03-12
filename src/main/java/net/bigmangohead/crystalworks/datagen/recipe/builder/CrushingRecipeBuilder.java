@@ -104,9 +104,9 @@ public class CrushingRecipeBuilder implements RecipeBuilder {
             if (!this.group.isEmpty()) {
                 jsonObject.addProperty("group", this.group);
             }
-
-            jsonObject.add("ingredient", this.ingredient.toJson());
-            jsonObject.addProperty("ingredientcount", this.ingredientCount);
+            JsonObject ingredientJsonObject = this.ingredient.toJson().getAsJsonObject();
+            ingredientJsonObject.addProperty("count", this.ingredientCount);
+            jsonObject.add("ingredient", ingredientJsonObject);
             jsonObject.add("result", itemStackToJson(this.result, this.resultCount));
             jsonObject.addProperty("recipetimemodifier", this.recipeTimeModifier);
         }

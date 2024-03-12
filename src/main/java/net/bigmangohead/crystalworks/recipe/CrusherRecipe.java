@@ -93,7 +93,7 @@ public class CrusherRecipe implements Recipe<SimpleContainer> {
             ItemStack result = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(jsonObject, "result"));
 
             Ingredient ingredient = Ingredient.fromJson(GsonHelper.getAsJsonObject(jsonObject, "ingredient"));
-            int ingredientCount = GsonHelper.getAsInt(jsonObject, "ingredientcount");
+            int ingredientCount = GsonHelper.getAsInt(GsonHelper.getAsJsonObject(jsonObject, "ingredient"), "count");
 
             double recipeTimeModifier = GsonHelper.getAsDouble(jsonObject, "recipetimemodifier");
 

@@ -1,7 +1,7 @@
 package net.bigmangohead.crystalworks.datagen;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.block.CrystalBlocks;
+import net.bigmangohead.crystalworks.registery.CrystalBlocks;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.BlockStateProvider;

@@ -1,9 +1,9 @@
-package net.bigmangohead.crystalworks.block;
+package net.bigmangohead.crystalworks.registery;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
+import net.bigmangohead.crystalworks.block.custom.BasicGeneratorBlock;
 import net.bigmangohead.crystalworks.block.custom.CrusherBlock;
-import net.bigmangohead.crystalworks.block.custom.SapphireBlock;
-import net.bigmangohead.crystalworks.item.CrystalItems;
+import net.bigmangohead.crystalworks.registery.CrystalItems;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -23,7 +23,7 @@ public class CrystalBlocks {
             DeferredRegister.create(ForgeRegistries.BLOCKS, CrystalWorksMod.MOD_ID);
 
     public static final RegistryObject<Block> SAPPHIRE_BLOCK = registerBlock("sapphire_block",
-            () -> new SapphireBlock(BlockBehaviour.Properties.copy(Blocks.DIAMOND_BLOCK)));
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.DIAMOND_BLOCK)));
 
     public static final RegistryObject<Block> SAPPHIRE_ORE = registerBlock("sapphire_ore",
             () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.STONE)
@@ -32,6 +32,9 @@ public class CrystalBlocks {
     public static final RegistryObject<Block> DEEPSLATE_SAPPHIRE_ORE = registerBlock("deepslate_sapphire_ore",
             () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.DEEPSLATE)
                      .strength(3f).requiresCorrectToolForDrops(), UniformInt.of(4, 7)));
+
+    public static final RegistryObject<Block> BASIC_GENERATOR = registerBlock("simple_generator",
+            () -> new BasicGeneratorBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
 
     public static final RegistryObject<Block> CRUSHER = registerBlock("crusher",
             () -> new CrusherBlock(BlockBehaviour.Properties.copy(Blocks.DIAMOND_BLOCK).noOcclusion()));

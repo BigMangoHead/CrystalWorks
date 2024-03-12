@@ -1,9 +1,9 @@
 package net.bigmangohead.crystalworks.datagen.recipe;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.block.CrystalBlocks;
+import net.bigmangohead.crystalworks.registery.CrystalBlocks;
 import net.bigmangohead.crystalworks.datagen.recipe.builder.CrushingRecipeBuilder;
-import net.bigmangohead.crystalworks.item.CrystalItems;
+import net.bigmangohead.crystalworks.registery.CrystalItems;
 import net.bigmangohead.crystalworks.recipe.CrusherRecipe;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
@@ -14,7 +14,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 
 import java.util.Iterator;
@@ -71,7 +70,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
     }
 
     private static void blockRecipe(Consumer<FinishedRecipe> recipeOutput, Item item, Block block) {
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block)
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block)
                 .pattern("XXX")
                 .pattern("XXX")
                 .pattern("XXX")

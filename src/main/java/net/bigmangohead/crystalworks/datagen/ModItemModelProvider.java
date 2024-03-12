@@ -1,7 +1,7 @@
 package net.bigmangohead.crystalworks.datagen;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.item.CrystalItems;
+import net.bigmangohead.crystalworks.registery.CrystalItems;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;

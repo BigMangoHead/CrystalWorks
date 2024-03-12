@@ -1,12 +1,12 @@
 package net.bigmangohead.crystalworks;
 
 import com.mojang.logging.LogUtils;
-import net.bigmangohead.crystalworks.block.CrystalBlocks;
-import net.bigmangohead.crystalworks.block.entity.ModBlockEntities;
-import net.bigmangohead.crystalworks.item.ModCreativeModTabs;
-import net.bigmangohead.crystalworks.recipe.ModRecipes;
+import net.bigmangohead.crystalworks.registery.CrystalBlocks;
+import net.bigmangohead.crystalworks.registery.ModBlockEntities;
+import net.bigmangohead.crystalworks.registery.ModCreativeModTabs;
+import net.bigmangohead.crystalworks.registery.ModRecipes;
 import net.bigmangohead.crystalworks.screen.machine.CrusherScreen;
-import net.bigmangohead.crystalworks.screen.ModMenuTypes;
+import net.bigmangohead.crystalworks.registery.ModMenuTypes;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.api.distmarker.Dist;
@@ -21,7 +21,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
-import net.bigmangohead.crystalworks.item.CrystalItems;
+import net.bigmangohead.crystalworks.registery.CrystalItems;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(CrystalWorksMod.MOD_ID)

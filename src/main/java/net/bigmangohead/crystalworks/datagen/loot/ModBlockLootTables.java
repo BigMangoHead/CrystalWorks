@@ -1,7 +1,7 @@
 package net.bigmangohead.crystalworks.datagen.loot;
 
-import net.bigmangohead.crystalworks.block.CrystalBlocks;
-import net.bigmangohead.crystalworks.item.CrystalItems;
+import net.bigmangohead.crystalworks.registery.CrystalBlocks;
+import net.bigmangohead.crystalworks.registery.CrystalItems;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Item;

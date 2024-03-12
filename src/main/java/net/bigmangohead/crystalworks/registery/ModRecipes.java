@@ -1,6 +1,7 @@
-package net.bigmangohead.crystalworks.recipe;
+package net.bigmangohead.crystalworks.registery;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
+import net.bigmangohead.crystalworks.recipe.CrusherRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;

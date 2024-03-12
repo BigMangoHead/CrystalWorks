@@ -1,6 +1,7 @@
-package net.bigmangohead.crystalworks.screen;
+package net.bigmangohead.crystalworks.registery;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
+import net.bigmangohead.crystalworks.screen.machine.BasicGeneratorMenu;
 import net.bigmangohead.crystalworks.screen.machine.CrusherMenu;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -16,9 +17,11 @@ public class ModMenuTypes {
             DeferredRegister.create(ForgeRegistries.MENU_TYPES, CrystalWorksMod.MOD_ID);
 
     public static final RegistryObject<MenuType<CrusherMenu>> CRUSHER_MENU =
-            registerMenuType("gem_polishing_menu", CrusherMenu::new);
+            registerMenuType("crusher_menu", CrusherMenu::new);
+    public static final RegistryObject<MenuType<BasicGeneratorMenu>> BASIC_GENERATOR_MENU =
+            registerMenuType("basic_generator_menu", BasicGeneratorMenu::new);
 
-    private static <T extends AbstractContainerMenu>RegistryObject<MenuType<T>> registerMenuType(String name, IContainerFactory<T> factory) {
+    private static <T extends AbstractContainerMenu> RegistryObject<MenuType<T>> registerMenuType(String name, IContainerFactory<T> factory) {
         return MENUS.register(name, () -> IForgeMenuType.create(factory));
     }
 
