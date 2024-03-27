@@ -1,6 +1,6 @@
 package net.bigmangohead.crystalworks.item.custom;
 
-import net.bigmangohead.crystalworks.util.ModTags;
+import net.bigmangohead.crystalworks.registery.ModTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;

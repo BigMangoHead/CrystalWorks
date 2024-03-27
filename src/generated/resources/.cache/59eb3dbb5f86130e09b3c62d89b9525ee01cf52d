@@ -1,4 +1,5 @@
-// 1.20.1	2024-03-08T16:59:23.1871163	Loot Tables
+// 1.20.1	2024-03-12T21:10:43.4092382	Loot Tables
+572dbe3c1049562f96d055ac281fe55d652281a2 data/crystalworks/loot_tables/blocks/basic_generator.json
 4abfcd93d207417775091e1790c2cd408c888024 data/crystalworks/loot_tables/blocks/crusher.json
 5e2797025eb8f0ba7a2b1b5155629fb9084932a1 data/crystalworks/loot_tables/blocks/deepslate_sapphire_ore.json
 8122aa4fb03b9e966058eafa22129a8474575034 data/crystalworks/loot_tables/blocks/sapphire_block.json

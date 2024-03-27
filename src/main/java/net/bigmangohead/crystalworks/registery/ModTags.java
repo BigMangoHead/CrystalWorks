@@ -1,4 +1,4 @@
-package net.bigmangohead.crystalworks.util;
+package net.bigmangohead.crystalworks.registery;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
 import net.minecraft.resources.ResourceLocation;

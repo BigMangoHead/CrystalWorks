@@ -1,11 +1,14 @@
-// 1.20.1	2024-03-08T16:59:23.1861191	Block States: crystalworks
+// 1.20.1	2024-03-12T21:10:43.4072439	Block States: crystalworks
+f1291dbcd1acab8fecef9c8dbce646796ca8c220 assets/crystalworks/blockstates/basic_generator.json
 ff409cf43dcca950628b3e9b3b1f354714ecd8cf assets/crystalworks/blockstates/crusher.json
 50e1d610b75b61f8efe3edf44f6f430058dfff0e assets/crystalworks/blockstates/deepslate_sapphire_ore.json
 8448fd5148248bc4fc7e5d3783dc1ff96d7fc00a assets/crystalworks/blockstates/sapphire_block.json
 7755a8e9b955c40078699da024c1e1d02c49411b assets/crystalworks/blockstates/sapphire_ore.json
+b1655fa424444d03d98a1ae021f5aa8688a436b0 assets/crystalworks/models/block/basic_generator.json
 a5e5a6715cc1cb61663c8e854ca90487f24e12ea assets/crystalworks/models/block/deepslate_sapphire_ore.json
 943ee670fffde10abddb06c44c460b7f002f4e9b assets/crystalworks/models/block/sapphire_block.json
 c89bc66e7b751df3935957952854a56b98a8bf8e assets/crystalworks/models/block/sapphire_ore.json
+4ac4d8589df766c7b6ac5a90e07ab04314ad6bf4 assets/crystalworks/models/item/basic_generator.json
 f1b63af9e3b3f14cee3c192b086482a4eb4e62a7 assets/crystalworks/models/item/crusher.json
 c36dd9232b6ea09181a006d4d76e6e96895f1810 assets/crystalworks/models/item/deepslate_sapphire_ore.json
 9d4b70de4ea3367ea9270e00e3c5c80bc003ac98 assets/crystalworks/models/item/sapphire_block.json

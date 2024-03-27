@@ -1,7 +1,10 @@
 package net.bigmangohead.crystalworks.block.custom;
 
+import net.bigmangohead.crystalworks.block.abstraction.CWBlockEntity;
+import net.bigmangohead.crystalworks.block.abstraction.CWCustomBlock;
 import net.bigmangohead.crystalworks.block.entity.CrusherBlockEntity;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
+import net.bigmangohead.crystalworks.util.block.BlockUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -22,7 +25,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.Nullable;
 
-public class CrusherBlock extends BaseEntityBlock {
+public class CrusherBlock extends CWCustomBlock {
     public static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 12, 16);
 
     public CrusherBlock(Properties pProperties) {
@@ -34,51 +37,24 @@ public class CrusherBlock extends BaseEntityBlock {
         return SHAPE;
     }
 
-    @Override
-    public RenderShape getRenderShape(BlockState pState) {
-        return RenderShape.MODEL;
-    }
-
-    @Override
-    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pMovedByPiston) {
-        if (pState.getBlock() != pNewState.getBlock()) {
-            BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
-            if (blockEntity instanceof CrusherBlockEntity) {
-                ((CrusherBlockEntity) blockEntity).drops();
-            }
-        }
-
-        super.onRemove(pState, pLevel, pPos, pNewState, pMovedByPiston);
-    }
-
-    @Override
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand hand, BlockHitResult pHit) {
-        if (!pLevel.isClientSide() && hand == InteractionHand.MAIN_HAND) {
-            BlockEntity entity = pLevel.getBlockEntity(pPos);
-            if(entity instanceof CrusherBlockEntity) {
-                NetworkHooks.openScreen(((ServerPlayer)pPlayer), (CrusherBlockEntity)entity, pPos);
-            } else {
-                throw new IllegalStateException("Container provider at is missing!");
-            }
-        }
-
-        return InteractionResult.sidedSuccess(pLevel.isClientSide());
-    }
-
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
         return new CrusherBlockEntity(blockPos, blockState);
     }
 
+    @Override
+    public InteractionResult onServerUse(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit, CWBlockEntity blockEntity) {
+        if(!(blockEntity instanceof CrusherBlockEntity)) {
+            throw new IllegalStateException("Container provider is missing!");
+        }
+        NetworkHooks.openScreen(((ServerPlayer)player), (CrusherBlockEntity)blockEntity, pos);
+        return InteractionResult.sidedSuccess(level.isClientSide());
+    }
+
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
-        if(pLevel.isClientSide()) {
-            return null;
-        }
-
-        return createTickerHelper(pBlockEntityType, ModBlockEntities.CRUSHER_BE.get(),
-                (level, blockPos, blockState, crusherBlockEntity) -> crusherBlockEntity.tick(level, blockPos, blockState));
+        return BlockUtils.getTicker(pLevel, pState, pBlockEntityType, ModBlockEntities.CRUSHER_BE.get());
     }
 }

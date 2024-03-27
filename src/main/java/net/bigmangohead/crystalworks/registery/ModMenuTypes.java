@@ -1,8 +1,8 @@
 package net.bigmangohead.crystalworks.registery;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.screen.machine.BasicGeneratorMenu;
-import net.bigmangohead.crystalworks.screen.machine.CrusherMenu;
+import net.bigmangohead.crystalworks.screen.menu.BasicGeneratorMenu;
+import net.bigmangohead.crystalworks.screen.menu.CrusherMenu;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.common.extensions.IForgeMenuType;

@@ -1,18 +1,27 @@
 package net.bigmangohead.crystalworks.block.custom;
 
+import net.bigmangohead.crystalworks.block.abstraction.CWBlockEntity;
+import net.bigmangohead.crystalworks.block.abstraction.CWCustomBlock;
 import net.bigmangohead.crystalworks.block.entity.BasicGeneratorBlockEntity;
+import net.bigmangohead.crystalworks.block.entity.CrusherBlockEntity;
+import net.bigmangohead.crystalworks.registery.ModBlockEntities;
+import net.bigmangohead.crystalworks.util.block.BlockUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.Nullable;
 
-public class BasicGeneratorBlock extends BaseEntityBlock {
+public class BasicGeneratorBlock extends CWCustomBlock {
 
     public BasicGeneratorBlock(Properties pProperties) {
         super(pProperties);
@@ -25,17 +34,17 @@ public class BasicGeneratorBlock extends BaseEntityBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand hand, BlockHitResult pHit) {
-        if (!pLevel.isClientSide() && hand == InteractionHand.MAIN_HAND) {
-            BlockEntity entity = pLevel.getBlockEntity(pPos);
-            if(!(entity instanceof BasicGeneratorBlockEntity)) {
-                throw new IllegalStateException("Our Container provider is missing!");
-            }
-            return InteractionResult.sidedSuccess(pLevel.isClientSide());
+    public InteractionResult onServerUse(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit, CWBlockEntity blockEntity) {
+        if(!(blockEntity instanceof BasicGeneratorBlockEntity)) {
+            throw new IllegalStateException("Container provider is missing!");
         }
-        return InteractionResult.SUCCESS;
+        NetworkHooks.openScreen(((ServerPlayer)player), (BasicGeneratorBlockEntity)blockEntity, pos);
+        return InteractionResult.sidedSuccess(level.isClientSide());
     }
 
-
-
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
+        return BlockUtils.getTicker(pLevel, pState, pBlockEntityType, ModBlockEntities.BASIC_GENERATOR_BE.get());
+    }
 }

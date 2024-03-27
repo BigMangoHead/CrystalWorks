@@ -4,11 +4,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -19,36 +21,48 @@ import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-//Includes some sort of menu
-public abstract class AbstractInventoryBlockEntity extends BaseBlockEntity implements MenuProvider {
-    private final CustomItemStackHandler inventory;
+import java.util.Set;
 
-    private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
+//Includes some sort of menu
+public abstract class AbstractInventoryBlockEntity extends CWBlockEntity implements MenuProvider {
+    protected final CWItemStackHandler inventory;
+
+    protected LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
 
     public AbstractInventoryBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState, int slots) {
         super(pType, pPos, pBlockState);
-        this.inventory = new CustomItemStackHandler(this, slots);
+        this.inventory = new CWItemStackHandler(this, slots);
     }
 
-    @Override
-    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if(cap == ForgeCapabilities.ITEM_HANDLER) {
-            return lazyItemHandler.cast();
-        }
+    public AbstractInventoryBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState, int slots, Set<Integer> cannotInsert, Set<Integer> cannotExtract) {
+        super(pType, pPos, pBlockState);
+        this.inventory = new CWItemStackHandler(this, slots, cannotInsert, cannotExtract);
+    }
 
-        return super.getCapability(cap, side);
+    public static class DataIndex {
+        public static final int AMOUNT_OF_VALUES = CWBlockEntity.DataIndex.AMOUNT_OF_VALUES;
     }
 
     @Override
     public void onLoad() {
         super.onLoad();
-        lazyItemHandler = LazyOptional.of(() -> inventory);
+        this.lazyItemHandler = LazyOptional.of(() -> this.inventory);
     }
 
     @Override
     public void invalidateCaps() {
         super.invalidateCaps();
-        lazyItemHandler.invalidate();
+        this.lazyItemHandler.invalidate();
+    }
+
+    // TODO: Make directional.
+    @Override
+    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+        if(cap == ForgeCapabilities.ITEM_HANDLER) {
+            return this.lazyItemHandler.cast();
+        }
+
+        return super.getCapability(cap, side);
     }
 
     public void drops() {
@@ -62,7 +76,7 @@ public abstract class AbstractInventoryBlockEntity extends BaseBlockEntity imple
 
     public abstract Component getDisplayName();
 
-    public ItemStackHandler getInventory() {
+    public CWItemStackHandler getInventory() {
         return this.inventory;
     }
 
@@ -76,7 +90,7 @@ public abstract class AbstractInventoryBlockEntity extends BaseBlockEntity imple
 
     @Override
     protected void saveAdditional(CompoundTag pTag) {
-        pTag.put("inventory", inventory.serializeNBT());
+        pTag.put("inventory", this.inventory.serializeNBT());
 
         super.saveAdditional(pTag);
     }
@@ -84,7 +98,13 @@ public abstract class AbstractInventoryBlockEntity extends BaseBlockEntity imple
     @Override
     public void load(CompoundTag pTag) { //Consider adding a specific mod tag to make sure that other mods don't try overriding this data
         super.load(pTag);
-        inventory.deserializeNBT(pTag.getCompound("inventory"));
+        this.inventory.deserializeNBT(pTag.getCompound("inventory"));
+    }
+
+    @Nullable
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
 

@@ -33,6 +33,7 @@ public class ModBlockLootTables extends BlockLootSubProvider {
                 block -> createBasicOreDrops(CrystalBlocks.DEEPSLATE_SAPPHIRE_ORE.get(), CrystalItems.SAPPHIRE.get(), 2.0f, 5.0f));
 
         this.dropSelf(CrystalBlocks.CRUSHER.get());
+        this.dropSelf(CrystalBlocks.BASIC_GENERATOR.get());
     }
 
     private LootTable.Builder createBasicOreDrops(Block pBlock, Item pItem, float minDrops, float maxDrops) {

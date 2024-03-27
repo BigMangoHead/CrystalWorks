@@ -1,7 +1,8 @@
-package net.bigmangohead.crystalworks.screen.machine;
+package net.bigmangohead.crystalworks.screen.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.bigmangohead.crystalworks.CrystalWorksMod;
+import net.bigmangohead.crystalworks.screen.menu.BasicGeneratorMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -25,7 +26,7 @@ public class BasicGeneratorScreen extends AbstractContainerScreen<BasicGenerator
     }
 
     @Override
-    protected void renderBg(GuiGraphics guiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
+    protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TEXTURE);
@@ -34,13 +35,29 @@ public class BasicGeneratorScreen extends AbstractContainerScreen<BasicGenerator
 
         guiGraphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight);
 
-        renderProgressArrow(guiGraphics, x, y);
+        renderEnergyBar(guiGraphics, partialTick, mouseX, mouseY);
     }
 
-    private void renderProgressArrow(GuiGraphics guiGraphics, int x, int y) {
-        if(menu.isCrafting()) {
-            guiGraphics.blit(TEXTURE, x + 72, y + 33, 176, 0, 32, menu.getScaledProgress());
-        }
+    private void renderEnergyBar(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
+        int energyBarHeight = this.menu.getEnergyStoredScaled();
+
+        //background
+        guiGraphics.fill(
+                this.leftPos + 115,
+                this.topPos + 20,
+                this.leftPos + 131,
+                this.topPos + 60,
+                0xFF555555 //AARRGGBB
+        );
+
+        //foreground
+        guiGraphics.fill(
+                this.leftPos + 116,
+                this.topPos + 21 + (38 - energyBarHeight),
+                this.leftPos + 130,
+                this.topPos + 59,
+                0xFFCC2222
+        );
     }
 
     @Override
@@ -48,5 +65,19 @@ public class BasicGeneratorScreen extends AbstractContainerScreen<BasicGenerator
         renderBackground(guiGraphics);
         super.render(guiGraphics, mouseX, mouseY, delta);
         renderTooltip(guiGraphics, mouseX, mouseY);
+
+        int energyStored = this.menu.getEnergy();
+        int maxEnergy = this.getMenu().getMaxEnergy();
+
+        // Note: with below, the text component is re-created every frame.
+        // Having some constant variables would make this more efficient.
+        Component energyBarText = Component.translatable("tooltip.crystalworks.energy_bar")
+                .append(Component.literal(": " + energyStored + " / " + maxEnergy));
+
+        if (isHovering(115, 20, 16, 40, mouseX, mouseY)) {
+            guiGraphics.renderTooltip(this.font, energyBarText, mouseX, mouseY);
+        }
     }
+
+
 }

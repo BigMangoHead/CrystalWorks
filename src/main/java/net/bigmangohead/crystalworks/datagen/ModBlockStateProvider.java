@@ -23,6 +23,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
 
         simpleBlockWithItem(CrystalBlocks.CRUSHER.get(),
                 new ModelFile.UncheckedModelFile(modLoc("block/crusher")));
+        blockWithItem(CrystalBlocks.BASIC_GENERATOR);
     }
 
     private void blockWithItem(RegistryObject<Block> blockRegistryObject) {

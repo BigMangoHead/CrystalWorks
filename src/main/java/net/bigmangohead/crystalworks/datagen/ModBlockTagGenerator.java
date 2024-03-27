@@ -2,7 +2,7 @@ package net.bigmangohead.crystalworks.datagen;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
 import net.bigmangohead.crystalworks.registery.CrystalBlocks;
-import net.bigmangohead.crystalworks.util.ModTags;
+import net.bigmangohead.crystalworks.registery.ModTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.tags.BlockTags;

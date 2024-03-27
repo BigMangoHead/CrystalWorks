@@ -1,7 +1,8 @@
-package net.bigmangohead.crystalworks.screen.machine;
+package net.bigmangohead.crystalworks.screen.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.bigmangohead.crystalworks.CrystalWorksMod;
+import net.bigmangohead.crystalworks.screen.menu.CrusherMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;

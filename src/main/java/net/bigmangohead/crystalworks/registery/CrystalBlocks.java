@@ -33,7 +33,7 @@ public class CrystalBlocks {
             () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.DEEPSLATE)
                      .strength(3f).requiresCorrectToolForDrops(), UniformInt.of(4, 7)));
 
-    public static final RegistryObject<Block> BASIC_GENERATOR = registerBlock("simple_generator",
+    public static final RegistryObject<Block> BASIC_GENERATOR = registerBlock("basic_generator",
             () -> new BasicGeneratorBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
 
     public static final RegistryObject<Block> CRUSHER = registerBlock("crusher",

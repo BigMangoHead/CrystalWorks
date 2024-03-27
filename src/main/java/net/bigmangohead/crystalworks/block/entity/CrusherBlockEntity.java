@@ -1,138 +1,78 @@
 package net.bigmangohead.crystalworks.block.entity;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.block.abstraction.BaseBlockEntity;
+import net.bigmangohead.crystalworks.block.abstraction.AbstractInventoryBlockEntity;
 import net.bigmangohead.crystalworks.recipe.CrusherRecipe;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
-import net.bigmangohead.crystalworks.screen.machine.CrusherMenu;
+import net.bigmangohead.crystalworks.screen.menu.CrusherMenu;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.system.windows.INPUT;
 
 import java.util.Optional;
+import java.util.Set;
 
-public class CrusherBlockEntity extends BaseBlockEntity implements MenuProvider {
-
-    // Recommendation was given to have a custom extension of the ItemStackHandler class
-    // That contains the onContentsChanged thing by default. Probably add with generalization
-    // Size represents amount of slots in inventory
-    private final ItemStackHandler inventory = new ItemStackHandler(2) {
-        @Override
-        protected void onContentsChanged(int slot) {
-            super.onContentsChanged(slot);
-            CrusherBlockEntity.this.setChanged();
-        }
-    };
-
+public class CrusherBlockEntity extends AbstractInventoryBlockEntity implements MenuProvider {
 
     private static final int INPUT_SLOT = 0;
     private static final int OUTPUT_SLOT = 1;
 
-    private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
-
-    protected final ContainerData data;
     private int progress = 0;
     private final int defaultMaxProgress = 78; //Represents total amount of ticks per recipe by default
     private int maxProgress = 78; //Represents total amount of ticks in a recipe after recipe modifier is applied
 
     public CrusherBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.CRUSHER_BE.get(), pPos, pBlockState);
-        this.data = new ContainerData() {
-            @Override
-            public int get(int pIndex) {
-                return switch (pIndex) {
-                    case 0 -> CrusherBlockEntity.this.progress;
-                    case 1 -> CrusherBlockEntity.this.maxProgress;
-                    default -> 0;
-                };
-            }
+        super(ModBlockEntities.CRUSHER_BE.get(), pPos, pBlockState, 2, Set.of(1), Set.of(0));
+    }
 
-            @Override
-            public void set(int pIndex, int pValue) {
-                switch (pIndex) {
-                    case 0 -> CrusherBlockEntity.this.progress = pValue;
-                    case 1 -> CrusherBlockEntity.this.maxProgress = pValue;
-                }
-
-            }
-
-            @Override
-            public int getCount() {
-                return 2; //Represents amount of integers that need to be synced
-            }
+    @Override
+    public int getData(int index) {
+        return switch (index) {
+            case DataIndex.PROGRESS -> CrusherBlockEntity.this.progress;
+            case DataIndex.MAX_PROGRESS -> CrusherBlockEntity.this.maxProgress;
+            default -> super.getData(index);
         };
-
     }
 
     @Override
-    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if(cap == ForgeCapabilities.ITEM_HANDLER) {
-            return lazyItemHandler.cast();
+    public void setData(int index, int value) {
+        switch (index) {
+            case DataIndex.PROGRESS -> CrusherBlockEntity.this.progress = value;
+            case DataIndex.MAX_PROGRESS -> CrusherBlockEntity.this.maxProgress = value;
         }
-
-        return super.getCapability(cap, side);
+        super.setData(index, value);
     }
 
     @Override
-    public void onLoad() {
-        super.onLoad();
-        lazyItemHandler = LazyOptional.of(() -> inventory);
+    public int getDataCount() {
+        return DataIndex.AMOUNT_OF_VALUES;
     }
 
-    @Override
-    public void invalidateCaps() {
-        super.invalidateCaps();
-        lazyItemHandler.invalidate();
-    }
+    public static class DataIndex {
+        public static final int AMOUNT_OF_VALUES = 2 + AbstractInventoryBlockEntity.DataIndex.AMOUNT_OF_VALUES;
 
-    public void drops() {
-        SimpleContainer inventory = new SimpleContainer(this.inventory.getSlots());
-        for(int i = 0; i < this.inventory.getSlots(); i++) {
-            inventory.setItem(i, this.inventory.getStackInSlot(i));
-        }
-
-        Containers.dropContents(this.level, this.worldPosition, inventory);
+        // Data index starts at previous final index
+        public static final int PROGRESS = AbstractInventoryBlockEntity.DataIndex.AMOUNT_OF_VALUES;
+        public static final int MAX_PROGRESS = AbstractInventoryBlockEntity.DataIndex.AMOUNT_OF_VALUES + 1;
     }
 
     @Override
     public Component getDisplayName() {
         return Component.translatable("block." + CrystalWorksMod.MOD_ID + ".crusher");
-    }
-
-    public ItemStackHandler getInventory() {
-        return this.inventory;
-    }
-
-    public ItemStack getStackInSlot(int slot) {
-        return this.inventory.getStackInSlot(slot);
-    }
-
-    public void setStackInSlot(int slot, ItemStack item) {
-        this.inventory.setStackInSlot(slot, item);
     }
 
     @Nullable
@@ -143,7 +83,6 @@ public class CrusherBlockEntity extends BaseBlockEntity implements MenuProvider 
 
     @Override
     protected void saveAdditional(CompoundTag pTag) {
-        pTag.put("inventory", inventory.serializeNBT());
         pTag.putInt("crusher.progress", progress);
 
         super.saveAdditional(pTag);
@@ -152,7 +91,6 @@ public class CrusherBlockEntity extends BaseBlockEntity implements MenuProvider 
     @Override
     public void load(CompoundTag pTag) { //Consider adding a specific mod tag to make sure that other mods don't try overriding this data
         super.load(pTag);
-        inventory.deserializeNBT(pTag.getCompound("inventory"));
         progress = pTag.getInt("crusher.progress");
     }
 
@@ -174,16 +112,9 @@ public class CrusherBlockEntity extends BaseBlockEntity implements MenuProvider 
     }
     */
 
-    @Nullable
     @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    @Override
-    public void tick(Level level, BlockPos blockPos, BlockState blockState) {
+    public void onServerTick(Level level, BlockPos blockPos, BlockState blockState) {
         //TODO: More robust method of checking recipes to optimize more
-        //Consider checking that this is server side and that level != null
 
         if(hasRecipe()) {
             progress ++;
@@ -205,14 +136,17 @@ public class CrusherBlockEntity extends BaseBlockEntity implements MenuProvider 
     private void craftItem() {
         Optional<CrusherRecipe> recipe = getCurrentRecipe();
         ItemStack result = recipe.get().getResultItem(null);
+        ItemStack inputStack = this.inventory.getStackInSlot(INPUT_SLOT);
 
-        this.inventory.extractItem(INPUT_SLOT, recipe.get().getInputCount(), false);
+
+        this.inventory.setStackInSlot(INPUT_SLOT, ItemHandlerHelper.copyStackWithSize(
+                inputStack, inputStack.getCount() - recipe.get().getInputCount()));
 
         this.inventory.setStackInSlot(OUTPUT_SLOT, new ItemStack(result.getItem(),
                 this.inventory.getStackInSlot(OUTPUT_SLOT).getCount() + result.getCount()));
     }
 
-    private boolean canInsertItemIntoOutputSlot(Item item) { //TODO: Prevent placing random items in the output area
+    private boolean canInsertItemIntoOutputSlot(Item item) {
         return this.inventory.getStackInSlot(OUTPUT_SLOT).isEmpty() || this.inventory.getStackInSlot(OUTPUT_SLOT).is(item);
     }
 

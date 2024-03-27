@@ -1,4 +1,4 @@
-package net.bigmangohead.crystalworks.screen.abstraction;
+package net.bigmangohead.crystalworks.screen.menu.abstraction;
 
 import net.bigmangohead.crystalworks.registery.CrystalBlocks;
 import net.bigmangohead.crystalworks.registery.ModMenuTypes;
@@ -17,18 +17,18 @@ public abstract class InventoryMenu extends AbstractContainerMenu {
     protected final int inventorySlotCount;
 
     //Client Constructor
-    public <T extends AbstractContainerMenu> InventoryMenu(int pContainerId, Inventory inv, FriendlyByteBuf extraData, int slots, MenuType<T> menuType) {
-        this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(slots), slots, menuType);
+    public <T extends AbstractContainerMenu> InventoryMenu(int pContainerId, Inventory inv, FriendlyByteBuf extraData, int amountOfDataValues, int inventorySlotCount, MenuType<T> menuType) {
+        this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(amountOfDataValues), inventorySlotCount, menuType);
     }
 
     //Server Constructor
-    public <T extends AbstractContainerMenu> InventoryMenu(int pContainerId, Inventory inv, BlockEntity entity, ContainerData data, int slots, MenuType<T> menuType) {
+    public <T extends AbstractContainerMenu> InventoryMenu(int pContainerId, Inventory inv, BlockEntity entity, ContainerData data, int inventorySlotCount, MenuType<T> menuType) {
         super(menuType, pContainerId);
-        checkContainerSize(inv, slots);
+        checkContainerSize(inv, inventorySlotCount);
         blockEntity = entity;
         this.level = inv.player.level();
         this.data = data;
-        this.inventorySlotCount = slots;
+        this.inventorySlotCount = inventorySlotCount;
 
         addPlayerInventory(inv);
         addPlayerHotbar(inv);

@@ -5,7 +5,8 @@ import net.bigmangohead.crystalworks.registery.CrystalBlocks;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
 import net.bigmangohead.crystalworks.registery.ModCreativeModTabs;
 import net.bigmangohead.crystalworks.registery.ModRecipes;
-import net.bigmangohead.crystalworks.screen.machine.CrusherScreen;
+import net.bigmangohead.crystalworks.screen.screen.BasicGeneratorScreen;
+import net.bigmangohead.crystalworks.screen.screen.CrusherScreen;
 import net.bigmangohead.crystalworks.registery.ModMenuTypes;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -80,9 +81,8 @@ public class CrystalWorksMod
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
         {
-
-
             MenuScreens.register(ModMenuTypes.CRUSHER_MENU.get(), CrusherScreen::new);
+            MenuScreens.register(ModMenuTypes.BASIC_GENERATOR_MENU.get(), BasicGeneratorScreen::new);
         }
     }
 }
