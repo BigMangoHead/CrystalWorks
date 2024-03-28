@@ -17,6 +17,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
     @Override
     protected void registerStatesAndModels() {
         blockWithItem(CrystalBlocks.SAPPHIRE_BLOCK);
+        blockWithItem(CrystalBlocks.JADE_BLOCK);
 
         blockWithItem(CrystalBlocks.SAPPHIRE_ORE);
         blockWithItem(CrystalBlocks.DEEPSLATE_SAPPHIRE_ORE);

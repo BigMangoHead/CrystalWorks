@@ -20,6 +20,7 @@ public class ModCreativeModTabs {
                     .displayItems((pParameters, pOutput) -> {
                         pOutput.accept(CrystalItems.SAPPHIRE.get());
                         pOutput.accept(CrystalBlocks.SAPPHIRE_BLOCK.get());
+                        pOutput.accept(CrystalBlocks.JADE_BLOCK.get());
 
                         pOutput.accept(CrystalBlocks.SAPPHIRE_ORE.get());
                         pOutput.accept(CrystalBlocks.DEEPSLATE_SAPPHIRE_ORE.get());
@@ -34,6 +35,7 @@ public class ModCreativeModTabs {
                         pOutput.accept(CrystalItems.COPPER_DUST.get());
 
                         pOutput.accept(CrystalBlocks.CRUSHER.get());
+                        pOutput.accept(CrystalBlocks.BASIC_GENERATOR.get());
 
                         pOutput.accept(CrystalItems.METAL_DETECTOR.get());
                         pOutput.accept(CrystalItems.CRYSTAL_FORMER.get());

@@ -1,4 +1,4 @@
-package net.bigmangohead.crystalworks.datagen;
+package net.bigmangohead.crystalworks.datagen.loot;
 
 import net.bigmangohead.crystalworks.datagen.loot.ModBlockLootTables;
 import net.minecraft.data.PackOutput;

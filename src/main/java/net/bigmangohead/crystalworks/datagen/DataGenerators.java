@@ -1,6 +1,7 @@
 package net.bigmangohead.crystalworks.datagen;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
+import net.bigmangohead.crystalworks.datagen.loot.ModLootTableProvider;
 import net.bigmangohead.crystalworks.datagen.recipe.ModRecipeProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
@@ -32,5 +33,4 @@ public class DataGenerators {
                 new ModBlockTagGenerator(packOutput, lookupProvider, existingFileHelper));
         generator.addProvider(event.includeServer(), new ModItemTagGenerator(packOutput, lookupProvider, blockTagGenerator.contentsGetter(), existingFileHelper));
     }
-
 }

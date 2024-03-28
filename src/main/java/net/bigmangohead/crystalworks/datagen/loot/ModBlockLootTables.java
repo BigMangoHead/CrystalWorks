@@ -26,6 +26,7 @@ public class ModBlockLootTables extends BlockLootSubProvider {
     @Override
     protected void generate() {
         this.dropSelf(CrystalBlocks.SAPPHIRE_BLOCK.get());
+        this.dropSelf(CrystalBlocks.JADE_BLOCK.get());
 
         this.add(CrystalBlocks.SAPPHIRE_ORE.get(),
                 block -> createBasicOreDrops(CrystalBlocks.SAPPHIRE_ORE.get(), CrystalItems.SAPPHIRE.get(), 2.0f, 5.0f));

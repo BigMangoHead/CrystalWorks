@@ -52,6 +52,7 @@ public class BasicGeneratorBlockEntity extends AbstractInventoryBlockEntity {
     public void setData(int index, int value) {
         switch (index) {
             case DataIndex.ENERGY -> BasicGeneratorBlockEntity.this.energy.setEnergy(value);
+            case DataIndex.MAX_ENERGY -> BasicGeneratorBlockEntity.this.energy.setMaxEnergyStored(value);
             case DataIndex.BURN_TIME -> BasicGeneratorBlockEntity.this.burnTime = value;
             case DataIndex.MAX_BURN_TIME -> BasicGeneratorBlockEntity.this.maxBurnTime = value;
         }

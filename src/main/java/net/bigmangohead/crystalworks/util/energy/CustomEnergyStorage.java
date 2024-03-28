@@ -44,4 +44,10 @@ public class CustomEnergyStorage extends EnergyStorage {
             throw new IllegalArgumentException("Non-negative integer expected for removeEnergy method");
         }
     }
+
+    public void setMaxEnergyStored(int capacity) {
+        if(capacity > 0) {
+            this.capacity = capacity;
+        }
+    }
 }

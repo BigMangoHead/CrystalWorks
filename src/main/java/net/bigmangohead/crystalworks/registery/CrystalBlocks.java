@@ -3,6 +3,7 @@ package net.bigmangohead.crystalworks.registery;
 import net.bigmangohead.crystalworks.CrystalWorksMod;
 import net.bigmangohead.crystalworks.block.custom.BasicGeneratorBlock;
 import net.bigmangohead.crystalworks.block.custom.CrusherBlock;
+import net.bigmangohead.crystalworks.block.custom.GemBlock;
 import net.bigmangohead.crystalworks.registery.CrystalItems;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.BlockItem;
@@ -24,6 +25,8 @@ public class CrystalBlocks {
 
     public static final RegistryObject<Block> SAPPHIRE_BLOCK = registerBlock("sapphire_block",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.DIAMOND_BLOCK)));
+    public static final RegistryObject<Block> JADE_BLOCK = registerBlock("jade_block",
+            () -> new GemBlock(BlockBehaviour.Properties.copy(Blocks.DIAMOND_BLOCK)));
 
     public static final RegistryObject<Block> SAPPHIRE_ORE = registerBlock("sapphire_ore",
             () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.STONE)

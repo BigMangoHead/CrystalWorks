@@ -3,6 +3,7 @@ package net.bigmangohead.crystalworks.registery;
 import net.bigmangohead.crystalworks.CrystalWorksMod;
 import net.bigmangohead.crystalworks.block.entity.BasicGeneratorBlockEntity;
 import net.bigmangohead.crystalworks.block.entity.CrusherBlockEntity;
+import net.bigmangohead.crystalworks.block.entity.GemBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -22,6 +23,11 @@ public class ModBlockEntities {
             BLOCK_ENTITIES.register("crusher_be", () ->
                     BlockEntityType.Builder.of(CrusherBlockEntity::new,
                             CrystalBlocks.CRUSHER.get()).build(null));
+
+    public static final RegistryObject<BlockEntityType<GemBlockEntity>> GEM_BE =
+            BLOCK_ENTITIES.register("gem_be", () ->
+                    BlockEntityType.Builder.of(GemBlockEntity::new,
+                            CrystalBlocks.JADE_BLOCK.get()).build(null));
 
     public static void register(IEventBus eventBus) {
         BLOCK_ENTITIES.register(eventBus);
