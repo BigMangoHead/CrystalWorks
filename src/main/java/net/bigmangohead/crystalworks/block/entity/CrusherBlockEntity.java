@@ -85,20 +85,6 @@ public class CrusherBlockEntity extends AbstractInventoryBlockEntity implements 
         public static final int MAX_ENERGY = AbstractInventoryBlockEntity.DataIndex.AMOUNT_OF_VALUES + 3;
     }
 
-    @Override
-    public void invalidateCaps() {
-        super.invalidateCaps();
-        this.energyOptional.invalidate();
-    }
-
-    @Override
-    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if (cap == ForgeCapabilities.ENERGY) {
-            return this.energyOptional.cast();
-        }
-        return super.getCapability(cap, side);
-    }
-
     public LazyOptional<CustomEnergyStorage> getEnergyOptional() {
         return this.energyOptional;
     }

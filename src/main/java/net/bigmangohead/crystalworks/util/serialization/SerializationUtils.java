@@ -19,7 +19,7 @@ public class SerializationUtils {
     }
 
     @Nullable
-    public static BlockPos deserialize(CompoundTag tag) {
+    public static BlockPos deserializeBlockPos(CompoundTag tag) {
         if (tag.contains("x") && tag.contains("y") && tag.contains("z")) {
             return new BlockPos(tag.getInt("x"), tag.getInt("y"), tag.getInt("z"));
         }

@@ -1,9 +1,7 @@
 package net.bigmangohead.crystalworks.registery;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.block.entity.BasicGeneratorBlockEntity;
-import net.bigmangohead.crystalworks.block.entity.CrusherBlockEntity;
-import net.bigmangohead.crystalworks.block.entity.GemBlockEntity;
+import net.bigmangohead.crystalworks.block.entity.*;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;

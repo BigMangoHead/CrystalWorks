@@ -1,37 +1,44 @@
 package net.bigmangohead.crystalworks.block.entity;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
+import net.bigmangohead.crystalworks.block.custom.CrusherBlock;
+import net.bigmangohead.crystalworks.block.custom.GemBlock;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
 import net.bigmangohead.crystalworks.util.serialization.SerializationUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class GemBlockEntity extends BlockEntity {
-    protected int attachmentState;
+    protected int attachmentState = attachmentStates.UNATTACHED;
 
     protected static class attachmentStates {
         public static final int UNATTACHED = 0;
         public static final int SINGLE_MACHINE = 1;
     }
 
-    protected BlockPos attachedBlockPosition;
-    protected CrusherBlockEntity attachedSingleMachine;
+    protected BlockPos attachedBlockPosition = null;
 
     public GemBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntities.GEM_BE.get(), pPos, pBlockState);
     }
 
-    public void sendUpdate() { //TEMP
+    protected void sendUpdate() {
         setChanged();
 
         if(this.level != null) {
@@ -39,16 +46,45 @@ public class GemBlockEntity extends BlockEntity {
         }
     }
 
-    @Nullable
     @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        CrystalWorksMod.LOGGER.info("test!");
-        return super.getUpdatePacket();
+    public void invalidateCaps() {
+        super.invalidateCaps();
+        if(attachmentState == attachmentStates.SINGLE_MACHINE) {
+            CrusherBlockEntity blockEntity = getBlockEntity();
+            blockEntity.getEnergyOptional().invalidate();
+        }
+    }
+
+    @Override
+    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+        if (cap == ForgeCapabilities.ENERGY && attachmentState == attachmentStates.SINGLE_MACHINE) {
+            return getBlockEntity().getEnergyOptional().cast();
+        }
+        return super.getCapability(cap, side);
+    }
+
+    // Maybe switch to having the machine blocks force updating the gem blocks?
+    // TODO: Make attachment also trigger on placement of gem block
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+        if (level.isClientSide()) return;
+
+        Block resultingBlock = level.getBlockState(neighborPos).getBlock();
+
+        // Note: this could cause an issue if changing from attached -> attached in the same tick.
+        if (attachmentState == attachmentStates.UNATTACHED && neighborPos.equals(this.worldPosition.above()) && (resultingBlock instanceof CrusherBlock)) {
+            this.attachmentState = attachmentStates.SINGLE_MACHINE;
+            this.attachedBlockPosition = neighborPos;
+        }
+
+        if (attachmentState == attachmentStates.SINGLE_MACHINE && neighborPos.equals(attachedBlockPosition) && !(resultingBlock instanceof CrusherBlock)) {
+            this.attachmentState = attachmentStates.UNATTACHED;
+            this.attachedBlockPosition = null;
+        }
     }
 
     protected void saveAdditional(CompoundTag pTag) {
-        pTag.putInt("gemblock.attachmentState", this.attachmentState);
-        pTag.put("gemblock.attachedBlockPosition", SerializationUtils.serialize(attachedBlockPosition));
+        pTag.putInt("crystalBlock.attachmentState", this.attachmentState);
+        pTag.put("crystalBlock.attachedBlockPosition", SerializationUtils.serialize(attachedBlockPosition));
 
         super.saveAdditional(pTag);
     }
@@ -57,11 +93,17 @@ public class GemBlockEntity extends BlockEntity {
     public void load(CompoundTag pTag) { //Consider adding a specific mod tag to make sure that other mods don't try overriding this data
         super.load(pTag);
 
-        this.attachmentState = pTag.getInt("gemBlock.attachmentState");
-        this.attachedBlockPosition = SerializationUtils.deserialize(pTag.getCompound("gemBlock.attachedBlockPosition"));
+        this.attachmentState = pTag.getInt("crystalBlock.attachmentState");
+        this.attachedBlockPosition = SerializationUtils.deserializeBlockPos(pTag.getCompound("crystalBlock.attachedBlockPosition"));
+    }
 
-        if (attachmentState == attachmentStates.SINGLE_MACHINE) {
-            this.attachedSingleMachine = (CrusherBlockEntity) this.level.getBlockEntity(attachedBlockPosition);
+    @Nullable
+    private CrusherBlockEntity getBlockEntity() {
+        if (this.level != null) {
+            BlockEntity blockEntity = this.level.getBlockEntity(this.attachedBlockPosition);
+            if (blockEntity == null) throw new IllegalStateException("Attached block for gem block at " + this.getBlockPos() + " does not exist!");
+            return (CrusherBlockEntity) blockEntity;
         }
+        return null;
     }
 }
