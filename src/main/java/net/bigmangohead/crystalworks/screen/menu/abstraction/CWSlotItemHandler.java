@@ -1,9 +1,8 @@
 package net.bigmangohead.crystalworks.screen.menu.abstraction;
 
-import net.bigmangohead.crystalworks.block.abstraction.CWItemStackHandler;
+import net.bigmangohead.crystalworks.util.item.CWItemStackHandler;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import org.jetbrains.annotations.NotNull;
 

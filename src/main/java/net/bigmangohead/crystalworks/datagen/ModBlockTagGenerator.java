@@ -1,7 +1,7 @@
 package net.bigmangohead.crystalworks.datagen;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.registery.CrystalBlocks;
+import net.bigmangohead.crystalworks.registery.ModBlocks;
 import net.bigmangohead.crystalworks.registery.ModTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
@@ -23,7 +23,7 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
     @Override
     protected void addTags(HolderLookup.Provider provider) {
         this.tag(ModTags.Blocks.CRYSTAL_MATRIX_BLOCKS)
-                .add(CrystalBlocks.SAPPHIRE_BLOCK.get(),
+                .add(ModBlocks.SAPPHIRE_BLOCK.get(),
                         Blocks.DIAMOND_BLOCK,
                         Blocks.EMERALD_BLOCK);
 
@@ -31,20 +31,20 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
         this.tag(BlockTags.NEEDS_STONE_TOOL);
 
         this.tag(BlockTags.NEEDS_IRON_TOOL)
-                .add(CrystalBlocks.SAPPHIRE_BLOCK.get(),
-                        CrystalBlocks.JADE_BLOCK.get(),
-                        CrystalBlocks.SAPPHIRE_ORE.get(),
-                        CrystalBlocks.CRUSHER.get());
+                .add(ModBlocks.SAPPHIRE_BLOCK.get(),
+                        ModBlocks.JADE_BLOCK.get(),
+                        ModBlocks.SAPPHIRE_ORE.get(),
+                        ModBlocks.CRUSHER.get());
 
         this.tag(BlockTags.NEEDS_DIAMOND_TOOL)
-                .add(CrystalBlocks.DEEPSLATE_SAPPHIRE_ORE.get());
+                .add(ModBlocks.DEEPSLATE_SAPPHIRE_ORE.get());
 
         this.tag(Tags.Blocks.NEEDS_NETHERITE_TOOL);
 
 
         this.tag(BlockTags.MINEABLE_WITH_PICKAXE)
-                .add(CrystalBlocks.SAPPHIRE_BLOCK.get(),
-                        CrystalBlocks.SAPPHIRE_ORE.get(),
-                        CrystalBlocks.DEEPSLATE_SAPPHIRE_ORE.get());
+                .add(ModBlocks.SAPPHIRE_BLOCK.get(),
+                        ModBlocks.SAPPHIRE_ORE.get(),
+                        ModBlocks.DEEPSLATE_SAPPHIRE_ORE.get());
     }
 }

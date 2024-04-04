@@ -1,6 +1,6 @@
 package net.bigmangohead.crystalworks.screen.menu;
 
-import net.bigmangohead.crystalworks.block.abstraction.CWItemStackHandler;
+import net.bigmangohead.crystalworks.util.item.CWItemStackHandler;
 import net.bigmangohead.crystalworks.block.entity.CrusherBlockEntity;
 import net.bigmangohead.crystalworks.registery.ModMenuTypes;
 import net.bigmangohead.crystalworks.screen.menu.abstraction.CWSlotItemHandler;
@@ -11,7 +11,6 @@ import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.SlotItemHandler;
 import org.jetbrains.annotations.NotNull;
 
 public class CrusherMenu extends InventoryMenu {

@@ -1,5 +1,6 @@
-package net.bigmangohead.crystalworks.block.abstraction;
+package net.bigmangohead.crystalworks.block.entity.abstraction;
 
+import net.bigmangohead.crystalworks.util.item.CWItemStackHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -17,7 +18,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,14 +29,9 @@ public abstract class AbstractInventoryBlockEntity extends CWBlockEntity impleme
 
     protected LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
 
-    public AbstractInventoryBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState, int slots) {
+    public AbstractInventoryBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
-        this.inventory = new CWItemStackHandler(this, slots);
-    }
-
-    public AbstractInventoryBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState, int slots, Set<Integer> cannotInsert, Set<Integer> cannotExtract) {
-        super(pType, pPos, pBlockState);
-        this.inventory = new CWItemStackHandler(this, slots, cannotInsert, cannotExtract);
+        this.inventory = new CWItemStackHandler(this, this.getSlotCount(), this.capabilitiesCannotInsert(), this.capabilitiesCannotExtract());
     }
 
     public static class DataIndex {
@@ -74,6 +69,17 @@ public abstract class AbstractInventoryBlockEntity extends CWBlockEntity impleme
         Containers.dropContents(this.level, this.worldPosition, inventory);
     }
 
+    public abstract int getSlotCount();
+
+    public Set<Integer> capabilitiesCannotInsert() {
+        return Set.of();
+    }
+
+    public Set<Integer> capabilitiesCannotExtract() {
+        return Set.of();
+    }
+
+    @Override
     public abstract Component getDisplayName();
 
     public CWItemStackHandler getInventory() {
@@ -89,24 +95,16 @@ public abstract class AbstractInventoryBlockEntity extends CWBlockEntity impleme
     }
 
     @Override
-    protected void saveAdditional(CompoundTag pTag) {
+    protected void saveData(CompoundTag pTag) {
         pTag.put("inventory", this.inventory.serializeNBT());
 
-        super.saveAdditional(pTag);
+        super.saveData(pTag);
     }
 
     @Override
-    public void load(CompoundTag pTag) { //Consider adding a specific mod tag to make sure that other mods don't try overriding this data
-        super.load(pTag);
+    public void loadData(CompoundTag pTag) { //Consider adding a specific mod tag to make sure that other mods don't try overriding this data
+        super.loadData(pTag);
         this.inventory.deserializeNBT(pTag.getCompound("inventory"));
     }
-
-    @Nullable
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-
 
 }

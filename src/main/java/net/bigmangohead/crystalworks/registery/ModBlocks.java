@@ -1,10 +1,9 @@
 package net.bigmangohead.crystalworks.registery;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.block.custom.BasicGeneratorBlock;
-import net.bigmangohead.crystalworks.block.custom.CrusherBlock;
-import net.bigmangohead.crystalworks.block.custom.GemBlock;
-import net.bigmangohead.crystalworks.registery.CrystalItems;
+import net.bigmangohead.crystalworks.block.block.BasicGeneratorBlock;
+import net.bigmangohead.crystalworks.block.block.CrusherBlock;
+import net.bigmangohead.crystalworks.block.block.CrystalBlock;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -19,14 +18,14 @@ import net.minecraftforge.registries.RegistryObject;
 
 import java.util.function.Supplier;
 
-public class CrystalBlocks {
+public class ModBlocks {
     public static final DeferredRegister<Block> BLOCKS =
             DeferredRegister.create(ForgeRegistries.BLOCKS, CrystalWorksMod.MOD_ID);
 
     public static final RegistryObject<Block> SAPPHIRE_BLOCK = registerBlock("sapphire_block",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.DIAMOND_BLOCK)));
     public static final RegistryObject<Block> JADE_BLOCK = registerBlock("jade_block",
-            () -> new GemBlock(BlockBehaviour.Properties.copy(Blocks.DIAMOND_BLOCK)));
+            () -> new CrystalBlock(BlockBehaviour.Properties.copy(Blocks.DIAMOND_BLOCK)));
 
     public static final RegistryObject<Block> SAPPHIRE_ORE = registerBlock("sapphire_ore",
             () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.STONE)
@@ -48,7 +47,7 @@ public class CrystalBlocks {
         return toReturn;
     }
     private static <T extends Block> RegistryObject<Item> registerBlockItem(String name, RegistryObject<T> block) {
-        return CrystalItems.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
+        return ModItems.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
     }
     public static void register(IEventBus eventBus) {
         BLOCKS.register(eventBus);

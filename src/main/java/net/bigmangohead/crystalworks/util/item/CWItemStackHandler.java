@@ -1,4 +1,4 @@
-package net.bigmangohead.crystalworks.block.abstraction;
+package net.bigmangohead.crystalworks.util.item;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;

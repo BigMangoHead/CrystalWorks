@@ -15,17 +15,17 @@ public class ModBlockEntities {
     public static final RegistryObject<BlockEntityType<BasicGeneratorBlockEntity>> BASIC_GENERATOR_BE =
             BLOCK_ENTITIES.register("basic_generator_be", () ->
                     BlockEntityType.Builder.of(BasicGeneratorBlockEntity::new,
-                            CrystalBlocks.BASIC_GENERATOR.get()).build(null));
+                            ModBlocks.BASIC_GENERATOR.get()).build(null));
 
     public static final RegistryObject<BlockEntityType<CrusherBlockEntity>> CRUSHER_BE =
             BLOCK_ENTITIES.register("crusher_be", () ->
                     BlockEntityType.Builder.of(CrusherBlockEntity::new,
-                            CrystalBlocks.CRUSHER.get()).build(null));
+                            ModBlocks.CRUSHER.get()).build(null));
 
-    public static final RegistryObject<BlockEntityType<GemBlockEntity>> GEM_BE =
+    public static final RegistryObject<BlockEntityType<CrystalBlockEntity>> GEM_BE =
             BLOCK_ENTITIES.register("gem_be", () ->
-                    BlockEntityType.Builder.of(GemBlockEntity::new,
-                            CrystalBlocks.JADE_BLOCK.get()).build(null));
+                    BlockEntityType.Builder.of(CrystalBlockEntity::new,
+                            ModBlocks.JADE_BLOCK.get()).build(null));
 
     public static void register(IEventBus eventBus) {
         BLOCK_ENTITIES.register(eventBus);

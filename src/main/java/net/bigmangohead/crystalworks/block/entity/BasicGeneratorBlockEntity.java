@@ -1,8 +1,9 @@
 package net.bigmangohead.crystalworks.block.entity;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.block.abstraction.AbstractInventoryBlockEntity;
+import net.bigmangohead.crystalworks.block.entity.abstraction.AbstractInventoryBlockEntity;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
+import net.bigmangohead.crystalworks.registery.ModCapabilities;
 import net.bigmangohead.crystalworks.screen.menu.BasicGeneratorMenu;
 import net.bigmangohead.crystalworks.util.energy.CustomEnergyStorage;
 import net.minecraft.core.BlockPos;
@@ -13,10 +14,12 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.IEnergyStorage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,6 +28,7 @@ import static net.bigmangohead.crystalworks.util.item.ItemUtils.getBurnTime;
 
 public class BasicGeneratorBlockEntity extends AbstractInventoryBlockEntity {
     private static final int INPUT_SLOT = 0;
+    private static final int SLOT_COUNT = 1;
 
     private int burnTime = 0;
     private final int defaultMaxProgress = 80; //Represents total amount of ticks per recipe by default
@@ -34,7 +38,7 @@ public class BasicGeneratorBlockEntity extends AbstractInventoryBlockEntity {
     private final LazyOptional<CustomEnergyStorage> energyOptional = LazyOptional.of(() -> this.energy);
 
     public BasicGeneratorBlockEntity(BlockPos pos, BlockState blockState) {
-        super(ModBlockEntities.BASIC_GENERATOR_BE.get(), pos, blockState, 1);
+        super(ModBlockEntities.BASIC_GENERATOR_BE.get(), pos, blockState);
     }
 
     @Override
@@ -96,6 +100,10 @@ public class BasicGeneratorBlockEntity extends AbstractInventoryBlockEntity {
         return this.energy;
     }
 
+    public int getSlotCount() {
+        return SLOT_COUNT;
+    }
+
     @Override
     public Component getDisplayName() {
         return Component.translatable("block." + CrystalWorksMod.MOD_ID + ".basic_generator");
@@ -110,16 +118,40 @@ public class BasicGeneratorBlockEntity extends AbstractInventoryBlockEntity {
     @Override
     public void onServerTick(Level level, BlockPos blockPos, BlockState blockState) {
         if(this.energy.getEnergyStored() < this.energy.getMaxEnergyStored()) {
-            if(this.burnTime <= 0) {
-                if(canBurn(this.inventory.getStackInSlot(INPUT_SLOT))) {
-                    this.burnTime = this.maxBurnTime = getBurnTime(this.inventory.getStackInSlot(0));
-                    this.inventory.getStackInSlot(INPUT_SLOT).shrink(1);
-                    sendUpdate();
-                }
-            } else {
-                this.burnTime --;
-                this.energy.addEnergy(1);
+            attemptGenerateEnergy();
+        }
+
+        if(this.energy.getEnergyStored() > 0) {
+            attemptPushEnergyAll();
+        }
+    }
+
+    private void attemptGenerateEnergy() {
+        if(this.burnTime <= 0) {
+            if(canBurn(this.inventory.getStackInSlot(INPUT_SLOT))) {
+                this.burnTime = this.maxBurnTime = getBurnTime(this.inventory.getStackInSlot(0));
+                this.inventory.getStackInSlot(INPUT_SLOT).shrink(1);
                 sendUpdate();
+            }
+        } else {
+            this.burnTime --;
+            this.energy.addEnergy(1);
+            sendUpdate();
+        }
+    }
+
+    // Note: each side will push the maximum amount of energy possibly extracted per tick
+    // This means the maximum extract per tick is 6 * maxExtract
+    private void attemptPushEnergyAll() {
+        for (Direction direction : Direction.values()) {
+            BlockEntity receivingBlockEntity = this.level.getBlockEntity(this.getBlockPos().relative(direction));
+            if (receivingBlockEntity != null) {
+                IEnergyStorage receivingBlockEntityEnergy = receivingBlockEntity.getCapability(ForgeCapabilities.ENERGY, direction.getOpposite()).orElse(null);
+                if (receivingBlockEntityEnergy != null) {
+                    int amountPushed = Math.min(this.energy.getEnergy(), this.energy.getMaxExtract());
+
+                    this.energy.extractEnergy(receivingBlockEntityEnergy.receiveEnergy(amountPushed, false), false);
+                }
             }
         }
     }
@@ -133,10 +165,10 @@ public class BasicGeneratorBlockEntity extends AbstractInventoryBlockEntity {
         super.saveAdditional(pTag);
     }
 
-    public void load(CompoundTag pTag) { //Consider adding a specific mod tag to make sure that other mods don't try overriding this data
-        super.load(pTag);
-        energy.deserializeNBT(pTag.get("energy"));
-        burnTime = pTag.getInt("basicgenerator.burntime");
-        maxBurnTime = pTag.getInt("basicgenerator.maxburntime");
+    public void load(CompoundTag nbt) { //Consider adding a specific mod tag to make sure that other mods don't try overriding this data
+        super.load(nbt);
+        energy.deserializeNBT(nbt.get("energy"));
+        burnTime = nbt.getInt("basicgenerator.burntime");
+        maxBurnTime = nbt.getInt("basicgenerator.maxburntime");
     }
 }

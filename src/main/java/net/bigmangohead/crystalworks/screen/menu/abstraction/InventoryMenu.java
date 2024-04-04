@@ -1,7 +1,5 @@
 package net.bigmangohead.crystalworks.screen.menu.abstraction;
 
-import net.bigmangohead.crystalworks.registery.CrystalBlocks;
-import net.bigmangohead.crystalworks.registery.ModMenuTypes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;

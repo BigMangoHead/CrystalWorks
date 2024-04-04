@@ -1,6 +1,6 @@
-package net.bigmangohead.crystalworks.block.custom;
+package net.bigmangohead.crystalworks.block.block;
 
-import net.bigmangohead.crystalworks.block.entity.GemBlockEntity;
+import net.bigmangohead.crystalworks.block.entity.CrystalBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -10,8 +10,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-public class GemBlock extends BaseEntityBlock {
-    public GemBlock(Properties pProperties) {
+public class CrystalBlock extends BaseEntityBlock {
+    public CrystalBlock(Properties pProperties) {
         super(pProperties);
     }
     @Override
@@ -22,9 +22,9 @@ public class GemBlock extends BaseEntityBlock {
     @Override
     public void neighborChanged(BlockState pState, Level pLevel, BlockPos pPos, Block pNeighborBlock, BlockPos pNeighborPos, boolean pMovedByPiston) {
         BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
-        if (!(blockEntity instanceof GemBlockEntity gemBlockEntity)) throw new IllegalStateException("Block entity is missing at " + pPos);
+        if (!(blockEntity instanceof CrystalBlockEntity crystalBlockEntity)) throw new IllegalStateException("Block entity is missing at " + pPos);
 
-        gemBlockEntity.neighborChanged(pState, pLevel, pPos, pNeighborBlock, pNeighborPos, pMovedByPiston);
+        crystalBlockEntity.neighborChanged(pState, pLevel, pPos, pNeighborBlock, pNeighborPos, pMovedByPiston);
 
         super.neighborChanged(pState, pLevel, pPos, pNeighborBlock, pNeighborPos, pMovedByPiston);
     }
@@ -32,6 +32,6 @@ public class GemBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-        return new GemBlockEntity(blockPos, blockState);
+        return new CrystalBlockEntity(blockPos, blockState);
     }
 }

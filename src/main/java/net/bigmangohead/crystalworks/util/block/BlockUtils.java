@@ -1,6 +1,6 @@
 package net.bigmangohead.crystalworks.util.block;
 
-import net.bigmangohead.crystalworks.block.abstraction.CWBlockEntity;
+import net.bigmangohead.crystalworks.block.entity.abstraction.CWBlockEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;

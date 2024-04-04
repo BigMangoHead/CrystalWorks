@@ -1,7 +1,7 @@
 package net.bigmangohead.crystalworks.datagen;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.registery.CrystalBlocks;
+import net.bigmangohead.crystalworks.registery.ModBlocks;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
@@ -16,15 +16,15 @@ public class ModBlockStateProvider extends BlockStateProvider {
 
     @Override
     protected void registerStatesAndModels() {
-        blockWithItem(CrystalBlocks.SAPPHIRE_BLOCK);
-        blockWithItem(CrystalBlocks.JADE_BLOCK);
+        blockWithItem(ModBlocks.SAPPHIRE_BLOCK);
+        blockWithItem(ModBlocks.JADE_BLOCK);
 
-        blockWithItem(CrystalBlocks.SAPPHIRE_ORE);
-        blockWithItem(CrystalBlocks.DEEPSLATE_SAPPHIRE_ORE);
+        blockWithItem(ModBlocks.SAPPHIRE_ORE);
+        blockWithItem(ModBlocks.DEEPSLATE_SAPPHIRE_ORE);
 
-        simpleBlockWithItem(CrystalBlocks.CRUSHER.get(),
+        simpleBlockWithItem(ModBlocks.CRUSHER.get(),
                 new ModelFile.UncheckedModelFile(modLoc("block/crusher")));
-        blockWithItem(CrystalBlocks.BASIC_GENERATOR);
+        blockWithItem(ModBlocks.BASIC_GENERATOR);
     }
 
     private void blockWithItem(RegistryObject<Block> blockRegistryObject) {

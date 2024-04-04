@@ -1,9 +1,9 @@
 package net.bigmangohead.crystalworks.datagen.recipe;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.registery.CrystalBlocks;
+import net.bigmangohead.crystalworks.registery.ModBlocks;
 import net.bigmangohead.crystalworks.datagen.recipe.builder.CrushingRecipeBuilder;
-import net.bigmangohead.crystalworks.registery.CrystalItems;
+import net.bigmangohead.crystalworks.registery.ModItems;
 import net.bigmangohead.crystalworks.recipe.CrusherRecipe;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 
 public class ModRecipeProvider extends RecipeProvider implements IConditionBuilder {
     private static final List<ItemLike> SAPPHIRE_SMELTABLES = List.of(
-            CrystalBlocks.SAPPHIRE_ORE.get(), CrystalBlocks.DEEPSLATE_SAPPHIRE_ORE.get()
+            ModBlocks.SAPPHIRE_ORE.get(), ModBlocks.DEEPSLATE_SAPPHIRE_ORE.get()
     );
 
     public ModRecipeProvider(PackOutput pOutput) {
@@ -31,15 +31,15 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 
     @Override
     protected void buildRecipes(Consumer<FinishedRecipe> recipeOutput) {
-        oreBlasting(recipeOutput, SAPPHIRE_SMELTABLES, RecipeCategory.MISC, CrystalItems.SAPPHIRE.get(), 0.25f, 200, "sapphire");
-        oreSmelting(recipeOutput, SAPPHIRE_SMELTABLES, RecipeCategory.MISC, CrystalItems.SAPPHIRE.get(), 0.25f, 100, "sapphire");
+        oreBlasting(recipeOutput, SAPPHIRE_SMELTABLES, RecipeCategory.MISC, ModItems.SAPPHIRE.get(), 0.25f, 200, "sapphire");
+        oreSmelting(recipeOutput, SAPPHIRE_SMELTABLES, RecipeCategory.MISC, ModItems.SAPPHIRE.get(), 0.25f, 100, "sapphire");
 
 
-        blockRecipe(recipeOutput, CrystalItems.SAPPHIRE.get(), CrystalBlocks.SAPPHIRE_BLOCK.get());
+        blockRecipe(recipeOutput, ModItems.SAPPHIRE.get(), ModBlocks.SAPPHIRE_BLOCK.get());
 
 
-        crusherRecipe(recipeOutput, Items.IRON_INGOT, 1, CrystalItems.IRON_DUST.get(), 1, 1, "dust");
-        crusherRecipe(recipeOutput, Items.GOLD_INGOT, 2, CrystalItems.GOLD_DUST.get(), 3, 2, "dust");
+        crusherRecipe(recipeOutput, Items.IRON_INGOT, 1, ModItems.IRON_DUST.get(), 1, 1, "dust");
+        crusherRecipe(recipeOutput, Items.GOLD_INGOT, 2, ModItems.GOLD_DUST.get(), 3, 2, "dust");
 
 
     }

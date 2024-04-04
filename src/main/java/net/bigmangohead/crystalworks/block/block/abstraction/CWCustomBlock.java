@@ -1,8 +1,7 @@
-package net.bigmangohead.crystalworks.block.abstraction;
+package net.bigmangohead.crystalworks.block.block.abstraction;
 
-import net.bigmangohead.crystalworks.block.entity.CrusherBlockEntity;
+import net.bigmangohead.crystalworks.block.entity.abstraction.CWBlockEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -12,7 +11,6 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.network.NetworkHooks;
 
 public abstract class CWCustomBlock extends BaseEntityBlock {
     protected CWCustomBlock(Properties pProperties) {

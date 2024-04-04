@@ -19,6 +19,18 @@ public class CustomEnergyStorage extends EnergyStorage {
         super(capacity, maxReceive, maxExtract, energy);
     }
 
+    public int getEnergy() {
+        return this.energy;
+    }
+
+    public int getMaxReceive() {
+        return this.maxReceive;
+    }
+
+    public int getMaxExtract() {
+        return this.maxExtract;
+    }
+
     public void setEnergy(int energy) {
         if(energy < 0) {
             this.energy = 0;

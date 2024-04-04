@@ -1,7 +1,7 @@
 package net.bigmangohead.crystalworks.datagen;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.registery.CrystalItems;
+import net.bigmangohead.crystalworks.registery.ModItems;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -17,19 +17,19 @@ public class ModItemModelProvider extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
-        simpleItem(CrystalItems.SAPPHIRE);
+        simpleItem(ModItems.SAPPHIRE);
 
-        simpleItem(CrystalItems.IRON_DUST);
-        simpleItem(CrystalItems.GOLD_DUST);
-        simpleItem(CrystalItems.DIAMOND_DUST);
-        simpleItem(CrystalItems.QUARTZ_DUST);
-        simpleItem(CrystalItems.NETHERITE_DUST);
-        simpleItem(CrystalItems.EMERALD_DUST);
-        simpleItem(CrystalItems.COPPER_DUST);
-        simpleItem(CrystalItems.LAPIS_DUST);
+        simpleItem(ModItems.IRON_DUST);
+        simpleItem(ModItems.GOLD_DUST);
+        simpleItem(ModItems.DIAMOND_DUST);
+        simpleItem(ModItems.QUARTZ_DUST);
+        simpleItem(ModItems.NETHERITE_DUST);
+        simpleItem(ModItems.EMERALD_DUST);
+        simpleItem(ModItems.COPPER_DUST);
+        simpleItem(ModItems.LAPIS_DUST);
 
-        simpleItem(CrystalItems.METAL_DETECTOR);
-        simpleItem(CrystalItems.CRYSTAL_FORMER);
+        simpleItem(ModItems.METAL_DETECTOR);
+        simpleItem(ModItems.CRYSTAL_FORMER);
     }
 
     private ItemModelBuilder simpleItem(RegistryObject<Item> item) {

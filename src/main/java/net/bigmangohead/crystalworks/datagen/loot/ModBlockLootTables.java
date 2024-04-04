@@ -1,7 +1,7 @@
 package net.bigmangohead.crystalworks.datagen.loot;
 
-import net.bigmangohead.crystalworks.registery.CrystalBlocks;
-import net.bigmangohead.crystalworks.registery.CrystalItems;
+import net.bigmangohead.crystalworks.registery.ModBlocks;
+import net.bigmangohead.crystalworks.registery.ModItems;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Item;
@@ -25,16 +25,16 @@ public class ModBlockLootTables extends BlockLootSubProvider {
 
     @Override
     protected void generate() {
-        this.dropSelf(CrystalBlocks.SAPPHIRE_BLOCK.get());
-        this.dropSelf(CrystalBlocks.JADE_BLOCK.get());
+        this.dropSelf(ModBlocks.SAPPHIRE_BLOCK.get());
+        this.dropSelf(ModBlocks.JADE_BLOCK.get());
 
-        this.add(CrystalBlocks.SAPPHIRE_ORE.get(),
-                block -> createBasicOreDrops(CrystalBlocks.SAPPHIRE_ORE.get(), CrystalItems.SAPPHIRE.get(), 2.0f, 5.0f));
-        this.add(CrystalBlocks.DEEPSLATE_SAPPHIRE_ORE.get(),
-                block -> createBasicOreDrops(CrystalBlocks.DEEPSLATE_SAPPHIRE_ORE.get(), CrystalItems.SAPPHIRE.get(), 2.0f, 5.0f));
+        this.add(ModBlocks.SAPPHIRE_ORE.get(),
+                block -> createBasicOreDrops(ModBlocks.SAPPHIRE_ORE.get(), ModItems.SAPPHIRE.get(), 2.0f, 5.0f));
+        this.add(ModBlocks.DEEPSLATE_SAPPHIRE_ORE.get(),
+                block -> createBasicOreDrops(ModBlocks.DEEPSLATE_SAPPHIRE_ORE.get(), ModItems.SAPPHIRE.get(), 2.0f, 5.0f));
 
-        this.dropSelf(CrystalBlocks.CRUSHER.get());
-        this.dropSelf(CrystalBlocks.BASIC_GENERATOR.get());
+        this.dropSelf(ModBlocks.CRUSHER.get());
+        this.dropSelf(ModBlocks.BASIC_GENERATOR.get());
     }
 
     private LootTable.Builder createBasicOreDrops(Block pBlock, Item pItem, float minDrops, float maxDrops) {
@@ -47,6 +47,6 @@ public class ModBlockLootTables extends BlockLootSubProvider {
 
     @Override
     protected Iterable<Block> getKnownBlocks() {
-        return CrystalBlocks.BLOCKS.getEntries().stream().map(RegistryObject::get)::iterator;
+        return ModBlocks.BLOCKS.getEntries().stream().map(RegistryObject::get)::iterator;
     }
 }

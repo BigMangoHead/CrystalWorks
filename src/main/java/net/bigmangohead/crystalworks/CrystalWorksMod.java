@@ -1,13 +1,9 @@
 package net.bigmangohead.crystalworks;
 
 import com.mojang.logging.LogUtils;
-import net.bigmangohead.crystalworks.registery.CrystalBlocks;
-import net.bigmangohead.crystalworks.registery.ModBlockEntities;
-import net.bigmangohead.crystalworks.registery.ModCreativeModTabs;
-import net.bigmangohead.crystalworks.registery.ModRecipes;
+import net.bigmangohead.crystalworks.registery.*;
 import net.bigmangohead.crystalworks.screen.screen.BasicGeneratorScreen;
 import net.bigmangohead.crystalworks.screen.screen.CrusherScreen;
-import net.bigmangohead.crystalworks.registery.ModMenuTypes;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.api.distmarker.Dist;
@@ -22,8 +18,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
-import net.bigmangohead.crystalworks.registery.CrystalItems;
-
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(CrystalWorksMod.MOD_ID)
 public class CrystalWorksMod
@@ -37,8 +31,8 @@ public class CrystalWorksMod
     {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        CrystalItems.register(modEventBus);
-        CrystalBlocks.register(modEventBus);
+        ModItems.register(modEventBus);
+        ModBlocks.register(modEventBus);
 
         ModBlockEntities.register(modEventBus);
         ModMenuTypes.register(modEventBus);
@@ -53,6 +47,9 @@ public class CrystalWorksMod
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
         ModCreativeModTabs.register(modEventBus);
+
+        modEventBus.register(ModCapabilities.class);
+        modEventBus.register(ModFluxTypes.class);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)
@@ -63,7 +60,7 @@ public class CrystalWorksMod
     // Add the example block item to the building blocks tab
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
         if(event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
-            event.accept(CrystalItems.SAPPHIRE);
+            event.accept(ModItems.SAPPHIRE);
         }
     }
 
@@ -71,7 +68,7 @@ public class CrystalWorksMod
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event)
     {
-        
+
     }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent

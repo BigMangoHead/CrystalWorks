@@ -1,13 +1,13 @@
 package net.bigmangohead.crystalworks.block.entity;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.block.abstraction.AbstractInventoryBlockEntity;
+import net.bigmangohead.crystalworks.block.entity.abstraction.AbstractInventoryBlockEntity;
+import net.bigmangohead.crystalworks.block.entity.abstraction.SmallMachineEntity;
 import net.bigmangohead.crystalworks.recipe.CrusherRecipe;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
 import net.bigmangohead.crystalworks.screen.menu.CrusherMenu;
 import net.bigmangohead.crystalworks.util.energy.CustomEnergyStorage;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
@@ -20,77 +20,35 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.items.ItemStackHandler;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.system.windows.INPUT;
 
 import java.util.Optional;
 import java.util.Set;
 
-public class CrusherBlockEntity extends AbstractInventoryBlockEntity implements MenuProvider {
+public class CrusherBlockEntity extends SmallMachineEntity implements MenuProvider {
 
     private static final int INPUT_SLOT = 0;
     private static final int OUTPUT_SLOT = 1;
-
-    private int progress = 0;
-    private final int defaultMaxProgress = 78; //Represents total amount of ticks per recipe by default
-    private int maxProgress = 78; //Represents total amount of ticks in a recipe after recipe modifier is applied
-
-    private final CustomEnergyStorage energy = new CustomEnergyStorage(10000, 100, 0, 0);
-    private final LazyOptional<CustomEnergyStorage> energyOptional = LazyOptional.of(() -> this.energy);
+    private static final int SLOT_COUNT = 2;
 
     public CrusherBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.CRUSHER_BE.get(), pPos, pBlockState, 2, Set.of(1), Set.of(0));
+        super(ModBlockEntities.CRUSHER_BE.get(), pPos, pBlockState);
+    }
+
+    public int getSlotCount() {
+        return SLOT_COUNT;
     }
 
     @Override
-    public int getData(int index) {
-        return switch (index) {
-            case DataIndex.ENERGY -> CrusherBlockEntity.this.energy.getEnergyStored();
-            case DataIndex.MAX_ENERGY -> CrusherBlockEntity.this.energy.getMaxEnergyStored();
-            case DataIndex.PROGRESS -> CrusherBlockEntity.this.progress;
-            case DataIndex.MAX_PROGRESS -> CrusherBlockEntity.this.maxProgress;
-            default -> super.getData(index);
-        };
+    public Set<Integer> capabilitiesCannotExtract() {
+        return Set.of(INPUT_SLOT);
     }
 
     @Override
-    public void setData(int index, int value) {
-        switch (index) {
-            case DataIndex.ENERGY -> CrusherBlockEntity.this.energy.setEnergy(value);
-            case DataIndex.MAX_ENERGY -> CrusherBlockEntity.this.energy.setMaxEnergyStored(value);
-            case DataIndex.PROGRESS -> CrusherBlockEntity.this.progress = value;
-            case DataIndex.MAX_PROGRESS -> CrusherBlockEntity.this.maxProgress = value;
-        }
-        super.setData(index, value);
-    }
-
-    @Override
-    public int getDataCount() {
-        return DataIndex.AMOUNT_OF_VALUES;
-    }
-
-    public static class DataIndex {
-        public static final int AMOUNT_OF_VALUES = 4 + AbstractInventoryBlockEntity.DataIndex.AMOUNT_OF_VALUES;
-
-        // Data index starts at previous final index
-        public static final int PROGRESS = AbstractInventoryBlockEntity.DataIndex.AMOUNT_OF_VALUES;
-        public static final int MAX_PROGRESS = AbstractInventoryBlockEntity.DataIndex.AMOUNT_OF_VALUES + 1;
-        public static final int ENERGY = AbstractInventoryBlockEntity.DataIndex.AMOUNT_OF_VALUES + 2;
-        public static final int MAX_ENERGY = AbstractInventoryBlockEntity.DataIndex.AMOUNT_OF_VALUES + 3;
-    }
-
-    public LazyOptional<CustomEnergyStorage> getEnergyOptional() {
-        return this.energyOptional;
-    }
-
-    public CustomEnergyStorage getEnergy() {
-        return this.energy;
+    public Set<Integer> capabilitiesCannotInsert() {
+        return Set.of(OUTPUT_SLOT);
     }
 
     @Override
@@ -103,39 +61,6 @@ public class CrusherBlockEntity extends AbstractInventoryBlockEntity implements 
     public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
         return new CrusherMenu(i, inventory, this, this.data);
     }
-
-    @Override
-    protected void saveAdditional(CompoundTag pTag) {
-        pTag.putInt("crusher.progress", progress);
-        pTag.put("energy", this.energy.serializeNBT());
-
-        super.saveAdditional(pTag);
-    }
-
-    @Override
-    public void load(CompoundTag pTag) { //Consider adding a specific mod tag to make sure that other mods don't try overriding this data
-        super.load(pTag);
-        energy.deserializeNBT(pTag.get("energy"));
-        progress = pTag.getInt("crusher.progress");
-    }
-
-    @Override
-    public CompoundTag getUpdateTag() {
-        CompoundTag nbt = super.getUpdateTag();
-        // Note: This can be changed to only sync data that is necessary to send
-        saveAdditional(nbt);
-        return nbt;
-    }
-
-    // Below code is only necessary if you only want to sync certain data
-    // By default, the load method is used.
-    // Additionally, onDataPacket needs to be overridden
-    /*
-    @Override
-    public void handleUpdateTag(CompoundTag tag) {
-        super.handleUpdateTag(tag);
-    }
-    */
 
     @Override
     public void onServerTick(Level level, BlockPos blockPos, BlockState blockState) {
