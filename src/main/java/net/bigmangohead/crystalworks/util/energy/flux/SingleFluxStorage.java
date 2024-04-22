@@ -6,13 +6,13 @@ import net.minecraftforge.common.util.INBTSerializable;
 
 public class SingleFluxStorage implements ISingleFluxStorage, INBTSerializable<Tag> {
 
-    protected FluxType fluxType;
+    protected IFluxType fluxType;
     protected int flux;
     protected int capacity;
     protected int maxReceive;
     protected int maxExtract;
 
-    public SingleFluxStorage(FluxType fluxType, int flux, int capacity, int maxReceive, int maxExtract) {
+    public SingleFluxStorage(IFluxType fluxType, int flux, int capacity, int maxReceive, int maxExtract) {
         this.fluxType = fluxType;
         this.capacity = capacity;
         this.maxReceive = maxReceive;
@@ -47,7 +47,7 @@ public class SingleFluxStorage implements ISingleFluxStorage, INBTSerializable<T
         }
     }
 
-    public FluxType getFluxType() {
+    public IFluxType getFluxType() {
         return fluxType;
     }
 

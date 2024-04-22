@@ -17,12 +17,12 @@ public interface IFluxStorage {
 
     Set<IFluxType> getStoredFluxTypes();
 
-    int getMaxEnergyStored();
+    Set<IFluxType> getAcceptedFluxTypes();
 
     boolean canAcceptFluxType(IFluxType fluxType);
 
-    boolean canExtract();
+    boolean canExtract(IFluxType fluxType);
 
-    boolean canReceive();
+    boolean canReceive(IFluxType fluxType);
 
 }
