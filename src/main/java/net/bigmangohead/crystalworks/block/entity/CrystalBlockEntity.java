@@ -1,7 +1,9 @@
 package net.bigmangohead.crystalworks.block.entity;
 
 import net.bigmangohead.crystalworks.block.block.CrusherBlock;
+import net.bigmangohead.crystalworks.block.entity.abstraction.CWBlockEntity;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
+import net.bigmangohead.crystalworks.registery.ModCapabilities;
 import net.bigmangohead.crystalworks.util.serialization.SerializationUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -13,10 +15,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CrystalBlockEntity extends BlockEntity {
+public class CrystalBlockEntity extends CWBlockEntity {
     protected int attachmentState = attachmentStates.UNATTACHED;
 
     protected static class attachmentStates {
@@ -30,12 +33,9 @@ public class CrystalBlockEntity extends BlockEntity {
         super(ModBlockEntities.GEM_BE.get(), pPos, pBlockState);
     }
 
-    protected void sendUpdate() {
-        setChanged();
+    @Override
+    public void drops() {
 
-        if(this.level != null) {
-            this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), Block.UPDATE_ALL);
-        }
     }
 
     @Override
@@ -43,7 +43,10 @@ public class CrystalBlockEntity extends BlockEntity {
         super.invalidateCaps();
         if(attachmentState == attachmentStates.SINGLE_MACHINE) {
             CrusherBlockEntity blockEntity = getBlockEntity();
-            blockEntity.getEnergyOptional().invalidate();
+            if(blockEntity != null) {
+                blockEntity.getEnergyOptional().invalidate();
+                blockEntity.getFluxOptional().invalidate();
+            }
         }
     }
 
@@ -51,6 +54,8 @@ public class CrystalBlockEntity extends BlockEntity {
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         if (cap == ForgeCapabilities.ENERGY && attachmentState == attachmentStates.SINGLE_MACHINE) {
             return getBlockEntity().getEnergyOptional().cast();
+        } else if (cap == ModCapabilities.FLUX && attachmentState == attachmentStates.SINGLE_MACHINE) {
+            return getBlockEntity().getFluxOptional().cast();
         }
         return super.getCapability(cap, side);
     }
@@ -74,16 +79,17 @@ public class CrystalBlockEntity extends BlockEntity {
         }
     }
 
-    protected void saveAdditional(CompoundTag pTag) {
+    @Override
+    protected void saveData(CompoundTag pTag) {
         pTag.putInt("crystalBlock.attachmentState", this.attachmentState);
         pTag.put("crystalBlock.attachedBlockPosition", SerializationUtils.serialize(attachedBlockPosition));
 
-        super.saveAdditional(pTag);
+        super.saveData(pTag);
     }
 
     @Override
-    public void load(CompoundTag pTag) { //Consider adding a specific mod tag to make sure that other mods don't try overriding this data
-        super.load(pTag);
+    public void loadData(CompoundTag pTag) {
+        super.loadData(pTag);
 
         this.attachmentState = pTag.getInt("crystalBlock.attachmentState");
         this.attachedBlockPosition = SerializationUtils.deserializeBlockPos(pTag.getCompound("crystalBlock.attachedBlockPosition"));

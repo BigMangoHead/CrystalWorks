@@ -48,7 +48,7 @@ public class CrystalWorksMod
         modEventBus.addListener(this::addCreative);
         ModCreativeModTabs.register(modEventBus);
 
-        modEventBus.register(ModCapabilities.class);
+        ModCapabilities.register(modEventBus);
         modEventBus.register(ModFluxTypes.class);
     }
 

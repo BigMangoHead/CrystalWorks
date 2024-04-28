@@ -1,9 +1,12 @@
 package net.bigmangohead.crystalworks.block.entity.abstraction;
 
 import net.bigmangohead.crystalworks.block.entity.CrusherBlockEntity;
+import net.bigmangohead.crystalworks.registery.ModFluxTypes;
 import net.bigmangohead.crystalworks.util.energy.CustomEnergyStorage;
+import net.bigmangohead.crystalworks.util.energy.flux.FluxStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntTag;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.util.LazyOptional;
@@ -19,8 +22,11 @@ public abstract class SmallMachineEntity extends AbstractInventoryBlockEntity {
     protected final int defaultMaxProgress = 78; //Represents total amount of ticks per recipe by default
     protected int maxProgress = 78; //Represents total amount of ticks in a recipe after recipe modifier is applied
 
-    protected final CustomEnergyStorage energy = new CustomEnergyStorage(10000, 100, 0, 0);
+    protected final CustomEnergyStorage energy = new CustomEnergyStorage(1000000, 100, 0, 0);
     protected final LazyOptional<CustomEnergyStorage> energyOptional = LazyOptional.of(() -> this.energy);
+
+    protected final FluxStorage flux = new FluxStorage(1, 1000000, 100, 0, Set.of(ModFluxTypes.DIAMOND));
+    protected final LazyOptional<FluxStorage> fluxOptional = LazyOptional.of(() -> this.flux);
 
     public SmallMachineEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
@@ -67,6 +73,10 @@ public abstract class SmallMachineEntity extends AbstractInventoryBlockEntity {
         return this.energyOptional;
     }
 
+    public LazyOptional<FluxStorage> getFluxOptional() {
+        return this.fluxOptional;
+    }
+
     public CustomEnergyStorage getEnergy() {
         return this.energy;
     }
@@ -75,15 +85,17 @@ public abstract class SmallMachineEntity extends AbstractInventoryBlockEntity {
     protected void saveData(CompoundTag pTag) {
         pTag.putInt("machine.progress", progress);
         pTag.put("energy", this.energy.serializeNBT());
+        pTag.put("diamond_flux", this.flux.serializeNBT());
 
         super.saveData(pTag);
     }
 
     @Override
-    public void loadData(CompoundTag pTag) {
-        super.loadData(pTag);
-        energy.deserializeNBT(pTag.get("energy"));
-        progress = pTag.getInt("machine.progress");
+    public void loadData(CompoundTag nbt) {
+        super.loadData(nbt);
+        energy.deserializeNBT(nbt.get("energy"));
+        progress = nbt.getInt("machine.progress");
+        flux.deserializeNBT(nbt.get("diamond_flux"));
     }
 
 }

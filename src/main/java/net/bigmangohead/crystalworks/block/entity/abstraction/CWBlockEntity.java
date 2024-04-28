@@ -66,31 +66,16 @@ public abstract class CWBlockEntity extends BlockEntity {
 
     public abstract void drops();
 
-    @Override
-    protected void saveAdditional(CompoundTag pTag) {
-        CompoundTag modNBT = new CompoundTag();
-        saveData(modNBT);
-        pTag.put(CrystalWorksMod.MOD_ID, modNBT);
 
-        super.saveAdditional(pTag);
-    }
 
     protected void saveData(CompoundTag nbt) {}
 
     protected void clientboundOnChunkLoad(CompoundTag nbt) {
-        saveAdditional(nbt);
+        saveData(nbt);
     }
 
     protected void clientboundOnBlockUpdate(CompoundTag nbt) {
-        saveAdditional(nbt);
-    }
-
-    @Override
-    public void load(CompoundTag nbt) {
-        CompoundTag modNBT = nbt.getCompound(CrystalWorksMod.MOD_ID);
-        loadData(modNBT);
-
-        super.load(nbt);
+        saveData(nbt);
     }
 
     protected void loadData(CompoundTag nbt) {}
@@ -101,6 +86,26 @@ public abstract class CWBlockEntity extends BlockEntity {
 
     protected void receiveDataOnBlockUpdate(CompoundTag nbt) {
         loadData(nbt);
+    }
+
+
+
+    //saveAdditional and load store data on the server side
+    @Override
+    protected void saveAdditional(CompoundTag pTag) {
+        CompoundTag modNBT = new CompoundTag();
+        saveData(modNBT);
+        pTag.put(CrystalWorksMod.MOD_ID, modNBT);
+
+        super.saveAdditional(pTag);
+    }
+
+    @Override
+    public void load(CompoundTag nbt) {
+        CompoundTag modNBT = nbt.getCompound(CrystalWorksMod.MOD_ID);
+        loadData(modNBT);
+
+        super.load(nbt);
     }
 
 
@@ -115,6 +120,13 @@ public abstract class CWBlockEntity extends BlockEntity {
         return nbt;
     }
 
+    @Override
+    public void handleUpdateTag(CompoundTag nbt) {
+        super.handleUpdateTag(nbt);
+
+        receiveDataOnChunkLoad(nbt.getCompound(CrystalWorksMod.MOD_ID));
+    }
+
     // I have been struggling to switch to using no parameters here
     // I'm not sure what the issue is - I was directly copying minecraft source code
     // and still getting errors. ¯\_(ツ)_/¯
@@ -127,13 +139,6 @@ public abstract class CWBlockEntity extends BlockEntity {
         return nbt;
     }
 
-
-    @Override
-    public void handleUpdateTag(CompoundTag nbt) {
-        super.handleUpdateTag(nbt);
-
-        receiveDataOnChunkLoad(nbt.getCompound(CrystalWorksMod.MOD_ID));
-    }
 
     //getUpdatePacket and onDataPacket occur on block update
     @Nullable
@@ -150,6 +155,8 @@ public abstract class CWBlockEntity extends BlockEntity {
             receiveDataOnBlockUpdate(nbt.getCompound(CrystalWorksMod.MOD_ID));
         }
     }
+
+
 
     //Gives a default state for the tick function so that the function can be assumed to exist when a ticker is created
     public void tick(Level level, BlockPos blockPos, BlockState blockState) {

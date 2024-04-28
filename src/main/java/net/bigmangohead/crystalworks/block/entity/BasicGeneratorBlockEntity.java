@@ -4,8 +4,10 @@ import net.bigmangohead.crystalworks.CrystalWorksMod;
 import net.bigmangohead.crystalworks.block.entity.abstraction.AbstractInventoryBlockEntity;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
 import net.bigmangohead.crystalworks.registery.ModCapabilities;
+import net.bigmangohead.crystalworks.registery.ModFluxTypes;
 import net.bigmangohead.crystalworks.screen.menu.BasicGeneratorMenu;
 import net.bigmangohead.crystalworks.util.energy.CustomEnergyStorage;
+import net.bigmangohead.crystalworks.util.energy.flux.FluxStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -152,21 +154,27 @@ public class BasicGeneratorBlockEntity extends AbstractInventoryBlockEntity {
 
                     this.energy.extractEnergy(receivingBlockEntityEnergy.receiveEnergy(amountPushed, false), false);
                 }
+
+                FluxStorage receivingBlockEntityFlux = receivingBlockEntity.getCapability(ModCapabilities.FLUX, direction.getOpposite()).orElse(null);
+                if (receivingBlockEntityFlux != null) {
+                    receivingBlockEntityFlux.forceAddFlux(ModFluxTypes.DIAMOND, 1);
+                }
             }
         }
     }
 
     @Override
-    protected void saveAdditional(CompoundTag pTag) {
+    protected void saveData(CompoundTag pTag) {
         pTag.putInt("basicgenerator.maxburntime", maxBurnTime);
         pTag.putInt("basicgenerator.burntime", burnTime);
         pTag.put("energy", this.energy.serializeNBT());
 
-        super.saveAdditional(pTag);
+        super.saveData(pTag);
     }
 
-    public void load(CompoundTag nbt) { //Consider adding a specific mod tag to make sure that other mods don't try overriding this data
-        super.load(nbt);
+    @Override
+    public void loadData(CompoundTag nbt) { //Consider adding a specific mod tag to make sure that other mods don't try overriding this data
+        super.loadData(nbt);
         energy.deserializeNBT(nbt.get("energy"));
         burnTime = nbt.getInt("basicgenerator.burntime");
         maxBurnTime = nbt.getInt("basicgenerator.maxburntime");

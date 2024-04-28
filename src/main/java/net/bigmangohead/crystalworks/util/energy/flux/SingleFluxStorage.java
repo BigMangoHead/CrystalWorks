@@ -4,15 +4,15 @@ import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.Tag;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public class SingleFluxStorage implements ISingleFluxStorage, INBTSerializable<Tag> {
+public class SingleFluxStorage implements INBTSerializable<Tag> {
 
-    protected IFluxType fluxType;
+    protected FluxType fluxType;
     protected int flux;
     protected int capacity;
     protected int maxReceive;
     protected int maxExtract;
 
-    public SingleFluxStorage(IFluxType fluxType, int flux, int capacity, int maxReceive, int maxExtract) {
+    public SingleFluxStorage(FluxType fluxType, int capacity, int maxReceive, int maxExtract, int flux) {
         this.fluxType = fluxType;
         this.capacity = capacity;
         this.maxReceive = maxReceive;
@@ -20,6 +20,8 @@ public class SingleFluxStorage implements ISingleFluxStorage, INBTSerializable<T
 
         this.flux = Math.max(0, Math.min(capacity, flux));
     }
+
+
 
     public int receiveFlux(int maxReceive, boolean simulate) {
         if (!this.canReceive()) {
@@ -47,7 +49,35 @@ public class SingleFluxStorage implements ISingleFluxStorage, INBTSerializable<T
         }
     }
 
-    public IFluxType getFluxType() {
+    public void forceSetFlux(int amount) {
+        if(amount < 0) {
+            this.flux = 0;
+        } else if (amount > this.capacity) {
+            this.flux = this.capacity;
+        } else {
+            this.flux = amount;
+        }
+    }
+
+    public void forceAddFlux(int amount) {
+        if (amount >= 0) {
+            forceSetFlux(this.flux + amount);
+        } else {
+            throw new IllegalArgumentException("Non-negative integer expected for forceAddFlux method");
+        }
+    }
+
+    public void forceRemoveFlux(int amount) {
+        if (amount >= 0) {
+            forceSetFlux(this.flux - amount);
+        } else {
+            throw new IllegalArgumentException("Non-negative integer expected for forceRemoveFlux method");
+        }
+    }
+
+
+
+    public FluxType getFluxType() {
         return fluxType;
     }
 
