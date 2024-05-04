@@ -10,27 +10,13 @@ public class FluxType {
     private final float maxReceiveModifier;
     private final String name;
 
-    private static final HashMap<String, FluxType> fluxTypeDirectory = new HashMap<>();
-
     public FluxType(float fluxModifier, float capacityModifier, float maxExtractModifier, float maxReceiveModifier, String name) {
         this.fluxModifier = fluxModifier;
         this.capacityModifier = capacityModifier;
         this.maxExtractModifier = maxExtractModifier;
         this.maxReceiveModifier = maxReceiveModifier;
         this.name = name;
-
-        //Might be a better way to do this since I'm using registries, but I can't find it at the least.
-        fluxTypeDirectory.put(name, this);
     }
-
-    public static FluxType getFluxType(String name) {
-        return fluxTypeDirectory.get(name);
-    }
-
-    public static HashMap<String, FluxType> getFluxTypeDirectory() {
-        return fluxTypeDirectory;
-    }
-
 
 
     public String getName() {

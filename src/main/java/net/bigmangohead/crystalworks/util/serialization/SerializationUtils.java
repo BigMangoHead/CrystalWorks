@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 public class SerializationUtils {
 
     //Returns empty tag if position is null
-    public static Tag serialize(BlockPos pos) {
+    public static Tag serialize(@Nullable BlockPos pos) {
         var positionData = new CompoundTag();
         if (pos == null) return positionData;
         positionData.putInt("x", pos.getX());

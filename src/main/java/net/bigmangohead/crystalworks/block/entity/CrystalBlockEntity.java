@@ -4,6 +4,7 @@ import net.bigmangohead.crystalworks.block.block.CrusherBlock;
 import net.bigmangohead.crystalworks.block.entity.abstraction.CWBlockEntity;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
 import net.bigmangohead.crystalworks.registery.ModCapabilities;
+import net.bigmangohead.crystalworks.util.block.LevelUtils;
 import net.bigmangohead.crystalworks.util.serialization.SerializationUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -28,6 +29,7 @@ public class CrystalBlockEntity extends CWBlockEntity {
     }
 
     protected BlockPos attachedBlockPosition = null;
+    protected BlockEntity attachedBlockEntity = null;
 
     public CrystalBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntities.GEM_BE.get(), pPos, pBlockState);
@@ -41,6 +43,7 @@ public class CrystalBlockEntity extends CWBlockEntity {
     @Override
     public void invalidateCaps() {
         super.invalidateCaps();
+
         if(attachmentState == attachmentStates.SINGLE_MACHINE) {
             CrusherBlockEntity blockEntity = getBlockEntity();
             if(blockEntity != null) {
@@ -48,6 +51,7 @@ public class CrystalBlockEntity extends CWBlockEntity {
                 blockEntity.getFluxOptional().invalidate();
             }
         }
+
     }
 
     @Override
@@ -81,8 +85,8 @@ public class CrystalBlockEntity extends CWBlockEntity {
 
     @Override
     protected void saveData(CompoundTag pTag) {
-        pTag.putInt("crystalBlock.attachmentState", this.attachmentState);
-        pTag.put("crystalBlock.attachedBlockPosition", SerializationUtils.serialize(attachedBlockPosition));
+        pTag.putInt("attachmentstate", this.attachmentState);
+        pTag.put("attachedposition", SerializationUtils.serialize(attachedBlockPosition));
 
         super.saveData(pTag);
     }
@@ -91,15 +95,20 @@ public class CrystalBlockEntity extends CWBlockEntity {
     public void loadData(CompoundTag pTag) {
         super.loadData(pTag);
 
-        this.attachmentState = pTag.getInt("crystalBlock.attachmentState");
-        this.attachedBlockPosition = SerializationUtils.deserializeBlockPos(pTag.getCompound("crystalBlock.attachedBlockPosition"));
+        this.attachmentState = pTag.getInt("attachmentstate");
+        this.attachedBlockPosition = SerializationUtils.deserializeBlockPos(pTag.getCompound("attachedposition"));
     }
 
     @Nullable
     private CrusherBlockEntity getBlockEntity() {
-        if (this.level != null) {
-            BlockEntity blockEntity = this.level.getBlockEntity(this.attachedBlockPosition);
-            if (blockEntity == null) throw new IllegalStateException("Attached block for gem block at " + this.getBlockPos() + " does not exist!");
+        if (this.level != null && this.attachmentState == attachmentStates.SINGLE_MACHINE) {
+            if (this.attachedBlockPosition == null) throw new IllegalStateException("Attached block position for crystal cannot be null!");
+
+            // For later reference, I use this safe method to guarantee that this method call does not create
+            // a new block entity when getting it. In this case, this creates recursive calls.
+            BlockEntity blockEntity = LevelUtils.getBlockEntitySafe(this.level, this.attachedBlockPosition);
+            if (blockEntity == null) return null;
+
             return (CrusherBlockEntity) blockEntity;
         }
         return null;

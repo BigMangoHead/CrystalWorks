@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import net.bigmangohead.crystalworks.registery.*;
 import net.bigmangohead.crystalworks.screen.screen.BasicGeneratorScreen;
 import net.bigmangohead.crystalworks.screen.screen.CrusherScreen;
+import net.bigmangohead.crystalworks.util.energy.flux.FluxUtils;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.api.distmarker.Dist;
@@ -34,6 +35,7 @@ public class CrystalWorksMod
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         modEventBus.addListener(this::registerRegistries);
+        modEventBus.addListener(this::specialRegistries);
 
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
@@ -60,7 +62,7 @@ public class CrystalWorksMod
 
     private void commonSetup(final FMLCommonSetupEvent event)
     {
-        
+        FluxUtils.generation();
     }
 
     @SubscribeEvent

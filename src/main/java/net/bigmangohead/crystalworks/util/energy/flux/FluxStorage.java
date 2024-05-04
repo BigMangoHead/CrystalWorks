@@ -204,9 +204,9 @@ public class FluxStorage implements INBTSerializable<Tag> {
         CompoundTag nbt = (CompoundTag) tag;
 
         //Use FluxType Directory to convert string back to object
-        for (String name : FluxType.getFluxTypeDirectory().keySet()) {
+        for (String name : FluxUtils.getFluxNames()) {
             if (nbt.contains(name)) {
-                SingleFluxStorage fluxStorage = this.storedFlux.get(FluxType.getFluxTypeDirectory().get(name));
+                SingleFluxStorage fluxStorage = this.storedFlux.get(FluxUtils.getFluxType(name));
                 fluxStorage.deserializeNBT(nbt.get(name));
             }
         }

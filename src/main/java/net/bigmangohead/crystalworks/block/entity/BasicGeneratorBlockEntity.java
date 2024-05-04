@@ -9,6 +9,7 @@ import net.bigmangohead.crystalworks.registery.ModRegistries;
 import net.bigmangohead.crystalworks.screen.menu.BasicGeneratorMenu;
 import net.bigmangohead.crystalworks.util.energy.CustomEnergyStorage;
 import net.bigmangohead.crystalworks.util.energy.flux.FluxStorage;
+import net.bigmangohead.crystalworks.util.energy.flux.FluxUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -159,8 +160,7 @@ public class BasicGeneratorBlockEntity extends AbstractInventoryBlockEntity {
 
                 FluxStorage receivingBlockEntityFlux = receivingBlockEntity.getCapability(ModCapabilities.FLUX, direction.getOpposite()).orElse(null);
                 if (receivingBlockEntityFlux != null) {
-                    receivingBlockEntityFlux.forceAddFlux(ModFluxTypes.DIAMOND, 1);
-                    receivingBlockEntityFlux.forceAddFlux(ModRegistries.FLUX_TYPES.get().getValue(new ResourceLocation(CrystalWorksMod.MOD_ID, "gold")), 2);
+                    receivingBlockEntityFlux.forceAddFlux(FluxUtils.getFluxType("gold"), 2);
                 }
             }
         }
@@ -176,7 +176,7 @@ public class BasicGeneratorBlockEntity extends AbstractInventoryBlockEntity {
     }
 
     @Override
-    public void loadData(CompoundTag nbt) { //Consider adding a specific mod tag to make sure that other mods don't try overriding this data
+    public void loadData(CompoundTag nbt) {
         super.loadData(nbt);
         energy.deserializeNBT(nbt.get("energy"));
         burnTime = nbt.getInt("basicgenerator.burntime");
