@@ -16,6 +16,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.NewRegistryEvent;
+import net.minecraftforge.registries.RegisterEvent;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -31,6 +33,8 @@ public class CrystalWorksMod
     {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
+        modEventBus.addListener(this::registerRegistries);
+
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
 
@@ -44,17 +48,29 @@ public class CrystalWorksMod
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
-        // Register the item to a creative tab
+
+        // Register items to creative tabs
         modEventBus.addListener(this::addCreative);
         ModCreativeModTabs.register(modEventBus);
 
+
         ModCapabilities.register(modEventBus);
-        modEventBus.register(ModFluxTypes.class);
+        //ModFluxTypes.register(modEventBus);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)
     {
         
+    }
+
+    @SubscribeEvent
+    public void registerRegistries(NewRegistryEvent event) {
+        ModRegistries.register(event);
+    }
+
+    @SubscribeEvent
+    public void specialRegistries(RegisterEvent event) {
+        ModFluxTypes.register(event);
     }
 
     // Add the example block item to the building blocks tab

@@ -2,6 +2,7 @@ package net.bigmangohead.crystalworks.util.energy.flux;
 
 import net.bigmangohead.crystalworks.registery.ModFluxTypes;
 import net.bigmangohead.crystalworks.util.energy.CustomEnergyStorage;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.Tag;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -191,13 +192,24 @@ public class FluxStorage implements INBTSerializable<Tag> {
 
     @Override
     public Tag serializeNBT() {
-        return IntTag.valueOf(this.getFluxAmount(ModFluxTypes.DIAMOND));
+        CompoundTag nbtData = new CompoundTag();
+        this.storedFlux.forEach(((fluxType, singleFluxStorage) ->
+                nbtData.put(fluxType.getName(), singleFluxStorage.serializeNBT())));
+
+        return nbtData;
     }
 
     @Override
     public void deserializeNBT(Tag tag) {
-        if (tag instanceof IntTag intNbt) {
-            this.storedFlux.get(ModFluxTypes.DIAMOND).flux = intNbt.getAsInt();
+        CompoundTag nbt = (CompoundTag) tag;
+
+        //Use FluxType Directory to convert string back to object
+        for (String name : FluxType.getFluxTypeDirectory().keySet()) {
+            if (nbt.contains(name)) {
+                SingleFluxStorage fluxStorage = this.storedFlux.get(FluxType.getFluxTypeDirectory().get(name));
+                fluxStorage.deserializeNBT(nbt.get(name));
+            }
         }
+
     }
 }

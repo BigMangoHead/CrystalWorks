@@ -5,6 +5,7 @@ import net.bigmangohead.crystalworks.block.entity.abstraction.AbstractInventoryB
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
 import net.bigmangohead.crystalworks.registery.ModCapabilities;
 import net.bigmangohead.crystalworks.registery.ModFluxTypes;
+import net.bigmangohead.crystalworks.registery.ModRegistries;
 import net.bigmangohead.crystalworks.screen.menu.BasicGeneratorMenu;
 import net.bigmangohead.crystalworks.util.energy.CustomEnergyStorage;
 import net.bigmangohead.crystalworks.util.energy.flux.FluxStorage;
@@ -12,6 +13,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -158,6 +160,7 @@ public class BasicGeneratorBlockEntity extends AbstractInventoryBlockEntity {
                 FluxStorage receivingBlockEntityFlux = receivingBlockEntity.getCapability(ModCapabilities.FLUX, direction.getOpposite()).orElse(null);
                 if (receivingBlockEntityFlux != null) {
                     receivingBlockEntityFlux.forceAddFlux(ModFluxTypes.DIAMOND, 1);
+                    receivingBlockEntityFlux.forceAddFlux(ModRegistries.FLUX_TYPES.get().getValue(new ResourceLocation(CrystalWorksMod.MOD_ID, "gold")), 2);
                 }
             }
         }

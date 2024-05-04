@@ -2,8 +2,10 @@ package net.bigmangohead.crystalworks.block.entity.abstraction;
 
 import net.bigmangohead.crystalworks.block.entity.CrusherBlockEntity;
 import net.bigmangohead.crystalworks.registery.ModFluxTypes;
+import net.bigmangohead.crystalworks.registery.ModRegistries;
 import net.bigmangohead.crystalworks.util.energy.CustomEnergyStorage;
 import net.bigmangohead.crystalworks.util.energy.flux.FluxStorage;
+import net.bigmangohead.crystalworks.util.energy.flux.FluxType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
@@ -25,7 +27,7 @@ public abstract class SmallMachineEntity extends AbstractInventoryBlockEntity {
     protected final CustomEnergyStorage energy = new CustomEnergyStorage(1000000, 100, 0, 0);
     protected final LazyOptional<CustomEnergyStorage> energyOptional = LazyOptional.of(() -> this.energy);
 
-    protected final FluxStorage flux = new FluxStorage(1, 1000000, 100, 0, Set.of(ModFluxTypes.DIAMOND));
+    protected final FluxStorage flux = new FluxStorage(1, 1000000, 100, 0, Set.copyOf(ModRegistries.FLUX_TYPES.get().getValues()));
     protected final LazyOptional<FluxStorage> fluxOptional = LazyOptional.of(() -> this.flux);
 
     public SmallMachineEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
@@ -85,7 +87,7 @@ public abstract class SmallMachineEntity extends AbstractInventoryBlockEntity {
     protected void saveData(CompoundTag pTag) {
         pTag.putInt("machine.progress", progress);
         pTag.put("energy", this.energy.serializeNBT());
-        pTag.put("diamond_flux", this.flux.serializeNBT());
+        pTag.put("flux", this.flux.serializeNBT());
 
         super.saveData(pTag);
     }
@@ -95,7 +97,7 @@ public abstract class SmallMachineEntity extends AbstractInventoryBlockEntity {
         super.loadData(nbt);
         energy.deserializeNBT(nbt.get("energy"));
         progress = nbt.getInt("machine.progress");
-        flux.deserializeNBT(nbt.get("diamond_flux"));
+        flux.deserializeNBT(nbt.get("flux"));
     }
 
 }
