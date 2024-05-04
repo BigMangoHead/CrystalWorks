@@ -1,0 +1,4 @@
+// 1.20.1	2024-05-02T22:22:26.7150355	Registries
+858f4eb2709a16e840688a794cc192e073d3c1ab data/crystalworks/forge/biome_modifier/add_sapphire_crystal.json
+9eccedbfbcaea03dc8805524cce1288898c86966 data/crystalworks/worldgen/configured_feature/sapphire_crystal.json
+6dd256c946f6e93275645d2f378e98b90f92e792 data/crystalworks/worldgen/placed_feature/sapphire_ore_placed.json
