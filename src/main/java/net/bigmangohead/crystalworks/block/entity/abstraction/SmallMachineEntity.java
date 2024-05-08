@@ -1,38 +1,46 @@
 package net.bigmangohead.crystalworks.block.entity.abstraction;
 
-import net.bigmangohead.crystalworks.block.entity.CrusherBlockEntity;
-import net.bigmangohead.crystalworks.registery.ModFluxTypes;
-import net.bigmangohead.crystalworks.registery.ModRegistries;
 import net.bigmangohead.crystalworks.util.energy.CustomEnergyStorage;
 import net.bigmangohead.crystalworks.util.energy.flux.FluxStorage;
-import net.bigmangohead.crystalworks.util.energy.flux.FluxType;
 import net.bigmangohead.crystalworks.util.energy.flux.FluxUtils;
+import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedInteger;
+import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedObject;
+import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedSerializable;
+import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.IntTag;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.util.LazyOptional;
-
-import java.util.Set;
 
 // Small Machine refers to any machine (takes an input to produce an output)
 // That requires a crystal block below it.
 public abstract class SmallMachineEntity extends AbstractInventoryBlockEntity {
     private static final int DEFAULT_PROCESS_COUNT = 2;
 
-    protected int progress = 0;
+    protected TrackedInteger progress = new TrackedInteger(0, "progress", TrackedType.SAVE, () -> this.level, this.worldPosition);
     protected final int defaultMaxProgress = 78; //Represents total amount of ticks per recipe by default
     protected int maxProgress = 78; //Represents total amount of ticks in a recipe after recipe modifier is applied
 
     protected final CustomEnergyStorage energy = new CustomEnergyStorage(1000000, 100, 0, 0);
     protected final LazyOptional<CustomEnergyStorage> energyOptional = LazyOptional.of(() -> this.energy);
 
-    protected final FluxStorage flux = new FluxStorage(1, 1000000, 100, 0, FluxUtils.getFluxTypes());
-    protected final LazyOptional<FluxStorage> fluxOptional = LazyOptional.of(() -> this.flux);
+    protected final TrackedObject<FluxStorage> flux;
+    protected final LazyOptional<FluxStorage> fluxOptional;
 
     public SmallMachineEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
+
+        FluxStorage flux = new FluxStorage(1, 1000000, 100, 0, FluxUtils.getFluxTypes());
+        this.flux = new TrackedSerializable<>(flux, "flux", TrackedType.SAVE, () -> this.level, this.worldPosition);
+        this.fluxOptional = LazyOptional.of(() -> this.flux.obj);
+    }
+
+    @Override
+    protected void registerTrackedObjects() {
+        super.registerTrackedObjects();
+
+        this.trackedObjects.add(() -> this.flux);
     }
 
     @Override
@@ -40,7 +48,7 @@ public abstract class SmallMachineEntity extends AbstractInventoryBlockEntity {
         return switch (index) {
             case DataIndex.ENERGY -> SmallMachineEntity.this.energy.getEnergyStored();
             case DataIndex.MAX_ENERGY -> SmallMachineEntity.this.energy.getMaxEnergyStored();
-            case DataIndex.PROGRESS -> SmallMachineEntity.this.progress;
+            case DataIndex.PROGRESS -> SmallMachineEntity.this.progress.obj;
             case DataIndex.MAX_PROGRESS -> SmallMachineEntity.this.maxProgress;
             default -> super.getData(index);
         };
@@ -51,7 +59,7 @@ public abstract class SmallMachineEntity extends AbstractInventoryBlockEntity {
         switch (index) {
             case DataIndex.ENERGY -> SmallMachineEntity.this.energy.setEnergy(value);
             case DataIndex.MAX_ENERGY -> SmallMachineEntity.this.energy.setMaxEnergyStored(value);
-            case DataIndex.PROGRESS -> SmallMachineEntity.this.progress = value;
+            case DataIndex.PROGRESS -> SmallMachineEntity.this.progress.obj = value;
             case DataIndex.MAX_PROGRESS -> SmallMachineEntity.this.maxProgress = value;
         }
         super.setData(index, value);
@@ -85,20 +93,17 @@ public abstract class SmallMachineEntity extends AbstractInventoryBlockEntity {
     }
 
     @Override
-    protected void saveData(CompoundTag pTag) {
-        pTag.putInt("machine.progress", progress);
-        pTag.put("energy", this.energy.serializeNBT());
-        pTag.put("flux", this.flux.serializeNBT());
+    protected void saveData(CompoundTag nbt) {
+        nbt.put("energy", this.energy.serializeNBT());
 
-        super.saveData(pTag);
+        super.saveData(nbt);
     }
 
     @Override
     public void loadData(CompoundTag nbt) {
         super.loadData(nbt);
-        energy.deserializeNBT(nbt.get("energy"));
-        progress = nbt.getInt("machine.progress");
-        flux.deserializeNBT(nbt.get("flux"));
+
+        if (nbt.contains("energy")) energy.deserializeNBT(nbt.get("energy"));
     }
 
 }

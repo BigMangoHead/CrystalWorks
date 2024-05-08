@@ -1,6 +1,7 @@
 package net.bigmangohead.crystalworks.block.entity.abstraction;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
+import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedObject;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
@@ -15,9 +16,13 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.function.Supplier;
+
 public abstract class CWBlockEntity extends BlockEntity {
 
     protected final ContainerData data;
+    protected final ArrayList<Supplier<TrackedObject<?>>> trackedObjects;
 
     public CWBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
@@ -37,6 +42,9 @@ public abstract class CWBlockEntity extends BlockEntity {
                 return getDataCount();
             }
         };
+
+        this.trackedObjects = new ArrayList<>();
+        registerTrackedObjects();
     }
 
     public static class DataIndex {
@@ -54,9 +62,15 @@ public abstract class CWBlockEntity extends BlockEntity {
 
     public int getDataCount() {
         return DataIndex.AMOUNT_OF_VALUES;
-    };
+    }
 
-    protected void sendUpdate() {
+    public void setChangedWithoutRedstoneCheck() {
+        if(this.level != null) {
+            this.level.blockEntityChanged(this.worldPosition);
+        }
+    }
+
+    public void sendUpdate() {
         setChanged();
 
         if(this.level != null) {
@@ -68,7 +82,23 @@ public abstract class CWBlockEntity extends BlockEntity {
 
 
 
-    protected void saveData(CompoundTag nbt) {}
+    protected void registerTrackedObjects() {
+
+    }
+
+    protected void saveData(CompoundTag nbt) {
+        for (Supplier<TrackedObject<?>> trackedObject : this.trackedObjects) {
+            trackedObject.get().putInTag(nbt);
+        }
+    }
+
+    protected void loadData(CompoundTag nbt) {
+        for(Supplier<TrackedObject<?>> trackedObject : this.trackedObjects) {
+            if (nbt.contains(trackedObject.get().getKey())) {
+                trackedObject.get().updateWithTag(nbt);
+            }
+        }
+    }
 
     protected void clientboundOnChunkLoad(CompoundTag nbt) {
         saveData(nbt);
@@ -77,8 +107,6 @@ public abstract class CWBlockEntity extends BlockEntity {
     protected void clientboundOnBlockUpdate(CompoundTag nbt) {
         saveData(nbt);
     }
-
-    protected void loadData(CompoundTag nbt) {}
 
     protected void receiveDataOnChunkLoad(CompoundTag nbt) {
         loadData(nbt);
@@ -127,24 +155,11 @@ public abstract class CWBlockEntity extends BlockEntity {
         receiveDataOnChunkLoad(nbt.getCompound(CrystalWorksMod.MOD_ID));
     }
 
-    // I have been struggling to switch to using no parameters here
-    // I'm not sure what the issue is - I was directly copying minecraft source code
-    // and still getting errors. ¯\_(ツ)_/¯
-    public CompoundTag getOnBlockUpdateTag(@Nullable BlockEntity unused) {
-        CompoundTag nbt = super.getUpdateTag();
-
-        CompoundTag modNBT = new CompoundTag();
-        clientboundOnBlockUpdate(modNBT);
-        nbt.put(CrystalWorksMod.MOD_ID, modNBT);
-        return nbt;
-    }
-
-
-    //getUpdatePacket and onDataPacket occur on block update
+    //getUpdatePacket and onDataPacket occur on block update, getOnBlockUpdateTag is a helper function for that.
     @Nullable
     @Override
     public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this, this::getOnBlockUpdateTag);
+        return ClientboundBlockEntityDataPacket.create(this, (unused) -> this.getOnBlockUpdateTag());
     }
 
     @Override
@@ -156,6 +171,27 @@ public abstract class CWBlockEntity extends BlockEntity {
         }
     }
 
+    public CompoundTag getOnBlockUpdateTag() {
+        CompoundTag nbt = super.getUpdateTag();
+
+        CompoundTag modNBT = new CompoundTag();
+        clientboundOnBlockUpdate(modNBT);
+        nbt.put(CrystalWorksMod.MOD_ID, modNBT);
+        return nbt;
+    }
+
+    // updateSuperTag and updateCWTag handle results from packets.
+    // Note that updateSuperTag overrides default NBT data,
+    // while updateCWTag only replace data given by the newCWData tag.
+    public void updateSuperTag(CompoundTag newNBTData) {
+        if (newNBTData != null) {
+            super.load(newNBTData);
+        }
+    }
+
+    public void updateCWNBTData(CompoundTag nbt) {
+        loadData(nbt);
+    }
 
 
     //Gives a default state for the tick function so that the function can be assumed to exist when a ticker is created

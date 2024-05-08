@@ -133,9 +133,9 @@ public class BasicGeneratorBlockEntity extends AbstractInventoryBlockEntity {
 
     private void attemptGenerateEnergy() {
         if(this.burnTime <= 0) {
-            if(canBurn(this.inventory.getStackInSlot(INPUT_SLOT))) {
-                this.burnTime = this.maxBurnTime = getBurnTime(this.inventory.getStackInSlot(0));
-                this.inventory.getStackInSlot(INPUT_SLOT).shrink(1);
+            if(canBurn(this.getStackInSlot(INPUT_SLOT))) {
+                this.burnTime = this.maxBurnTime = getBurnTime(this.getStackInSlot(INPUT_SLOT));
+                this.getStackInSlot(INPUT_SLOT).shrink(1);
                 sendUpdate();
             }
         } else {
@@ -167,19 +167,19 @@ public class BasicGeneratorBlockEntity extends AbstractInventoryBlockEntity {
     }
 
     @Override
-    protected void saveData(CompoundTag pTag) {
-        pTag.putInt("basicgenerator.maxburntime", maxBurnTime);
-        pTag.putInt("basicgenerator.burntime", burnTime);
-        pTag.put("energy", this.energy.serializeNBT());
+    protected void saveData(CompoundTag nbt) {
+        nbt.putInt("maxburntime", maxBurnTime);
+        nbt.putInt("burntime", burnTime);
+        nbt.put("energy", this.energy.serializeNBT());
 
-        super.saveData(pTag);
+        super.saveData(nbt);
     }
 
     @Override
     public void loadData(CompoundTag nbt) {
         super.loadData(nbt);
-        energy.deserializeNBT(nbt.get("energy"));
-        burnTime = nbt.getInt("basicgenerator.burntime");
-        maxBurnTime = nbt.getInt("basicgenerator.maxburntime");
+        if (nbt.contains("energy")) energy.deserializeNBT(nbt.get("energy"));
+        if (nbt.contains("burntime")) burnTime = nbt.getInt("burntime");
+        if (nbt.contains("maxburntime")) maxBurnTime = nbt.getInt("maxburntime");
     }
 }

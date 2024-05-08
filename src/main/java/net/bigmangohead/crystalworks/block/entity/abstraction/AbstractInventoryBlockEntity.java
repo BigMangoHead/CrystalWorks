@@ -1,13 +1,12 @@
 package net.bigmangohead.crystalworks.block.entity.abstraction;
 
 import net.bigmangohead.crystalworks.util.item.CWItemStackHandler;
+import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedObject;
+import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedSerializable;
+import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -25,13 +24,22 @@ import java.util.Set;
 
 //Includes some sort of menu
 public abstract class AbstractInventoryBlockEntity extends CWBlockEntity implements MenuProvider {
-    protected final CWItemStackHandler inventory;
+    protected final TrackedObject<CWItemStackHandler> inventory;
 
     protected LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
 
     public AbstractInventoryBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
-        this.inventory = new CWItemStackHandler(this, this.getSlotCount(), this.capabilitiesCannotInsert(), this.capabilitiesCannotExtract());
+        CWItemStackHandler inventory = new CWItemStackHandler(this, this.getSlotCount(), this.capabilitiesCannotInsert(), this.capabilitiesCannotExtract());
+
+        this.inventory = new TrackedSerializable<>(inventory, "inventory", TrackedType.SAVE_AND_SYNC, () -> this.level, this.worldPosition, true);
+    }
+
+    @Override
+    protected void registerTrackedObjects() {
+        super.registerTrackedObjects();
+
+        this.trackedObjects.add(() -> this.inventory);
     }
 
     public static class DataIndex {
@@ -41,7 +49,7 @@ public abstract class AbstractInventoryBlockEntity extends CWBlockEntity impleme
     @Override
     public void onLoad() {
         super.onLoad();
-        this.lazyItemHandler = LazyOptional.of(() -> this.inventory);
+        this.lazyItemHandler = LazyOptional.of(() -> this.inventory.obj);
     }
 
     @Override
@@ -61,9 +69,9 @@ public abstract class AbstractInventoryBlockEntity extends CWBlockEntity impleme
     }
 
     public void drops() {
-        SimpleContainer inventory = new SimpleContainer(this.inventory.getSlots());
-        for(int i = 0; i < this.inventory.getSlots(); i++) {
-            inventory.setItem(i, this.inventory.getStackInSlot(i));
+        SimpleContainer inventory = new SimpleContainer(this.inventory.obj.getSlots());
+        for(int i = 0; i < this.inventory.obj.getSlots(); i++) {
+            inventory.setItem(i, this.inventory.obj.getStackInSlot(i));
         }
 
         Containers.dropContents(this.level, this.worldPosition, inventory);
@@ -83,28 +91,14 @@ public abstract class AbstractInventoryBlockEntity extends CWBlockEntity impleme
     public abstract Component getDisplayName();
 
     public CWItemStackHandler getInventory() {
-        return this.inventory;
+        return this.inventory.obj;
     }
 
     public ItemStack getStackInSlot(int slot) {
-        return this.inventory.getStackInSlot(slot);
+        return this.inventory.obj.getStackInSlot(slot);
     }
 
     public void setStackInSlot(int slot, ItemStack item) {
-        this.inventory.setStackInSlot(slot, item);
+        this.inventory.obj.setStackInSlot(slot, item);
     }
-
-    @Override
-    protected void saveData(CompoundTag pTag) {
-        pTag.put("inventory", this.inventory.serializeNBT());
-
-        super.saveData(pTag);
-    }
-
-    @Override
-    public void loadData(CompoundTag pTag) { //Consider adding a specific mod tag to make sure that other mods don't try overriding this data
-        super.loadData(pTag);
-        this.inventory.deserializeNBT(pTag.getCompound("inventory"));
-    }
-
 }

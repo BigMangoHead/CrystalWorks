@@ -1,6 +1,8 @@
 package net.bigmangohead.crystalworks;
 
 import com.mojang.logging.LogUtils;
+import net.bigmangohead.crystalworks.network.PacketHandler;
+import net.bigmangohead.crystalworks.network.packet.client.CWBlockEntityUpdateHandler;
 import net.bigmangohead.crystalworks.registery.*;
 import net.bigmangohead.crystalworks.screen.screen.BasicGeneratorScreen;
 import net.bigmangohead.crystalworks.screen.screen.CrusherScreen;
@@ -8,8 +10,11 @@ import net.bigmangohead.crystalworks.util.energy.flux.FluxUtils;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -45,7 +50,6 @@ public class CrystalWorksMod
 
         ModRecipes.register(modEventBus);
 
-        // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
 
         // Register ourselves for server and other game events we are interested in
@@ -55,22 +59,21 @@ public class CrystalWorksMod
         modEventBus.addListener(this::addCreative);
         ModCreativeModTabs.register(modEventBus);
 
-
         ModCapabilities.register(modEventBus);
-        //ModFluxTypes.register(modEventBus);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)
     {
-        FluxUtils.generation();
+        event.enqueueWork(() -> {
+            FluxUtils.generation();
+            PacketHandler.registerPacketHandling();
+        });
     }
 
-    @SubscribeEvent
     public void registerRegistries(NewRegistryEvent event) {
         ModRegistries.register(event);
     }
 
-    @SubscribeEvent
     public void specialRegistries(RegisterEvent event) {
         ModFluxTypes.register(event);
     }
@@ -80,6 +83,11 @@ public class CrystalWorksMod
         if(event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(ModItems.SAPPHIRE);
         }
+    }
+
+    @SubscribeEvent
+    public void onClientLogin(EntityJoinLevelEvent event) {
+        CWBlockEntityUpdateHandler.onLogin(event);
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call

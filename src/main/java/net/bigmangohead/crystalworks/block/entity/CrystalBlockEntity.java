@@ -2,6 +2,8 @@ package net.bigmangohead.crystalworks.block.entity;
 
 import net.bigmangohead.crystalworks.block.block.CrusherBlock;
 import net.bigmangohead.crystalworks.block.entity.abstraction.CWBlockEntity;
+import net.bigmangohead.crystalworks.network.PacketHandler;
+import net.bigmangohead.crystalworks.network.packet.server.CWBlockEntityUpdatePacket;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
 import net.bigmangohead.crystalworks.registery.ModCapabilities;
 import net.bigmangohead.crystalworks.util.block.LevelUtils;
@@ -16,7 +18,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,7 +46,7 @@ public class CrystalBlockEntity extends CWBlockEntity {
         super.invalidateCaps();
 
         if(attachmentState == attachmentStates.SINGLE_MACHINE) {
-            CrusherBlockEntity blockEntity = getBlockEntity();
+            CrusherBlockEntity blockEntity = getAttachedBlockEntity();
             if(blockEntity != null) {
                 blockEntity.getEnergyOptional().invalidate();
                 blockEntity.getFluxOptional().invalidate();
@@ -57,9 +58,9 @@ public class CrystalBlockEntity extends CWBlockEntity {
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         if (cap == ForgeCapabilities.ENERGY && attachmentState == attachmentStates.SINGLE_MACHINE) {
-            return getBlockEntity().getEnergyOptional().cast();
+            return getAttachedBlockEntity().getEnergyOptional().cast();
         } else if (cap == ModCapabilities.FLUX && attachmentState == attachmentStates.SINGLE_MACHINE) {
-            return getBlockEntity().getFluxOptional().cast();
+            return getAttachedBlockEntity().getFluxOptional().cast();
         }
         return super.getCapability(cap, side);
     }
@@ -86,25 +87,25 @@ public class CrystalBlockEntity extends CWBlockEntity {
     @Override
     protected void saveData(CompoundTag pTag) {
         pTag.putInt("attachmentstate", this.attachmentState);
-        pTag.put("attachedposition", SerializationUtils.serialize(attachedBlockPosition));
+        pTag.put("attachedpos", SerializationUtils.serialize(attachedBlockPosition));
 
         super.saveData(pTag);
     }
 
     @Override
-    public void loadData(CompoundTag pTag) {
-        super.loadData(pTag);
+    public void loadData(CompoundTag nbt) {
+        super.loadData(nbt);
 
-        this.attachmentState = pTag.getInt("attachmentstate");
-        this.attachedBlockPosition = SerializationUtils.deserializeBlockPos(pTag.getCompound("attachedposition"));
+        if (nbt.contains("attachmentstate")) this.attachmentState = nbt.getInt("attachmentstate");
+        if (nbt.contains("attachedpos")) this.attachedBlockPosition = SerializationUtils.deserializeBlockPos(nbt.getCompound("attachedpos"));
     }
 
     @Nullable
-    private CrusherBlockEntity getBlockEntity() {
+    private CrusherBlockEntity getAttachedBlockEntity() {
         if (this.level != null && this.attachmentState == attachmentStates.SINGLE_MACHINE) {
             if (this.attachedBlockPosition == null) throw new IllegalStateException("Attached block position for crystal cannot be null!");
 
-            // For later reference, I use this safe method to guarantee that this method call does not create
+            // This safe method is used to guarantee that this method call does not create
             // a new block entity when getting it. In this case, this creates recursive calls.
             BlockEntity blockEntity = LevelUtils.getBlockEntitySafe(this.level, this.attachedBlockPosition);
             if (blockEntity == null) return null;

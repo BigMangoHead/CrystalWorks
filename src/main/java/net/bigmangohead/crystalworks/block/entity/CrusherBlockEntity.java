@@ -67,41 +67,41 @@ public class CrusherBlockEntity extends SmallMachineEntity implements MenuProvid
         //TODO: More robust method of checking recipes to optimize more
 
         if(hasRecipe()) {
-            progress ++;
-            setChanged(level, blockPos, blockState);
+            progress.obj ++;
+            progress.sendUpdate();
 
             if(hasProgressFinished()) {
                 craftItem();
-                progress = 0;
+                inventory.sendUpdate();
+                progress.obj = 0;
             }
         } else {
-            progress = 0;
+            progress.obj = 0;
         }
 
         //sync to client. TODO: Switch for specific packets method
-        // Note, I might have already added that above, can't remember ¯\_(ツ)_/¯
         this.level.sendBlockUpdated(this.worldPosition, getBlockState(), getBlockState(), Block.UPDATE_ALL);
     }
 
     private void craftItem() {
         Optional<CrusherRecipe> recipe = getCurrentRecipe();
         ItemStack result = recipe.get().getResultItem(null);
-        ItemStack inputStack = this.inventory.getStackInSlot(INPUT_SLOT);
+        ItemStack inputStack = this.getStackInSlot(INPUT_SLOT);
 
 
-        this.inventory.setStackInSlot(INPUT_SLOT, ItemHandlerHelper.copyStackWithSize(
+        this.setStackInSlot(INPUT_SLOT, ItemHandlerHelper.copyStackWithSize(
                 inputStack, inputStack.getCount() - recipe.get().getInputCount()));
 
-        this.inventory.setStackInSlot(OUTPUT_SLOT, new ItemStack(result.getItem(),
-                this.inventory.getStackInSlot(OUTPUT_SLOT).getCount() + result.getCount()));
+        this.setStackInSlot(OUTPUT_SLOT, new ItemStack(result.getItem(),
+                this.getStackInSlot(OUTPUT_SLOT).getCount() + result.getCount()));
     }
 
     private boolean canInsertItemIntoOutputSlot(Item item) {
-        return this.inventory.getStackInSlot(OUTPUT_SLOT).isEmpty() || this.inventory.getStackInSlot(OUTPUT_SLOT).is(item);
+        return this.getStackInSlot(OUTPUT_SLOT).isEmpty() || this.getStackInSlot(OUTPUT_SLOT).is(item);
     }
 
     private boolean canInsertAmountIntoOutputSlot(int count) {
-        return this.inventory.getStackInSlot(OUTPUT_SLOT).getCount() + count <= this.inventory.getStackInSlot(OUTPUT_SLOT).getMaxStackSize();
+        return this.getStackInSlot(OUTPUT_SLOT).getCount() + count <= this.getStackInSlot(OUTPUT_SLOT).getMaxStackSize();
     }
 
     private boolean enoughInputItems(CrusherRecipe recipe, int inputCount) {
@@ -109,7 +109,7 @@ public class CrusherBlockEntity extends SmallMachineEntity implements MenuProvid
     }
 
     private boolean hasProgressFinished() {
-        return progress >= maxProgress;
+        return progress.obj >= maxProgress;
     }
 
     private boolean hasRecipe() {
@@ -125,13 +125,13 @@ public class CrusherBlockEntity extends SmallMachineEntity implements MenuProvid
         // This makes it harder to get a 1 tick machine
         this.maxProgress = (int) Math.ceil(recipe.get().getRecipeTimeModifier() * defaultMaxProgress);
 
-        return enoughInputItems(recipe.get(), this.inventory.getStackInSlot(INPUT_SLOT).getCount()) && canInsertAmountIntoOutputSlot(result.getCount()) && canInsertItemIntoOutputSlot(result.getItem());
+        return enoughInputItems(recipe.get(), this.getStackInSlot(INPUT_SLOT).getCount()) && canInsertAmountIntoOutputSlot(result.getCount()) && canInsertItemIntoOutputSlot(result.getItem());
     }
 
     private Optional<CrusherRecipe> getCurrentRecipe() {
-        SimpleContainer inventory = new SimpleContainer(this.inventory.getSlots());
-        for(int i = 0; i < this.inventory.getSlots(); i++) {
-            inventory.setItem(i, this.inventory.getStackInSlot(i));
+        SimpleContainer inventory = new SimpleContainer(this.inventory.obj.getSlots());
+        for(int i = 0; i < this.inventory.obj.getSlots(); i++) {
+            inventory.setItem(i, this.getStackInSlot(i));
         }
 
         return this.level.getRecipeManager().getRecipeFor(CrusherRecipe.Type.INSTANCE, inventory, level); //Can be optimized by also sending in the last recipe

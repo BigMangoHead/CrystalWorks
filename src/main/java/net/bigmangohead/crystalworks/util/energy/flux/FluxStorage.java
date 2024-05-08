@@ -6,6 +6,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.Tag;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.common.util.LazyOptional;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,12 +16,14 @@ public class FluxStorage implements INBTSerializable<Tag> {
 
     protected HashMap<FluxType, SingleFluxStorage> storedFlux;
     protected Set<FluxType> acceptableFluxTypes;
-    protected Set<FluxType> storedFluxTypes;
+    protected Set<FluxType> storedFluxTypes; // Only includes types with more than 0 flux
 
     // -1 represents no maximum
     protected int maxFluxTypesCount = -1;
 
-    protected CustomEnergyStorage forgeEnergyStorage;
+    protected boolean containsForgeEnergy = false;
+    protected RedstoneFluxStorage forgeEnergyStorage = null;
+    protected LazyOptional<RedstoneFluxStorage> optionalForgeEnergyStorage = LazyOptional.of(() -> this.forgeEnergyStorage);
 
     public FluxStorage(Set<SingleFluxStorage> fluxStorageDataSet) {
         this.storedFlux = new HashMap<>();
@@ -57,9 +60,23 @@ public class FluxStorage implements INBTSerializable<Tag> {
         //Set up data using the global values
         for (FluxType acceptedFluxType : acceptableFluxTypes) {
             if (!storedFlux.containsKey(acceptedFluxType)) {
-                SingleFluxStorage newFluxStorage = new SingleFluxStorage(acceptedFluxType, acceptedFluxType.applyCapacityModifier(globalCapacity),
-                        acceptedFluxType.applyMaxReceiveModifier(globalMaxReceive), acceptedFluxType.applyMaxExtractModifier(globalMaxExtract),
-                        acceptedFluxType.applyFluxModifier(0));
+
+                SingleFluxStorage newFluxStorage;
+                if (acceptedFluxType.getName().equals("redstone")) {
+                    RedstoneFluxStorage newStorage = new RedstoneFluxStorage(acceptedFluxType.applyCapacityModifier(globalCapacity),
+                            acceptedFluxType.applyMaxReceiveModifier(globalMaxReceive), acceptedFluxType.applyMaxExtractModifier(globalMaxExtract),
+                            acceptedFluxType.applyFluxModifier(0));
+
+                    this.forgeEnergyStorage = newStorage;
+                    this.containsForgeEnergy = true;
+                    newFluxStorage = newStorage;
+
+                } else {
+                    newFluxStorage = new SingleFluxStorage(acceptedFluxType, acceptedFluxType.applyCapacityModifier(globalCapacity),
+                            acceptedFluxType.applyMaxReceiveModifier(globalMaxReceive), acceptedFluxType.applyMaxExtractModifier(globalMaxExtract),
+                            acceptedFluxType.applyFluxModifier(0));
+                }
+
 
                 this.storedFlux.put(acceptedFluxType, newFluxStorage);
 
@@ -179,6 +196,14 @@ public class FluxStorage implements INBTSerializable<Tag> {
 
     public Set<FluxType> getAcceptedFluxTypes() {
         return acceptableFluxTypes;
+    }
+
+    public RedstoneFluxStorage getForgeEnergyStorage() {
+        return forgeEnergyStorage;
+    }
+
+    public LazyOptional<RedstoneFluxStorage> getOptionalForgeEnergyStorage() {
+        return optionalForgeEnergyStorage;
     }
 
     //Currently, extracting a flux type requires that that flux is accepted.

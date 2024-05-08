@@ -11,6 +11,7 @@ public class ModFluxTypes {
     public static void register(RegisterEvent event) {
         event.register(ModRegistries.fluxTypeKey,
                 helper -> {
+            helper.register("redstone", new FluxType(1, 1, 1, 1, "redstone"));
             helper.register("gold", new FluxType(1, 1, 1, 1, "gold"));
             helper.register("diamond", new FluxType(1, 2, 1, 1, "diamond"));
         });
