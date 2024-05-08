@@ -17,6 +17,7 @@ public class LevelUtils {
         if (level.isOutsideBuildHeight(pPos)) {
             return null;
         } else {
+            // Reminder to myself that isClientSide is a misleading name, don't get confused by it
             return !level.isClientSide ? null : level.getChunkAt(pPos).getBlockEntity(pPos, LevelChunk.EntityCreationType.CHECK);
         }
     }

@@ -15,8 +15,8 @@ public class FluxUtils {
     public static void generation() {
 
         ModRegistries.FLUX_TYPES.get().getKeys().forEach(resourceLocation -> {
-            fluxNames.add(resourceLocation.getNamespace());
-            fluxNameToTypeMap.put(resourceLocation.getNamespace(), ModRegistries.FLUX_TYPES.get().getValue(resourceLocation));
+            fluxNames.add(resourceLocation.getPath());
+            fluxNameToTypeMap.put(resourceLocation.getPath(), ModRegistries.FLUX_TYPES.get().getValue(resourceLocation));
         });
 
         fluxTypes = Set.copyOf(ModRegistries.FLUX_TYPES.get().getValues());

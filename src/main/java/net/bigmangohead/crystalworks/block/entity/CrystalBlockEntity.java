@@ -2,8 +2,6 @@ package net.bigmangohead.crystalworks.block.entity;
 
 import net.bigmangohead.crystalworks.block.block.CrusherBlock;
 import net.bigmangohead.crystalworks.block.entity.abstraction.CWBlockEntity;
-import net.bigmangohead.crystalworks.network.PacketHandler;
-import net.bigmangohead.crystalworks.network.packet.server.CWBlockEntityUpdatePacket;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
 import net.bigmangohead.crystalworks.registery.ModCapabilities;
 import net.bigmangohead.crystalworks.util.block.LevelUtils;
@@ -22,15 +20,16 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class CrystalBlockEntity extends CWBlockEntity {
-    protected int attachmentState = attachmentStates.UNATTACHED;
+    protected AttachmentState attachmentState = AttachmentState.UNATTACHED;
 
-    protected static class attachmentStates {
-        public static final int UNATTACHED = 0;
-        public static final int SINGLE_MACHINE = 1;
+    protected enum AttachmentState {
+        UNATTACHED,
+        SINGLE_MACHINE
     }
 
     protected BlockPos attachedBlockPosition = null;
-    protected BlockEntity attachedBlockEntity = null;
+    @Nullable
+    protected CrusherBlockEntity attachedBlockEntity = null;
 
     public CrystalBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntities.GEM_BE.get(), pPos, pBlockState);
@@ -45,8 +44,8 @@ public class CrystalBlockEntity extends CWBlockEntity {
     public void invalidateCaps() {
         super.invalidateCaps();
 
-        if(attachmentState == attachmentStates.SINGLE_MACHINE) {
-            CrusherBlockEntity blockEntity = getAttachedBlockEntity();
+        if(attachmentState == AttachmentState.SINGLE_MACHINE) {
+            CrusherBlockEntity blockEntity = this.attachedBlockEntity;
             if(blockEntity != null) {
                 blockEntity.getEnergyOptional().invalidate();
                 blockEntity.getFluxOptional().invalidate();
@@ -57,11 +56,18 @@ public class CrystalBlockEntity extends CWBlockEntity {
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if (cap == ForgeCapabilities.ENERGY && attachmentState == attachmentStates.SINGLE_MACHINE) {
-            return getAttachedBlockEntity().getEnergyOptional().cast();
-        } else if (cap == ModCapabilities.FLUX && attachmentState == attachmentStates.SINGLE_MACHINE) {
-            return getAttachedBlockEntity().getFluxOptional().cast();
+        if ((cap == ForgeCapabilities.ENERGY || cap == ModCapabilities.FLUX) && attachmentState == AttachmentState.SINGLE_MACHINE) {
+            CrusherBlockEntity attachedBlockEntity = this.attachedBlockEntity;
+            if (attachedBlockEntity == null) return super.getCapability(cap, side);
+
+            if (cap == ForgeCapabilities.ENERGY) {
+
+                return attachedBlockEntity.getEnergyOptional().cast();
+            } else {
+                return attachedBlockEntity.getFluxOptional().cast();
+            }
         }
+
         return super.getCapability(cap, side);
     }
 
@@ -73,20 +79,22 @@ public class CrystalBlockEntity extends CWBlockEntity {
         Block resultingBlock = level.getBlockState(neighborPos).getBlock();
 
         // Note: this could cause an issue if changing from attached -> attached in the same tick.
-        if (attachmentState == attachmentStates.UNATTACHED && neighborPos.equals(this.worldPosition.above()) && (resultingBlock instanceof CrusherBlock)) {
-            this.attachmentState = attachmentStates.SINGLE_MACHINE;
+        if (attachmentState == AttachmentState.UNATTACHED && neighborPos.equals(this.worldPosition.above()) && (resultingBlock instanceof CrusherBlock)) {
+            this.attachmentState = AttachmentState.SINGLE_MACHINE;
             this.attachedBlockPosition = neighborPos;
+            this.attachedBlockEntity = (CrusherBlockEntity) level.getBlockEntity(neighborPos);
         }
 
-        if (attachmentState == attachmentStates.SINGLE_MACHINE && neighborPos.equals(attachedBlockPosition) && !(resultingBlock instanceof CrusherBlock)) {
-            this.attachmentState = attachmentStates.UNATTACHED;
+        if (attachmentState == AttachmentState.SINGLE_MACHINE && neighborPos.equals(attachedBlockPosition) && !(resultingBlock instanceof CrusherBlock)) {
+            this.attachmentState = AttachmentState.UNATTACHED;
             this.attachedBlockPosition = null;
+            this.attachedBlockEntity = null;
         }
     }
 
     @Override
     protected void saveData(CompoundTag pTag) {
-        pTag.putInt("attachmentstate", this.attachmentState);
+        pTag.putInt("attachmentstate", this.attachmentState.ordinal());
         pTag.put("attachedpos", SerializationUtils.serialize(attachedBlockPosition));
 
         super.saveData(pTag);
@@ -96,14 +104,14 @@ public class CrystalBlockEntity extends CWBlockEntity {
     public void loadData(CompoundTag nbt) {
         super.loadData(nbt);
 
-        if (nbt.contains("attachmentstate")) this.attachmentState = nbt.getInt("attachmentstate");
+        if (nbt.contains("attachmentstate")) this.attachmentState = AttachmentState.values()[nbt.getInt("attachmentstate")];
         if (nbt.contains("attachedpos")) this.attachedBlockPosition = SerializationUtils.deserializeBlockPos(nbt.getCompound("attachedpos"));
     }
 
     @Nullable
     private CrusherBlockEntity getAttachedBlockEntity() {
-        if (this.level != null && this.attachmentState == attachmentStates.SINGLE_MACHINE) {
-            if (this.attachedBlockPosition == null) throw new IllegalStateException("Attached block position for crystal cannot be null!");
+        if (this.level != null && this.attachmentState == AttachmentState.SINGLE_MACHINE) {
+            if (this.attachedBlockPosition == null) throw new IllegalStateException("Attached block position for crystal cannot be null when attachment state is SINGLE_MACHINE!");
 
             // This safe method is used to guarantee that this method call does not create
             // a new block entity when getting it. In this case, this creates recursive calls.

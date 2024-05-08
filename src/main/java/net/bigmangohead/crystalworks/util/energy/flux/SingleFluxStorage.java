@@ -75,6 +75,15 @@ public class SingleFluxStorage implements INBTSerializable<Tag> {
         }
     }
 
+    public void forceSetCapacity(int amount) {
+        if (amount >= 0) {
+            this.capacity = amount;
+            if (this.flux > this.capacity) {
+                this.flux = this.capacity;
+            }
+        }
+    }
+
 
 
     public FluxType getFluxType() {

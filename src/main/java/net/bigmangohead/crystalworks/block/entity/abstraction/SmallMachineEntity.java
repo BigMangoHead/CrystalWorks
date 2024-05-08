@@ -3,6 +3,7 @@ package net.bigmangohead.crystalworks.block.entity.abstraction;
 import net.bigmangohead.crystalworks.util.energy.CustomEnergyStorage;
 import net.bigmangohead.crystalworks.util.energy.flux.FluxStorage;
 import net.bigmangohead.crystalworks.util.energy.flux.FluxUtils;
+import net.bigmangohead.crystalworks.util.energy.flux.RedstoneFluxStorage;
 import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedInteger;
 import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedObject;
 import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedSerializable;
@@ -21,9 +22,6 @@ public abstract class SmallMachineEntity extends AbstractInventoryBlockEntity {
     protected TrackedInteger progress = new TrackedInteger(0, "progress", TrackedType.SAVE, () -> this.level, this.worldPosition);
     protected final int defaultMaxProgress = 78; //Represents total amount of ticks per recipe by default
     protected int maxProgress = 78; //Represents total amount of ticks in a recipe after recipe modifier is applied
-
-    protected final CustomEnergyStorage energy = new CustomEnergyStorage(1000000, 100, 0, 0);
-    protected final LazyOptional<CustomEnergyStorage> energyOptional = LazyOptional.of(() -> this.energy);
 
     protected final TrackedObject<FluxStorage> flux;
     protected final LazyOptional<FluxStorage> fluxOptional;
@@ -46,8 +44,8 @@ public abstract class SmallMachineEntity extends AbstractInventoryBlockEntity {
     @Override
     public int getData(int index) {
         return switch (index) {
-            case DataIndex.ENERGY -> SmallMachineEntity.this.energy.getEnergyStored();
-            case DataIndex.MAX_ENERGY -> SmallMachineEntity.this.energy.getMaxEnergyStored();
+            case DataIndex.ENERGY -> SmallMachineEntity.this.flux.obj.getForgeEnergyStorage().getEnergyStored();
+            case DataIndex.MAX_ENERGY -> SmallMachineEntity.this.flux.obj.getForgeEnergyStorage().getMaxEnergyStored();
             case DataIndex.PROGRESS -> SmallMachineEntity.this.progress.obj;
             case DataIndex.MAX_PROGRESS -> SmallMachineEntity.this.maxProgress;
             default -> super.getData(index);
@@ -57,8 +55,8 @@ public abstract class SmallMachineEntity extends AbstractInventoryBlockEntity {
     @Override
     public void setData(int index, int value) {
         switch (index) {
-            case DataIndex.ENERGY -> SmallMachineEntity.this.energy.setEnergy(value);
-            case DataIndex.MAX_ENERGY -> SmallMachineEntity.this.energy.setMaxEnergyStored(value);
+            case DataIndex.ENERGY -> SmallMachineEntity.this.flux.obj.getForgeEnergyStorage().forceSetFlux(value);
+            case DataIndex.MAX_ENERGY -> SmallMachineEntity.this.flux.obj.getForgeEnergyStorage().forceSetCapacity(value);
             case DataIndex.PROGRESS -> SmallMachineEntity.this.progress.obj = value;
             case DataIndex.MAX_PROGRESS -> SmallMachineEntity.this.maxProgress = value;
         }
@@ -80,21 +78,21 @@ public abstract class SmallMachineEntity extends AbstractInventoryBlockEntity {
         public static final int MAX_PROGRESS = AbstractInventoryBlockEntity.DataIndex.AMOUNT_OF_VALUES + 3;
     }
 
-    public LazyOptional<CustomEnergyStorage> getEnergyOptional() {
-        return this.energyOptional;
+    public LazyOptional<RedstoneFluxStorage> getEnergyOptional() {
+        return this.flux.obj.getOptionalForgeEnergyStorage();
     }
 
     public LazyOptional<FluxStorage> getFluxOptional() {
         return this.fluxOptional;
     }
 
-    public CustomEnergyStorage getEnergy() {
-        return this.energy;
+    public RedstoneFluxStorage getEnergy() {
+        return this.flux.obj.getForgeEnergyStorage();
     }
 
     @Override
     protected void saveData(CompoundTag nbt) {
-        nbt.put("energy", this.energy.serializeNBT());
+        //nbt.put("energy", this.energy.serializeNBT());
 
         super.saveData(nbt);
     }
@@ -103,7 +101,7 @@ public abstract class SmallMachineEntity extends AbstractInventoryBlockEntity {
     public void loadData(CompoundTag nbt) {
         super.loadData(nbt);
 
-        if (nbt.contains("energy")) energy.deserializeNBT(nbt.get("energy"));
+        //if (nbt.contains("energy")) energy.deserializeNBT(nbt.get("energy"));
     }
 
 }
