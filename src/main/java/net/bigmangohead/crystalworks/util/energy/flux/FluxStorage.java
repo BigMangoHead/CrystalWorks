@@ -1,5 +1,6 @@
 package net.bigmangohead.crystalworks.util.energy.flux;
 
+import net.bigmangohead.crystalworks.CrystalWorksMod;
 import net.bigmangohead.crystalworks.registery.ModFluxTypes;
 import net.bigmangohead.crystalworks.util.energy.CustomEnergyStorage;
 import net.minecraft.nbt.CompoundTag;
@@ -122,7 +123,9 @@ public class FluxStorage implements INBTSerializable<Tag> {
 
     // TODO: Clean up these force set commands, a lot of repeated code here.
     public void forceSetFlux(FluxType fluxType, int fluxAmount) {
-        if (this.acceptableFluxTypes.contains(fluxType)) {
+        if (fluxType == null) {
+            CrystalWorksMod.LOGGER.warn("FluxType passed in to forceSetFlux is null!");
+        } else if (this.acceptableFluxTypes.contains(fluxType)) {
             this.storedFlux.get(fluxType).forceSetFlux(fluxAmount);
 
             if (this.storedFlux.get(fluxType).getFluxStored() > 0) {
@@ -134,7 +137,9 @@ public class FluxStorage implements INBTSerializable<Tag> {
     }
 
     public void forceAddFlux(FluxType fluxType, int amount) {
-        if (this.acceptableFluxTypes.contains(fluxType)) {
+        if (fluxType == null) {
+            CrystalWorksMod.LOGGER.warn("FluxType passed in it to forceAddFlux is null!!");
+        } else if (this.acceptableFluxTypes.contains(fluxType)) {
             this.storedFlux.get(fluxType).forceAddFlux(amount);
 
             if (this.storedFlux.get(fluxType).getFluxStored() > 0) {
@@ -146,7 +151,9 @@ public class FluxStorage implements INBTSerializable<Tag> {
     }
 
     public void forceRemoveFlux(FluxType fluxType, int amount) {
-        if (this.acceptableFluxTypes.contains(fluxType)) {
+        if (fluxType == null) {
+            CrystalWorksMod.LOGGER.warn("FluxType passed in to forceRemoveFlux is null!");
+        } else if (this.acceptableFluxTypes.contains(fluxType)) {
             this.storedFlux.get(fluxType).forceRemoveFlux(amount);
 
             if (this.storedFlux.get(fluxType).getFluxStored() > 0) {
@@ -208,10 +215,18 @@ public class FluxStorage implements INBTSerializable<Tag> {
 
     //Currently, extracting a flux type requires that that flux is accepted.
     public boolean canExtract(FluxType fluxType) {
+        if (fluxType == null) {
+            CrystalWorksMod.LOGGER.warn("FluxType passed in to canExtract is null!");
+            return false;
+        }
         return this.storedFluxTypes.contains(fluxType) && this.acceptableFluxTypes.contains(fluxType);
     }
 
     public boolean canReceive(FluxType fluxType) {
+        if (fluxType == null) {
+            CrystalWorksMod.LOGGER.warn("FluxType passed in to canReceive is null!");
+            return false;
+        }
         return acceptableFluxTypes.contains(fluxType) && (this.storedFluxTypes.size() < this.maxFluxTypesCount || this.storedFluxTypes.contains(fluxType));
     }
 
