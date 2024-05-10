@@ -121,46 +121,28 @@ public class FluxStorage implements INBTSerializable<Tag> {
     }
 
 
-    // TODO: Clean up these force set commands, a lot of repeated code here.
+
     public void forceSetFlux(FluxType fluxType, int fluxAmount) {
-        if (fluxType == null) {
-            CrystalWorksMod.LOGGER.warn("FluxType passed in to forceSetFlux is null!");
-        } else if (this.acceptableFluxTypes.contains(fluxType)) {
+        if (canAccept(fluxType)) {
             this.storedFlux.get(fluxType).forceSetFlux(fluxAmount);
 
-            if (this.storedFlux.get(fluxType).getFluxStored() > 0) {
-                this.storedFluxTypes.add(fluxType);
-            } else {
-                this.storedFluxTypes.remove(fluxType);
-            }
+            updateStoredFlux(fluxType);
         }
     }
 
     public void forceAddFlux(FluxType fluxType, int amount) {
-        if (fluxType == null) {
-            CrystalWorksMod.LOGGER.warn("FluxType passed in it to forceAddFlux is null!!");
-        } else if (this.acceptableFluxTypes.contains(fluxType)) {
+        if (canAccept(fluxType)) {
             this.storedFlux.get(fluxType).forceAddFlux(amount);
 
-            if (this.storedFlux.get(fluxType).getFluxStored() > 0) {
-                this.storedFluxTypes.add(fluxType);
-            } else {
-                this.storedFluxTypes.remove(fluxType);
-            }
+            updateStoredFlux(fluxType);
         }
     }
 
     public void forceRemoveFlux(FluxType fluxType, int amount) {
-        if (fluxType == null) {
-            CrystalWorksMod.LOGGER.warn("FluxType passed in to forceRemoveFlux is null!");
-        } else if (this.acceptableFluxTypes.contains(fluxType)) {
+        if (canAccept(fluxType)) {
             this.storedFlux.get(fluxType).forceRemoveFlux(amount);
 
-            if (this.storedFlux.get(fluxType).getFluxStored() > 0) {
-                this.storedFluxTypes.add(fluxType);
-            } else {
-                this.storedFluxTypes.remove(fluxType);
-            }
+            updateStoredFlux(fluxType);
         }
     }
 
@@ -189,6 +171,8 @@ public class FluxStorage implements INBTSerializable<Tag> {
         this.acceptableFluxTypes.remove(fluxType);
     }
 
+
+
     public SingleFluxStorage getFluxStorage(FluxType fluxType) {
         return this.storedFlux.get(fluxType);
     }
@@ -213,6 +197,8 @@ public class FluxStorage implements INBTSerializable<Tag> {
         return optionalForgeEnergyStorage;
     }
 
+
+
     //Currently, extracting a flux type requires that that flux is accepted.
     public boolean canExtract(FluxType fluxType) {
         if (fluxType == null) {
@@ -229,6 +215,27 @@ public class FluxStorage implements INBTSerializable<Tag> {
         }
         return acceptableFluxTypes.contains(fluxType) && (this.storedFluxTypes.size() < this.maxFluxTypesCount || this.storedFluxTypes.contains(fluxType));
     }
+
+    public boolean canAccept(FluxType fluxType) {
+        if (fluxType == null) {
+            CrystalWorksMod.LOGGER.warn("FluxType passed in to canAccept is null!");
+            return false;
+        }
+        return acceptableFluxTypes.contains(fluxType);
+    }
+
+
+
+    protected void updateStoredFlux(FluxType fluxType) {
+        if (fluxType == null || this.storedFlux.get(fluxType) == null) return;
+        if (this.storedFlux.get(fluxType).getFluxStored() > 0) {
+            this.storedFluxTypes.add(fluxType);
+        } else {
+            this.storedFluxTypes.remove(fluxType);
+        }
+    }
+
+
 
     @Override
     public Tag serializeNBT() {

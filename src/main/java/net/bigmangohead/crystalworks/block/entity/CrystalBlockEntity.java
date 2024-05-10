@@ -4,14 +4,15 @@ import net.bigmangohead.crystalworks.block.block.CrusherBlock;
 import net.bigmangohead.crystalworks.block.entity.abstraction.CWBlockEntity;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
 import net.bigmangohead.crystalworks.registery.ModCapabilities;
-import net.bigmangohead.crystalworks.util.block.LevelUtils;
 import net.bigmangohead.crystalworks.util.serialization.SerializationUtils;
+import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedType;
+import net.bigmangohead.crystalworks.util.serialization.trackedobject.implementations.TrackedEnum;
+import net.bigmangohead.crystalworks.util.serialization.trackedobject.implementations.TrackedPosition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
@@ -20,19 +21,30 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class CrystalBlockEntity extends CWBlockEntity {
-    protected AttachmentState attachmentState = AttachmentState.UNATTACHED;
 
     protected enum AttachmentState {
         UNATTACHED,
         SINGLE_MACHINE
     }
 
-    protected BlockPos attachedBlockPosition = null;
+    protected TrackedEnum<AttachmentState> attachmentState;
+    protected TrackedPosition attachedBlockPosition;
     @Nullable
     protected CrusherBlockEntity attachedBlockEntity = null;
 
     public CrystalBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntities.GEM_BE.get(), pPos, pBlockState);
+
+        this.attachmentState = new TrackedEnum<>(AttachmentState.UNATTACHED, "AttachmentState", TrackedType.SAVE, () -> this.level, this.worldPosition);
+        this.attachedBlockPosition = new TrackedPosition(null, "AttachedPosition", TrackedType.SAVE, () -> this.level, this.worldPosition);
+    }
+
+    @Override
+    protected void registerTrackedObjects() {
+        super.registerTrackedObjects();
+
+        this.trackedObjects.add(() -> this.attachmentState);
+        this.trackedObjects.add(() -> this.attachedBlockPosition);
     }
 
     @Override
@@ -44,7 +56,7 @@ public class CrystalBlockEntity extends CWBlockEntity {
     public void invalidateCaps() {
         super.invalidateCaps();
 
-        if(attachmentState == AttachmentState.SINGLE_MACHINE) {
+        if(attachmentState.obj == AttachmentState.SINGLE_MACHINE) {
             CrusherBlockEntity blockEntity = this.attachedBlockEntity;
             if(blockEntity != null) {
                 blockEntity.getEnergyOptional().invalidate();
@@ -56,12 +68,11 @@ public class CrystalBlockEntity extends CWBlockEntity {
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if ((cap == ForgeCapabilities.ENERGY || cap == ModCapabilities.FLUX) && attachmentState == AttachmentState.SINGLE_MACHINE) {
+        if ((cap == ForgeCapabilities.ENERGY || cap == ModCapabilities.FLUX) && attachmentState.obj == AttachmentState.SINGLE_MACHINE) {
             CrusherBlockEntity attachedBlockEntity = this.attachedBlockEntity;
             if (attachedBlockEntity == null) return super.getCapability(cap, side);
 
             if (cap == ForgeCapabilities.ENERGY) {
-
                 return attachedBlockEntity.getEnergyOptional().cast();
             } else {
                 return attachedBlockEntity.getFluxOptional().cast();
@@ -72,54 +83,48 @@ public class CrystalBlockEntity extends CWBlockEntity {
     }
 
     // Maybe switch to having the machine blocks force updating the gem blocks?
-    // TODO: Make attachment also trigger on placement of gem block
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
         if (level.isClientSide()) return;
 
         Block resultingBlock = level.getBlockState(neighborPos).getBlock();
 
         // Note: this could cause an issue if changing from attached -> attached in the same tick.
-        if (attachmentState == AttachmentState.UNATTACHED && neighborPos.equals(this.worldPosition.above()) && (resultingBlock instanceof CrusherBlock)) {
-            this.attachmentState = AttachmentState.SINGLE_MACHINE;
-            this.attachedBlockPosition = neighborPos;
+        if (attachmentState.obj == AttachmentState.UNATTACHED && neighborPos.equals(this.worldPosition.above()) && (resultingBlock instanceof CrusherBlock)) {
+            this.attachmentState.obj = AttachmentState.SINGLE_MACHINE;
+            this.attachedBlockPosition.obj = neighborPos;
             this.attachedBlockEntity = (CrusherBlockEntity) level.getBlockEntity(neighborPos);
+            setChangedWithoutRedstoneCheck();
         }
 
-        if (attachmentState == AttachmentState.SINGLE_MACHINE && neighborPos.equals(attachedBlockPosition) && !(resultingBlock instanceof CrusherBlock)) {
-            this.attachmentState = AttachmentState.UNATTACHED;
-            this.attachedBlockPosition = null;
+        if (attachmentState.obj == AttachmentState.SINGLE_MACHINE && neighborPos.equals(attachedBlockPosition.obj) && !(resultingBlock instanceof CrusherBlock)) {
+            this.attachmentState.obj = AttachmentState.UNATTACHED;
+            this.attachedBlockPosition.obj = null;
             this.attachedBlockEntity = null;
+            setChangedWithoutRedstoneCheck();
+        }
+    }
+
+    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+        if (level.isClientSide()) return;
+
+        Block attachableBlock = level.getBlockState(pos.above()).getBlock();
+
+        if (attachableBlock instanceof CrusherBlock) {
+            this.attachmentState.obj = AttachmentState.SINGLE_MACHINE;
+            this.attachedBlockPosition.obj = pos.above();
+            this.attachedBlockEntity = (CrusherBlockEntity) level.getBlockEntity(pos.above());
+            setChangedWithoutRedstoneCheck();
         }
     }
 
     @Override
-    protected void saveData(CompoundTag pTag) {
-        pTag.putInt("attachmentstate", this.attachmentState.ordinal());
-        pTag.put("attachedpos", SerializationUtils.serialize(attachedBlockPosition));
+    public void loadServerData(CompoundTag nbt) {
+        BlockPos oldAttachedPosition = this.attachedBlockPosition.obj;
 
-        super.saveData(pTag);
-    }
+        super.loadServerData(nbt);
 
-    @Override
-    public void loadData(CompoundTag nbt) {
-        super.loadData(nbt);
-
-        if (nbt.contains("attachmentstate")) this.attachmentState = AttachmentState.values()[nbt.getInt("attachmentstate")];
-        if (nbt.contains("attachedpos")) this.attachedBlockPosition = SerializationUtils.deserializeBlockPos(nbt.getCompound("attachedpos"));
-    }
-
-    @Nullable
-    private CrusherBlockEntity getAttachedBlockEntity() {
-        if (this.level != null && this.attachmentState == AttachmentState.SINGLE_MACHINE) {
-            if (this.attachedBlockPosition == null) throw new IllegalStateException("Attached block position for crystal cannot be null when attachment state is SINGLE_MACHINE!");
-
-            // This safe method is used to guarantee that this method call does not create
-            // a new block entity when getting it. In this case, this creates recursive calls.
-            BlockEntity blockEntity = LevelUtils.getBlockEntitySafe(this.level, this.attachedBlockPosition);
-            if (blockEntity == null) return null;
-
-            return (CrusherBlockEntity) blockEntity;
+        if (oldAttachedPosition != this.attachedBlockPosition.obj && this.attachedBlockPosition.obj != null && level != null) {
+            this.attachedBlockEntity = (CrusherBlockEntity) this.level.getBlockEntity(this.attachedBlockPosition.obj);
         }
-        return null;
     }
 }

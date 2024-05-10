@@ -1,12 +1,11 @@
 package net.bigmangohead.crystalworks.block.entity.abstraction;
 
-import net.bigmangohead.crystalworks.util.energy.CustomEnergyStorage;
 import net.bigmangohead.crystalworks.util.energy.flux.FluxStorage;
 import net.bigmangohead.crystalworks.util.energy.flux.FluxUtils;
 import net.bigmangohead.crystalworks.util.energy.flux.RedstoneFluxStorage;
-import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedInteger;
+import net.bigmangohead.crystalworks.util.serialization.trackedobject.implementations.TrackedInteger;
 import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedObject;
-import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedSerializable;
+import net.bigmangohead.crystalworks.util.serialization.trackedobject.implementations.TrackedSerializable;
 import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -39,6 +38,7 @@ public abstract class SmallMachineEntity extends AbstractInventoryBlockEntity {
         super.registerTrackedObjects();
 
         this.trackedObjects.add(() -> this.flux);
+        this.trackedObjects.add(() -> this.progress);
     }
 
     @Override
@@ -89,19 +89,4 @@ public abstract class SmallMachineEntity extends AbstractInventoryBlockEntity {
     public RedstoneFluxStorage getEnergy() {
         return this.flux.obj.getForgeEnergyStorage();
     }
-
-    @Override
-    protected void saveData(CompoundTag nbt) {
-        //nbt.put("energy", this.energy.serializeNBT());
-
-        super.saveData(nbt);
-    }
-
-    @Override
-    public void loadData(CompoundTag nbt) {
-        super.loadData(nbt);
-
-        //if (nbt.contains("energy")) energy.deserializeNBT(nbt.get("energy"));
-    }
-
 }

@@ -78,9 +78,6 @@ public class CrusherBlockEntity extends SmallMachineEntity implements MenuProvid
         } else {
             progress.obj = 0;
         }
-
-        //sync to client. TODO: Switch for specific packets method
-        this.level.sendBlockUpdated(this.worldPosition, getBlockState(), getBlockState(), Block.UPDATE_ALL);
     }
 
     private void craftItem() {

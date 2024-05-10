@@ -39,6 +39,16 @@ public class CrystalBlock extends BaseEntityBlock {
         super.neighborChanged(pState, pLevel, pPos, pNeighborBlock, pNeighborPos, pMovedByPiston);
     }
 
+    @Override
+    public void onPlace(BlockState pState, Level pLevel, BlockPos pPos, BlockState pOldState, boolean pMovedByPiston) {
+        BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
+        if (!(blockEntity instanceof CrystalBlockEntity crystalBlockEntity)) throw new IllegalStateException("Block entity is missing at " + pPos);
+
+        crystalBlockEntity.onPlace(pState, pLevel, pPos, pOldState, pMovedByPiston);
+
+        super.onPlace(pState, pLevel, pPos, pOldState, pMovedByPiston);
+    }
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {

@@ -55,7 +55,6 @@ public abstract class CWBlockEntity extends BlockEntity {
         return 0;
     }
 
-    // TODO: Validate data for setData function
     public void setData(int index, int value) {
 
     }
@@ -86,10 +85,24 @@ public abstract class CWBlockEntity extends BlockEntity {
 
     }
 
-    protected void saveData(CompoundTag nbt) {
+    protected void saveData(CompoundTag nbt, boolean syncingData) {
         for (Supplier<TrackedObject<?>> trackedObject : this.trackedObjects) {
-            trackedObject.get().putInTag(nbt);
+            switch (trackedObject.get().getTrackedType()) {
+                case SAVE -> {
+                    if (!syncingData) {
+                        trackedObject.get().putInTag(nbt);
+                    }
+                }
+
+                case SAVE_AND_SYNC -> {
+                    trackedObject.get().putInTag(nbt);
+                }
+            }
         }
+    }
+
+    protected void saveData(CompoundTag nbt) {
+        saveData(nbt, true);
     }
 
     protected void loadData(CompoundTag nbt) {
@@ -100,12 +113,20 @@ public abstract class CWBlockEntity extends BlockEntity {
         }
     }
 
+    protected void saveServerData(CompoundTag nbt) {
+        saveData(nbt, false);
+    }
+
     protected void clientboundOnChunkLoad(CompoundTag nbt) {
-        saveData(nbt);
+        saveData(nbt, true);
     }
 
     protected void clientboundOnBlockUpdate(CompoundTag nbt) {
-        saveData(nbt);
+        saveData(nbt, true);
+    }
+
+    protected void loadServerData(CompoundTag nbt) {
+        loadData(nbt);
     }
 
     protected void receiveDataOnChunkLoad(CompoundTag nbt) {
@@ -122,7 +143,7 @@ public abstract class CWBlockEntity extends BlockEntity {
     @Override
     protected void saveAdditional(CompoundTag pTag) {
         CompoundTag modNBT = new CompoundTag();
-        saveData(modNBT);
+        saveServerData(modNBT);
         pTag.put(CrystalWorksMod.MOD_ID, modNBT);
 
         super.saveAdditional(pTag);
@@ -131,7 +152,7 @@ public abstract class CWBlockEntity extends BlockEntity {
     @Override
     public void load(CompoundTag nbt) {
         CompoundTag modNBT = nbt.getCompound(CrystalWorksMod.MOD_ID);
-        loadData(modNBT);
+        loadServerData(modNBT);
 
         super.load(nbt);
     }

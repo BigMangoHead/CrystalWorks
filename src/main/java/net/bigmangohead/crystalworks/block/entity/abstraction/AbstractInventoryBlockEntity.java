@@ -2,7 +2,7 @@ package net.bigmangohead.crystalworks.block.entity.abstraction;
 
 import net.bigmangohead.crystalworks.util.item.CWItemStackHandler;
 import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedObject;
-import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedSerializable;
+import net.bigmangohead.crystalworks.util.serialization.trackedobject.implementations.TrackedSerializable;
 import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -58,7 +58,6 @@ public abstract class AbstractInventoryBlockEntity extends CWBlockEntity impleme
         this.lazyItemHandler.invalidate();
     }
 
-    // TODO: Make directional.
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         if(cap == ForgeCapabilities.ITEM_HANDLER) {
