@@ -1,8 +1,8 @@
 package net.bigmangohead.crystalworks.block.block;
 
+import net.bigmangohead.crystalworks.block.block.abstraction.CWFunctionalBlock;
 import net.bigmangohead.crystalworks.block.entity.abstraction.CWBlockEntity;
-import net.bigmangohead.crystalworks.block.block.abstraction.CWCustomBlock;
-import net.bigmangohead.crystalworks.block.entity.BasicGeneratorBlockEntity;
+import net.bigmangohead.crystalworks.block.entity.machine.BasicGeneratorBlockEntity;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
 import net.bigmangohead.crystalworks.util.block.BlockUtils;
 import net.minecraft.core.BlockPos;
@@ -18,15 +18,14 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.Nullable;
 
-public class BasicGeneratorBlock extends CWCustomBlock {
+public class BasicGeneratorBlock extends CWFunctionalBlock {
 
     public BasicGeneratorBlock(Properties pProperties) {
         super(pProperties);
     }
 
-    @Nullable
     @Override
-    public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
+    protected CWBlockEntity getNewBlockEntity(BlockPos blockPos, BlockState blockState) {
         return new BasicGeneratorBlockEntity(blockPos, blockState);
     }
 

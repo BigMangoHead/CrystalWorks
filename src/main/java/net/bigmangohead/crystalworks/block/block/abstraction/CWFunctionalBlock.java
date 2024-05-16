@@ -6,14 +6,12 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-public abstract class CWCustomBlock extends BaseEntityBlock {
-    protected CWCustomBlock(Properties pProperties) {
+public abstract class CWFunctionalBlock extends CWBlock {
+    protected CWFunctionalBlock(Properties pProperties) {
         super(pProperties);
     }
 
@@ -43,10 +41,7 @@ public abstract class CWCustomBlock extends BaseEntityBlock {
         return onServerUse(pState, pLevel, pPos, pPlayer, pHit, (CWBlockEntity) entity);
     }
 
-    public abstract InteractionResult onServerUse(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit, CWBlockEntity blockEntity);
-
-    @Override
-    public RenderShape getRenderShape(BlockState pState) {
-        return RenderShape.MODEL;
+    public InteractionResult onServerUse(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit, CWBlockEntity blockEntity) {
+        return InteractionResult.PASS;
     }
 }

@@ -1,10 +1,11 @@
 package net.bigmangohead.crystalworks.block.block;
 
+import net.bigmangohead.crystalworks.block.block.abstraction.CWFunctionalBlock;
 import net.bigmangohead.crystalworks.block.entity.abstraction.CWBlockEntity;
-import net.bigmangohead.crystalworks.block.block.abstraction.CWCustomBlock;
-import net.bigmangohead.crystalworks.block.entity.CrusherBlockEntity;
+import net.bigmangohead.crystalworks.block.entity.machine.CrusherBlockEntity;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
 import net.bigmangohead.crystalworks.util.block.BlockUtils;
+import net.bigmangohead.crystalworks.util.network.NetworkUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -19,10 +20,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.Nullable;
 
-public class CrusherBlock extends CWCustomBlock {
+public class CrusherBlock extends CWFunctionalBlock {
     public static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 12, 16);
 
     public CrusherBlock(Properties pProperties) {
@@ -36,7 +36,7 @@ public class CrusherBlock extends CWCustomBlock {
 
     @Nullable
     @Override
-    public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
+    public CWBlockEntity getNewBlockEntity(BlockPos blockPos, BlockState blockState) {
         return new CrusherBlockEntity(blockPos, blockState);
     }
 
@@ -45,7 +45,7 @@ public class CrusherBlock extends CWCustomBlock {
         if(!(blockEntity instanceof CrusherBlockEntity)) {
             throw new IllegalStateException("Container provider is missing!");
         }
-        NetworkHooks.openScreen(((ServerPlayer)player), (CrusherBlockEntity)blockEntity, pos);
+        NetworkUtils.openScreen(((ServerPlayer)player), (CrusherBlockEntity)blockEntity, pos, (buf) -> {});
         return InteractionResult.sidedSuccess(level.isClientSide());
     }
 
