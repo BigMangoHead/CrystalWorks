@@ -36,7 +36,7 @@ public class CrystalBlockEntity extends CWBlockEntity {
     // it can just be grabbed whenever necessary, and any checks for grabbing it can be done on the fly.
     protected Supplier<CrusherBlockEntity> attachedBlockEntity = () -> {
         if (this.level != null && this.attachedBlockPosition.obj != null) {
-            return (CrusherBlockEntity) this.level.getBlockEntity(attachedBlockPosition.obj);
+            return (CrusherBlockEntity) this.level.getExistingBlockEntity(attachedBlockPosition.obj);
         } else {
             return null;
         }
@@ -68,6 +68,7 @@ public class CrystalBlockEntity extends CWBlockEntity {
 
         if(attachmentState.obj == AttachmentState.SINGLE_MACHINE) {
             CrusherBlockEntity blockEntity = this.attachedBlockEntity.get();
+            System.out.println(attachedBlockEntity);
             if(blockEntity != null) {
                 blockEntity.getEnergyOptional().invalidate();
                 blockEntity.getFluxOptional().invalidate();
