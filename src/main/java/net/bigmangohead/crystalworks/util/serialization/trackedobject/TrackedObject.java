@@ -4,10 +4,10 @@ import net.bigmangohead.crystalworks.network.PacketHandler;
 import net.bigmangohead.crystalworks.network.packet.server.CWBlockEntityUpdatePacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-import java.util.Objects;
 import java.util.function.Supplier;
 
 // This acts as a storage for any object that can be serialized
@@ -45,6 +45,10 @@ public abstract class TrackedObject<T> {
 
     public abstract void updateWithTag(CompoundTag nbt);
 
+    public abstract void writeToByteBuffer(FriendlyByteBuf buf);
+
+    public abstract void updateFromByteBuffer(FriendlyByteBuf buf);
+
     // Sends packet updates and tells server to save changed data.
     public void sendUpdate(boolean sendRedstoneUpdate) {
         CompoundTag nbtToSend = new CompoundTag();
@@ -52,11 +56,11 @@ public abstract class TrackedObject<T> {
         switch (this.trackedMethod) {
 
             case BLOCK_ENTITY -> {
-                if (this.trackedType == TrackedType.SAVE_AND_SYNC) {
+                if (this.trackedType.shouldSyncOnUpdate()) {
                     PacketHandler.sendToPlayersTrackingBlock(this.level.get(), this.blockPos, new CWBlockEntityUpdatePacket(CWBlockEntityUpdatePacket.UpdateType.ADD_CW_DATA, this.blockPos, nbtToSend));
                 }
 
-                if (this.level.get() != null) {
+                if (this.trackedType.shouldSave() && this.level.get() != null) {
                     if (sendRedstoneUpdate && this.updateRedstone) {
                         // Note that this is not very fine to do multiple times per tick, involves many immediate actions.
                         BlockEntity targetBlockEntity = this.level.get().getBlockEntity(this.blockPos);

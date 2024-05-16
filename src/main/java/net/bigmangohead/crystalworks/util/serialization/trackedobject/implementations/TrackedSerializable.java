@@ -5,6 +5,7 @@ import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedTyp
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.INBTSerializable;
 
@@ -28,5 +29,15 @@ public class TrackedSerializable<S extends Tag, T extends INBTSerializable<S>> e
     @Override
     public void updateWithTag(CompoundTag nbt) {
         this.obj.deserializeNBT((S) nbt.get(this.key));
+    }
+
+    @Override
+    public void writeToByteBuffer(FriendlyByteBuf buf) {
+        buf.writeNbt((CompoundTag) obj.serializeNBT());
+    }
+
+    @Override
+    public void updateFromByteBuffer(FriendlyByteBuf buf) {
+        obj.deserializeNBT((S) buf.readNbt());
     }
 }
