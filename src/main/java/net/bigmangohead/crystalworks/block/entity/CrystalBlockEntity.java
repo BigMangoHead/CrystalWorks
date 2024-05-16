@@ -2,15 +2,14 @@ package net.bigmangohead.crystalworks.block.entity;
 
 import net.bigmangohead.crystalworks.block.block.CrusherBlock;
 import net.bigmangohead.crystalworks.block.entity.abstraction.CWBlockEntity;
+import net.bigmangohead.crystalworks.block.entity.machine.CrusherBlockEntity;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
 import net.bigmangohead.crystalworks.registery.ModCapabilities;
-import net.bigmangohead.crystalworks.util.serialization.SerializationUtils;
 import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedType;
 import net.bigmangohead.crystalworks.util.serialization.trackedobject.implementations.TrackedEnum;
 import net.bigmangohead.crystalworks.util.serialization.trackedobject.implementations.TrackedPosition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,6 +18,8 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Supplier;
 
 public class CrystalBlockEntity extends CWBlockEntity {
 
@@ -29,8 +30,17 @@ public class CrystalBlockEntity extends CWBlockEntity {
 
     protected TrackedEnum<AttachmentState> attachmentState;
     protected TrackedPosition attachedBlockPosition;
-    @Nullable
-    protected CrusherBlockEntity attachedBlockEntity = null;
+
+    // While the supplier object will never be null, the attached block entity can be.
+    // The supplier is used so that the attached block entity never has to be tracked,
+    // it can just be grabbed whenever necessary, and any checks for grabbing it can be done on the fly.
+    protected Supplier<CrusherBlockEntity> attachedBlockEntity = () -> {
+        if (this.level != null && this.attachedBlockPosition.obj != null) {
+            return (CrusherBlockEntity) this.level.getBlockEntity(attachedBlockPosition.obj);
+        } else {
+            return null;
+        }
+    };
 
     public CrystalBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntities.GEM_BE.get(), pPos, pBlockState);
@@ -57,7 +67,7 @@ public class CrystalBlockEntity extends CWBlockEntity {
         super.invalidateCaps();
 
         if(attachmentState.obj == AttachmentState.SINGLE_MACHINE) {
-            CrusherBlockEntity blockEntity = this.attachedBlockEntity;
+            CrusherBlockEntity blockEntity = this.attachedBlockEntity.get();
             if(blockEntity != null) {
                 blockEntity.getEnergyOptional().invalidate();
                 blockEntity.getFluxOptional().invalidate();
@@ -69,7 +79,7 @@ public class CrystalBlockEntity extends CWBlockEntity {
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         if ((cap == ForgeCapabilities.ENERGY || cap == ModCapabilities.FLUX) && attachmentState.obj == AttachmentState.SINGLE_MACHINE) {
-            CrusherBlockEntity attachedBlockEntity = this.attachedBlockEntity;
+            CrusherBlockEntity attachedBlockEntity = this.attachedBlockEntity.get();
             if (attachedBlockEntity == null) return super.getCapability(cap, side);
 
             if (cap == ForgeCapabilities.ENERGY) {
@@ -92,14 +102,12 @@ public class CrystalBlockEntity extends CWBlockEntity {
         if (attachmentState.obj == AttachmentState.UNATTACHED && neighborPos.equals(this.worldPosition.above()) && (resultingBlock instanceof CrusherBlock)) {
             this.attachmentState.obj = AttachmentState.SINGLE_MACHINE;
             this.attachedBlockPosition.obj = neighborPos;
-            this.attachedBlockEntity = (CrusherBlockEntity) level.getBlockEntity(neighborPos);
             setChangedWithoutRedstoneCheck();
         }
 
         if (attachmentState.obj == AttachmentState.SINGLE_MACHINE && neighborPos.equals(attachedBlockPosition.obj) && !(resultingBlock instanceof CrusherBlock)) {
             this.attachmentState.obj = AttachmentState.UNATTACHED;
             this.attachedBlockPosition.obj = null;
-            this.attachedBlockEntity = null;
             setChangedWithoutRedstoneCheck();
         }
     }
@@ -112,19 +120,7 @@ public class CrystalBlockEntity extends CWBlockEntity {
         if (attachableBlock instanceof CrusherBlock) {
             this.attachmentState.obj = AttachmentState.SINGLE_MACHINE;
             this.attachedBlockPosition.obj = pos.above();
-            this.attachedBlockEntity = (CrusherBlockEntity) level.getBlockEntity(pos.above());
             setChangedWithoutRedstoneCheck();
-        }
-    }
-
-    @Override
-    public void loadServerData(CompoundTag nbt) {
-        BlockPos oldAttachedPosition = this.attachedBlockPosition.obj;
-
-        super.loadServerData(nbt);
-
-        if (oldAttachedPosition != this.attachedBlockPosition.obj && this.attachedBlockPosition.obj != null && level != null) {
-            this.attachedBlockEntity = (CrusherBlockEntity) this.level.getBlockEntity(this.attachedBlockPosition.obj);
         }
     }
 }
