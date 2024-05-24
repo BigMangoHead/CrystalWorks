@@ -37,9 +37,6 @@ public class PacketHandler {
     }
 
     public static void sendToPlayer(Object msg, ServerPlayer serverPlayer) {
-        if (msg instanceof CWBlockEntityUpdatePacket msgUpdatePacket) {
-            System.out.println("Sending Packet! " + msgUpdatePacket.getNBTData());
-        }
         INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer), msg);
     }
 

@@ -1,7 +1,6 @@
 package net.bigmangohead.crystalworks.block.entity.abstraction;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.block.entity.machine.CrusherBlockEntity;
 import net.bigmangohead.crystalworks.util.network.NetworkUtils;
 import net.bigmangohead.crystalworks.util.serialization.trackedobject.handler.TrackedObjectBEHandler;
 import net.minecraft.core.BlockPos;
@@ -111,9 +110,6 @@ public abstract class CWBlockEntity extends BlockEntity {
     }
 
     protected void loadData(CompoundTag nbt) {
-        if (nbt.contains("progress")) {
-            System.out.println("(In CWBlockEntity.loadData): " + nbt.getInt("progress"));
-        }
         this.trackedObjectHandler.updateFromTag(nbt);
     }
 
@@ -224,11 +220,6 @@ public abstract class CWBlockEntity extends BlockEntity {
     public void tick(Level level, BlockPos blockPos, BlockState blockState) {
         if (this.level != null && !(this.level.isClientSide())) {
             onServerTick(level, blockPos, blockState);
-        }
-
-        if (this.level != null && this.level.isClientSide() && this instanceof CrusherBlockEntity crusherBlockEntity) {
-            System.out.println("(In CWBlockEntity.tick, crusherBlockEntity reference): " + crusherBlockEntity.progress.obj);
-            System.out.println("(In CWBlockEntity.tick, TrackedObject reference): " + this.trackedObjectHandler.getTrackedObject("progress").obj);
         }
     }
 

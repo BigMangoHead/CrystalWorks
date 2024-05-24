@@ -17,7 +17,6 @@ public class ServerEvents {
 
     @SubscribeEvent
     public static void onMenuOpened(PlayerContainerEvent.Open event) {
-        System.out.println("Menu opened!");
         if (event.getContainer() instanceof ICWBlockEntityMenu menu) {
             menu.getBlockEntity().playerOpenedMenu((ServerPlayer) event.getEntity());
         }

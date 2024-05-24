@@ -11,11 +11,10 @@ import net.bigmangohead.crystalworks.util.energy.flux.FluxUtils;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -89,21 +88,14 @@ public class CrystalWorksMod
     }
 
     @SubscribeEvent
-    public void onClientLogin(EntityJoinLevelEvent event) {
-        CWBlockEntityUpdateHandler.updateLevel(event.getLevel());
+    public void onPlayerClientJoinWorld(ClientPlayerNetworkEvent.LoggingIn event) {
+        CWBlockEntityUpdateHandler.updateLevel(event.getPlayer().level());
     }
 
     @SubscribeEvent
     public void onDimensionSwitch(PlayerEvent.PlayerChangedDimensionEvent event) {
         // TODO: Check this actually works
         CWBlockEntityUpdateHandler.updateLevel(event.getEntity().level());
-    }
-
-    // You can use SubscribeEvent and let the Event Bus discover methods to call
-    @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event)
-    {
-
     }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent

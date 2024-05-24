@@ -72,9 +72,7 @@ public class TrackedObjectBEHandler extends TrackedObjectHandler {
     public void updateFromTag(CompoundTag nbt) {
         for(TrackedObject<?> trackedObject : this.trackedObjects) {
             if (nbt.contains(trackedObject.getKey())) {
-                System.out.println("Updating tracked object! " + nbt.getInt("progress"));
                 trackedObject.updateWithTag(nbt);
-                System.out.println("New value: " + trackedObject.obj);
             }
         }
     }
@@ -85,10 +83,6 @@ public class TrackedObjectBEHandler extends TrackedObjectHandler {
             if (trackedObject.getTrackedType().shouldSyncOnMenu()) {
                 trackedObject.putInTag(nbt);
             }
-        }
-
-        if (nbt.contains("progress")) {
-            System.out.println("Progress value sent: " + nbt.getInt("progress"));
         }
         PacketHandler.sendToPlayer(new CWBlockEntityUpdatePacket(CWBlockEntityUpdatePacket.UpdateType.ADD_CW_DATA, this.blockPos, nbt), player);
     }
@@ -165,14 +159,8 @@ public class TrackedObjectBEHandler extends TrackedObjectHandler {
         // Send update packets to players that need them, if required
         for (Player player : level.get().players()) {
             if (playersInMenu.contains(player) && !tagForMenuSync.isEmpty()) {
-                if (tagForMenuSync.contains("progress")) {
-                    System.out.println("Progress value sent: " + tagForMenuSync.getInt("progress"));
-                }
                 PacketHandler.sendToPlayer(new CWBlockEntityUpdatePacket(CWBlockEntityUpdatePacket.UpdateType.ADD_CW_DATA, this.blockPos, tagForMenuSync), (ServerPlayer) player);
             } else if (!tagForUpdateSync.isEmpty()) {
-                if (tagForUpdateSync.contains("progress")) {
-                    System.out.println("Progress value sent: " + tagForUpdateSync.getInt("progress"));
-                }
                 PacketHandler.sendToPlayer(new CWBlockEntityUpdatePacket(CWBlockEntityUpdatePacket.UpdateType.ADD_CW_DATA, this.blockPos, tagForUpdateSync), (ServerPlayer) player);
             }
         }

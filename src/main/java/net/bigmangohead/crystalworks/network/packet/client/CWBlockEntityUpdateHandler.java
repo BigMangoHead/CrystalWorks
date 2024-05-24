@@ -18,14 +18,11 @@ public class CWBlockEntityUpdateHandler {
     public static void handlePacket(CWBlockEntityUpdatePacket updatePacket, NetworkEvent.Context context) {
         context.enqueueWork(() -> {
             BlockPos blockPos = updatePacket.getBlockPos();
-            System.out.println("Packet received! " + updatePacket.getNBTData() + " " + updatePacket.getUpdateType());
 
             if (level != null && level.hasChunkAt(blockPos)) {
-                System.out.println("Processing received packet 1");
                 BlockEntity blockEntity = level.getExistingBlockEntity(blockPos);
                 level.getBlockEntity(blockPos);
                 if (blockEntity instanceof CWBlockEntity cwBlockEntity) {
-                    System.out.println("Processing received packet 2");
                     updateBlockEntity(cwBlockEntity, updatePacket);
                 }
             }
@@ -39,15 +36,11 @@ public class CWBlockEntityUpdateHandler {
         switch (updatePacket.getUpdateType()) {
             case ADD_CW_DATA -> {
 
-                System.out.println("Processing received packet 3");
                 // Add NBT data to the crystalworks tag
                 CompoundTag CWNBTData = blockNBTData.getCompound("crystalworks");
                 CompoundTag NBTDataToAdd = updatePacket.getNBTData();
                 for (String key : NBTDataToAdd.getAllKeys()) {
                     CWNBTData.put(key, NBTDataToAdd.get(key));
-                    if (key.equals("progress")) {
-                        System.out.println("Progress value received: " + NBTDataToAdd.get("progress"));
-                    }
                 }
                 blockNBTData.put("crystalworks", CWNBTData);
 
