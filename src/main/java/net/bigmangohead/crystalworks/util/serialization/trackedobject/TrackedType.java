@@ -27,4 +27,8 @@ public enum TrackedType {
     public boolean shouldSyncOnMenu() {
         return syncOnMenu;
     }
+
+    public boolean shouldSync() {
+        return syncOnUpdate || syncOnMenu;
+    }
 }

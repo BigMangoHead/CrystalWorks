@@ -2,6 +2,10 @@
   "values": [
     "crystalworks:sapphire_block",
     "crystalworks:sapphire_ore",
-    "crystalworks:deepslate_sapphire_ore"
+    "crystalworks:deepslate_sapphire_ore",
+    "crystalworks:jade_block",
+    "crystalworks:basic_generator",
+    "crystalworks:crusher",
+    "crystalworks:plate_former"
   ]
 }

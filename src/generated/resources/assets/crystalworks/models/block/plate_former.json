@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "crystalworks:block/plate_former_front",
+    "side": "crystalworks:block/plate_former_side",
+    "top": "crystalworks:block/plate_former_top"
+  }
+}

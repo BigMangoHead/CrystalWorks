@@ -45,16 +45,18 @@ public class CrystalBlockEntity extends CWBlockEntity {
     public CrystalBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntities.GEM_BE.get(), pPos, pBlockState);
 
-        this.attachmentState = new TrackedEnum<>(AttachmentState.UNATTACHED, "AttachmentState", TrackedType.SAVE, () -> this.level, this.worldPosition);
-        this.attachedBlockPosition = new TrackedPosition(null, "AttachedPosition", TrackedType.SAVE, () -> this.level, this.worldPosition);
+        this.attachmentState = new TrackedEnum<>(AttachmentState.UNATTACHED, "AttachmentState", TrackedType.SAVE);
+        this.attachedBlockPosition = new TrackedPosition(null, "AttachedPosition", TrackedType.SAVE);
+
+        finishCreation();
     }
 
     @Override
     protected void registerTrackedObjects() {
         super.registerTrackedObjects();
 
-        this.trackedObjects.add(() -> this.attachmentState);
-        this.trackedObjects.add(() -> this.attachedBlockPosition);
+        this.trackedObjectHandler.register(this.attachmentState);
+        this.trackedObjectHandler.register(this.attachedBlockPosition);
     }
 
     @Override

@@ -1,14 +1,8 @@
 package net.bigmangohead.crystalworks.util.serialization.trackedobject;
 
-import net.bigmangohead.crystalworks.network.PacketHandler;
-import net.bigmangohead.crystalworks.network.packet.server.CWBlockEntityUpdatePacket;
-import net.minecraft.core.BlockPos;
+import net.bigmangohead.crystalworks.util.serialization.trackedobject.handler.TrackedObjectHandler;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-
-import java.util.function.Supplier;
 
 // This acts as a storage for any object that can be serialized
 // into a nbt object. This is used to make calls for sending packets/
@@ -23,62 +17,44 @@ public abstract class TrackedObject<T> {
 
     protected final TrackedMethod trackedMethod;
 
-    //Used for block entity saving
-    protected final Supplier<Level> level;
-    protected final BlockPos blockPos;
+    // Note that this value does not matter if syncing is disabled for the particular tracked object.
+    private final int ticksBetweenCheckForSync;
+
+    protected TrackedObjectHandler handler;
+
+    // Used for block entity updates
     protected final boolean updateRedstone;
 
     // Constructor for block entities
-    public TrackedObject(T obj, String key, TrackedType trackedType, Supplier<Level> level, BlockPos blockPos, Boolean updateRedstone) {
+    public TrackedObject(T obj, String key, TrackedType trackedType, int ticksBetweenCheckForSync, Boolean updateRedstone) {
         this.obj = obj;
         this.key = key;
         this.trackedType = trackedType;
+        this.ticksBetweenCheckForSync = ticksBetweenCheckForSync;
 
         this.trackedMethod = TrackedMethod.BLOCK_ENTITY;
 
-        this.level = level;
-        this.blockPos = blockPos;
         this.updateRedstone = updateRedstone;
+    }
+
+    public void declareHandler(TrackedObjectHandler handler) {
+        this.handler = handler;
     }
 
     public abstract void putInTag(CompoundTag nbt);
 
     public abstract void updateWithTag(CompoundTag nbt);
 
+    // TODO: Consider making syncing data more efficient by changing out nbt tags.
+    // Could also maybe use shortened nbt tags or something. I'd need to look
+    // into the nbt tag code to see if this would be more efficient though.
     public abstract void writeToByteBuffer(FriendlyByteBuf buf);
 
     public abstract void updateFromByteBuffer(FriendlyByteBuf buf);
 
     // Sends packet updates and tells server to save changed data.
-    public void sendUpdate(boolean sendRedstoneUpdate) {
-        CompoundTag nbtToSend = new CompoundTag();
-        putInTag(nbtToSend);
-        switch (this.trackedMethod) {
-
-            case BLOCK_ENTITY -> {
-                if (this.trackedType.shouldSyncOnUpdate()) {
-                    PacketHandler.sendToPlayersTrackingBlock(this.level.get(), this.blockPos, new CWBlockEntityUpdatePacket(CWBlockEntityUpdatePacket.UpdateType.ADD_CW_DATA, this.blockPos, nbtToSend));
-                }
-
-                if (this.trackedType.shouldSave() && this.level.get() != null) {
-                    if (sendRedstoneUpdate && this.updateRedstone) {
-                        // Note that this is not very fine to do multiple times per tick, involves many immediate actions.
-                        BlockEntity targetBlockEntity = this.level.get().getBlockEntity(this.blockPos);
-                        if (targetBlockEntity != null) {
-                            targetBlockEntity.setChanged();
-                        }
-                    } else {
-                        // Note that this should be fine to do multiple times per tick, as all it really does is check that the chunk exists and then sets a flag to refer back to later.
-                        this.level.get().blockEntityChanged(this.blockPos);
-                    }
-                }
-            }
-
-        }
-    }
-
-    public void sendUpdate() {
-        sendUpdate(true);
+    public void queueUpdate() {
+        handler.queueUpdate(this);
     }
 
     public String getKey() {
@@ -87,5 +63,13 @@ public abstract class TrackedObject<T> {
 
     public TrackedType getTrackedType() {
         return this.trackedType;
+    }
+
+    public int getTicksBetweenCheckForSync() {
+        return ticksBetweenCheckForSync;
+    }
+
+    public boolean shouldUpdateRedstone() {
+        return this.updateRedstone;
     }
 }

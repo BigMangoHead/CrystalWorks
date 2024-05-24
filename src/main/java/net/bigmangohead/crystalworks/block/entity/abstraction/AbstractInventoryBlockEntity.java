@@ -2,8 +2,8 @@ package net.bigmangohead.crystalworks.block.entity.abstraction;
 
 import net.bigmangohead.crystalworks.util.item.CWItemStackHandler;
 import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedObject;
-import net.bigmangohead.crystalworks.util.serialization.trackedobject.implementations.TrackedSerializable;
 import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedType;
+import net.bigmangohead.crystalworks.util.serialization.trackedobject.implementations.TrackedSerializable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -32,18 +32,18 @@ public abstract class AbstractInventoryBlockEntity extends CWBlockEntity impleme
         super(pType, pPos, pBlockState);
         CWItemStackHandler inventory = new CWItemStackHandler(this, this.getSlotCount(), this.capabilitiesCannotInsert(), this.capabilitiesCannotExtract());
 
-        this.inventory = new TrackedSerializable<>(inventory, "inventory", TrackedType.SAVE_AND_SYNC, () -> this.level, this.worldPosition, true);
+        this.inventory = new TrackedSerializable<>(inventory, "inventory", TrackedType.SAVE_AND_SYNC_ALL_UPDATES, 8, true);
     }
 
     @Override
     protected void registerTrackedObjects() {
         super.registerTrackedObjects();
 
-        this.trackedObjects.add(() -> this.inventory);
+        this.trackedObjectHandler.register(this.inventory);
     }
 
     public static class DataIndex {
-        public static final int AMOUNT_OF_VALUES = CWBlockEntity.DataIndex.AMOUNT_OF_VALUES;
+        public static final int AMOUNT_OF_VALUES = 1;
     }
 
     @Override
@@ -51,6 +51,7 @@ public abstract class AbstractInventoryBlockEntity extends CWBlockEntity impleme
         super.onLoad();
         this.lazyItemHandler = LazyOptional.of(() -> this.inventory.obj);
     }
+
 
     @Override
     public void invalidateCaps() {
@@ -66,6 +67,7 @@ public abstract class AbstractInventoryBlockEntity extends CWBlockEntity impleme
 
         return super.getCapability(cap, side);
     }
+
 
     public void drops() {
         SimpleContainer inventory = new SimpleContainer(this.inventory.obj.getSlots());

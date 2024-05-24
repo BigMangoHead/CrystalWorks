@@ -1,5 +1,7 @@
 package net.bigmangohead.crystalworks.screen.menu.abstraction;
 
+import net.bigmangohead.crystalworks.block.entity.abstraction.CWBlockEntity;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -8,22 +10,25 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-public abstract class InventoryMenu extends AbstractContainerMenu {
-    public final BlockEntity blockEntity;
+public abstract class InventoryMenu extends AbstractContainerMenu implements ICWBlockEntityMenu {
+    public final CWBlockEntity blockEntity;
+    public final BlockPos blockEntityPos;
     protected final Level level;
     protected final ContainerData data;
     protected final int inventorySlotCount;
 
     //Client Constructor
+    // TODO: Should probably check the cast to CWBlockEntity
     public <T extends AbstractContainerMenu> InventoryMenu(int pContainerId, Inventory inv, FriendlyByteBuf extraData, int amountOfDataValues, int inventorySlotCount, MenuType<T> menuType) {
-        this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(amountOfDataValues), inventorySlotCount, menuType);
+        this(pContainerId, inv, (CWBlockEntity) inv.player.level().getBlockEntity(extraData.readBlockPos()), new SimpleContainerData(amountOfDataValues), inventorySlotCount, menuType);
     }
 
     //Server Constructor
-    public <T extends AbstractContainerMenu> InventoryMenu(int pContainerId, Inventory inv, BlockEntity entity, ContainerData data, int inventorySlotCount, MenuType<T> menuType) {
+    public <T extends AbstractContainerMenu> InventoryMenu(int pContainerId, Inventory inv, CWBlockEntity entity, ContainerData data, int inventorySlotCount, MenuType<T> menuType) {
         super(menuType, pContainerId);
         checkContainerSize(inv, inventorySlotCount);
-        blockEntity = entity;
+        this.blockEntity = entity;
+        this.blockEntityPos = blockEntity.getBlockPos();
         this.level = inv.player.level();
         this.data = data;
         this.inventorySlotCount = inventorySlotCount;
@@ -108,5 +113,10 @@ public abstract class InventoryMenu extends AbstractContainerMenu {
         for (int i = 0; i < 9; ++i) {
             this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 142));
         }
+    }
+
+    @Override
+    public CWBlockEntity getBlockEntity() {
+        return blockEntity;
     }
 }

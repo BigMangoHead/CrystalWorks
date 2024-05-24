@@ -35,6 +35,7 @@ public class ModCreativeModTabs {
                         pOutput.accept(ModItems.COPPER_DUST.get());
 
                         pOutput.accept(ModBlocks.CRUSHER.get());
+                        pOutput.accept(ModBlocks.PLATE_FORMER.get());
                         pOutput.accept(ModBlocks.BASIC_GENERATOR.get());
 
                         pOutput.accept(ModItems.METAL_DETECTOR.get());

@@ -1,13 +1,15 @@
 package net.bigmangohead.crystalworks.screen.menu;
 
-import net.bigmangohead.crystalworks.util.item.CWItemStackHandler;
-import net.bigmangohead.crystalworks.block.entity.CrusherBlockEntity;
+import net.bigmangohead.crystalworks.block.entity.abstraction.CWBlockEntity;
+import net.bigmangohead.crystalworks.block.entity.abstraction.SmallMachineBlockEntity;
+import net.bigmangohead.crystalworks.block.entity.machine.CrusherBlockEntity;
 import net.bigmangohead.crystalworks.registery.ModMenuTypes;
-import net.bigmangohead.crystalworks.screen.menu.abstraction.CWSlotItemHandler;
 import net.bigmangohead.crystalworks.screen.menu.abstraction.InventoryMenu;
+import net.bigmangohead.crystalworks.screen.menu.slot.CWSlotItemHandler;
+import net.bigmangohead.crystalworks.util.item.CWItemStackHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.*;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
@@ -21,20 +23,29 @@ public class CrusherMenu extends InventoryMenu {
     }
 
     //Server Constructor
-    public CrusherMenu(int pContainerId, Inventory inv, BlockEntity entity, ContainerData data) {
+    public CrusherMenu(int pContainerId, Inventory inv, CWBlockEntity entity, ContainerData data) {
         super(pContainerId, inv, entity, data, 2, ModMenuTypes.CRUSHER_MENU.get());
     }
 
+    //TODO: Add proper variable references
     public boolean isCrafting() {
-        return this.data.get(CrusherBlockEntity.DataIndex.PROGRESS) > 0;
+        return ((CrusherBlockEntity) this.level.getExistingBlockEntity(this.blockEntityPos)).getProgress() > 0;
     }
 
     public int getScaledProgress() {
-        int progress = this.data.get(CrusherBlockEntity.DataIndex.PROGRESS);
-        int maxProgress = this.data.get(CrusherBlockEntity.DataIndex.MAX_PROGRESS);
+        int progress = ((CrusherBlockEntity) this.level.getExistingBlockEntity(this.blockEntityPos)).getProgress();
+        int maxProgress = 78;
         int progressArrowSize = 22; // This is the height in pixels of your arrow
 
         return maxProgress != 0 && progress != 0 ? progress * progressArrowSize / maxProgress : 0;
+    }
+
+    public int getEnergy() {
+        return this.data.get(SmallMachineBlockEntity.DataIndex.ENERGY);
+    }
+
+    public int getProgress() {
+        return ((CrusherBlockEntity) this.level.getExistingBlockEntity(this.blockEntityPos)).getProgress();
     }
 
     protected void addBlockEntityInventory(BlockEntity blockEntity) {

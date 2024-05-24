@@ -34,6 +34,7 @@ public class ModBlockLootTables extends BlockLootSubProvider {
                 block -> createBasicOreDrops(ModBlocks.DEEPSLATE_SAPPHIRE_ORE.get(), ModItems.SAPPHIRE.get(), 2.0f, 5.0f));
 
         this.dropSelf(ModBlocks.CRUSHER.get());
+        this.dropSelf(ModBlocks.PLATE_FORMER.get());
         this.dropSelf(ModBlocks.BASIC_GENERATOR.get());
     }
 

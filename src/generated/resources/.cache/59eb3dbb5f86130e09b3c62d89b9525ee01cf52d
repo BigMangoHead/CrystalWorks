@@ -1,7 +1,8 @@
-// 1.20.1	2024-03-27T21:23:17.4301012	Loot Tables
+// 1.20.1	2024-05-11T14:45:22.8064091	Loot Tables
 572dbe3c1049562f96d055ac281fe55d652281a2 data/crystalworks/loot_tables/blocks/basic_generator.json
 4abfcd93d207417775091e1790c2cd408c888024 data/crystalworks/loot_tables/blocks/crusher.json
 5e2797025eb8f0ba7a2b1b5155629fb9084932a1 data/crystalworks/loot_tables/blocks/deepslate_sapphire_ore.json
 b19d37546fcef3e76c39f6cd7509064bbc022d4b data/crystalworks/loot_tables/blocks/jade_block.json
+da86f9c9c5adb3a436e4f7f3a47f6b37b46ecbaf data/crystalworks/loot_tables/blocks/plate_former.json
 8122aa4fb03b9e966058eafa22129a8474575034 data/crystalworks/loot_tables/blocks/sapphire_block.json
 22fd2536cdcf55debcfd39bd06f1904890848bf9 data/crystalworks/loot_tables/blocks/sapphire_ore.json

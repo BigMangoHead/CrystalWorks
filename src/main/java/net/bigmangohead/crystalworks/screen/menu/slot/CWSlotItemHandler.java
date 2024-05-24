@@ -1,4 +1,4 @@
-package net.bigmangohead.crystalworks.screen.menu.abstraction;
+package net.bigmangohead.crystalworks.screen.menu.slot;
 
 import net.bigmangohead.crystalworks.util.item.CWItemStackHandler;
 import net.minecraft.world.entity.player.Player;
@@ -18,7 +18,7 @@ public class CWSlotItemHandler extends SlotItemHandler {
 
     @Override
     public boolean mayPlace(@NotNull ItemStack stack) {
-        return stack.isEmpty() ? false : this.itemHandler.canItemStackBeInserted(index, stack, true);
+        return !stack.isEmpty() && this.itemHandler.canItemStackBeInserted(index, stack, true);
     }
 
     @Override

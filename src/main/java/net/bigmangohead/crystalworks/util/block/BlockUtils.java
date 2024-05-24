@@ -13,9 +13,9 @@ public class BlockUtils {
     // CustomBlocks call this
     @Nullable
     public static <T extends BlockEntity, A extends CWBlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType, BlockEntityType<A> expectedBlockEntityType) {
-        if(pLevel.isClientSide()) {
-            return null;
-        }
+        //if(pLevel.isClientSide()) {
+        //    return null;
+        //}
 
         return createTickerHelper(pBlockEntityType, expectedBlockEntityType,
                 (level, blockPos, blockState, blockEntity) -> blockEntity.tick(level, blockPos, blockState));

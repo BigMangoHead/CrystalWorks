@@ -6,23 +6,26 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.network.NetworkEvent;
 
 public class CWBlockEntityUpdateHandler {
     private static Level level;
 
-    public static void onLogin(EntityJoinLevelEvent event) {
-        level = event.getLevel();
+    public static void updateLevel(Level newLevel) {
+        level = newLevel;
     }
 
     public static void handlePacket(CWBlockEntityUpdatePacket updatePacket, NetworkEvent.Context context) {
         context.enqueueWork(() -> {
             BlockPos blockPos = updatePacket.getBlockPos();
+            System.out.println("Packet received! " + updatePacket.getNBTData() + " " + updatePacket.getUpdateType());
 
             if (level != null && level.hasChunkAt(blockPos)) {
-                BlockEntity blockEntity = level.getBlockEntity(blockPos);
+                System.out.println("Processing received packet 1");
+                BlockEntity blockEntity = level.getExistingBlockEntity(blockPos);
+                level.getBlockEntity(blockPos);
                 if (blockEntity instanceof CWBlockEntity cwBlockEntity) {
+                    System.out.println("Processing received packet 2");
                     updateBlockEntity(cwBlockEntity, updatePacket);
                 }
             }
@@ -36,11 +39,15 @@ public class CWBlockEntityUpdateHandler {
         switch (updatePacket.getUpdateType()) {
             case ADD_CW_DATA -> {
 
+                System.out.println("Processing received packet 3");
                 // Add NBT data to the crystalworks tag
                 CompoundTag CWNBTData = blockNBTData.getCompound("crystalworks");
                 CompoundTag NBTDataToAdd = updatePacket.getNBTData();
                 for (String key : NBTDataToAdd.getAllKeys()) {
                     CWNBTData.put(key, NBTDataToAdd.get(key));
+                    if (key.equals("progress")) {
+                        System.out.println("Progress value received: " + NBTDataToAdd.get("progress"));
+                    }
                 }
                 blockNBTData.put("crystalworks", CWNBTData);
 

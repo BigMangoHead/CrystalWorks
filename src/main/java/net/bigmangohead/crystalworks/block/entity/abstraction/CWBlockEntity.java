@@ -1,13 +1,17 @@
 package net.bigmangohead.crystalworks.block.entity.abstraction;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedObject;
+import net.bigmangohead.crystalworks.block.entity.machine.CrusherBlockEntity;
+import net.bigmangohead.crystalworks.util.network.NetworkUtils;
+import net.bigmangohead.crystalworks.util.serialization.trackedobject.handler.TrackedObjectBEHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -16,52 +20,61 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.function.Supplier;
-
 public abstract class CWBlockEntity extends BlockEntity {
 
     protected final ContainerData data;
-    protected final ArrayList<Supplier<TrackedObject<?>>> trackedObjects;
+    protected final TrackedObjectBEHandler trackedObjectHandler;
 
     public CWBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
         this.data = new ContainerData() {
             @Override
             public int get(int i) {
-                return getData(i);
+                return getMenuData(i);
             }
 
             @Override
             public void set(int i, int i1) {
-                setData(i, i1);
+                setMenuData(i, i1);
             }
 
             @Override
             public int getCount() {
-                return getDataCount();
+                return getMenuDataCount();
             }
         };
 
-        this.trackedObjects = new ArrayList<>();
+        this.trackedObjectHandler = new TrackedObjectBEHandler(() -> this.level, this.getBlockPos());
+    }
+
+    public void finishCreation() {
         registerTrackedObjects();
+        trackedObjectHandler.finishRegistration();
     }
 
-    public static class DataIndex {
-        public static final int AMOUNT_OF_VALUES = 0;
-    }
 
-    public int getData(int index) {
+
+    // Sets/gets menu data unless the index is invalid
+    public int getMenuData(int index) {
         return 0;
     }
 
-    public void setData(int index, int value) {
-
+    public void setMenuData(int index, int value) {
     }
 
-    public int getDataCount() {
-        return DataIndex.AMOUNT_OF_VALUES;
+    public int getMenuDataCount() {
+        return 0;
     }
+
+    public void playerOpenedMenu(ServerPlayer player) {
+        trackedObjectHandler.playerOpenedMenu(player);
+    }
+
+    public void playerClosedMenu(ServerPlayer player) {
+        trackedObjectHandler.playerClosedMenu(player);
+    }
+
+
 
     public void setChangedWithoutRedstoneCheck() {
         if(this.level != null) {
@@ -86,18 +99,10 @@ public abstract class CWBlockEntity extends BlockEntity {
     }
 
     protected void saveData(CompoundTag nbt, boolean syncingData) {
-        for (Supplier<TrackedObject<?>> trackedObject : this.trackedObjects) {
-            switch (trackedObject.get().getTrackedType()) {
-                case SAVE -> {
-                    if (!syncingData) {
-                        trackedObject.get().putInTag(nbt);
-                    }
-                }
-
-                case SAVE_AND_SYNC -> {
-                    trackedObject.get().putInTag(nbt);
-                }
-            }
+        if (syncingData) {
+            this.trackedObjectHandler.updateTagForSyncOnUpdate(nbt);
+        } else {
+            this.trackedObjectHandler.updateTagForSave(nbt);
         }
     }
 
@@ -106,11 +111,10 @@ public abstract class CWBlockEntity extends BlockEntity {
     }
 
     protected void loadData(CompoundTag nbt) {
-        for(Supplier<TrackedObject<?>> trackedObject : this.trackedObjects) {
-            if (nbt.contains(trackedObject.get().getKey())) {
-                trackedObject.get().updateWithTag(nbt);
-            }
+        if (nbt.contains("progress")) {
+            System.out.println("(In CWBlockEntity.loadData): " + nbt.getInt("progress"));
         }
+        this.trackedObjectHandler.updateFromTag(nbt);
     }
 
     protected void saveServerData(CompoundTag nbt) {
@@ -139,7 +143,7 @@ public abstract class CWBlockEntity extends BlockEntity {
 
 
 
-    //saveAdditional and load store data on the server side
+    //saveAdditional and load store data on the server and client side. This means that technically work is done on the client, but it should mostly do nothing.
     @Override
     protected void saveAdditional(CompoundTag pTag) {
         CompoundTag modNBT = new CompoundTag();
@@ -215,14 +219,31 @@ public abstract class CWBlockEntity extends BlockEntity {
     }
 
 
+
     //Gives a default state for the tick function so that the function can be assumed to exist when a ticker is created
     public void tick(Level level, BlockPos blockPos, BlockState blockState) {
         if (this.level != null && !(this.level.isClientSide())) {
             onServerTick(level, blockPos, blockState);
         }
+
+        if (this.level != null && this.level.isClientSide() && this instanceof CrusherBlockEntity crusherBlockEntity) {
+            System.out.println("(In CWBlockEntity.tick, crusherBlockEntity reference): " + crusherBlockEntity.progress.obj);
+            System.out.println("(In CWBlockEntity.tick, TrackedObject reference): " + this.trackedObjectHandler.getTrackedObject("progress").obj);
+        }
     }
 
     public void onServerTick(Level level, BlockPos blockPos, BlockState blockState) {
-
+        if (trackedObjectHandler.queuedUpdate) {
+            trackedObjectHandler.sendQueuedUpdates();
+        }
     }
+
+
+
+    public void openScreen(ServerPlayer player, MenuProvider containerSupplier, BlockPos pos) {
+        NetworkUtils.openScreen(player, containerSupplier, pos, (buf) -> {
+
+        });
+    }
+
 }

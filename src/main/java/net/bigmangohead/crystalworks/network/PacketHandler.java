@@ -1,7 +1,6 @@
 package net.bigmangohead.crystalworks.network;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.network.packet.abstraction.CustomPacket;
 import net.bigmangohead.crystalworks.network.packet.server.CWBlockEntityUpdatePacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -38,6 +37,9 @@ public class PacketHandler {
     }
 
     public static void sendToPlayer(Object msg, ServerPlayer serverPlayer) {
+        if (msg instanceof CWBlockEntityUpdatePacket msgUpdatePacket) {
+            System.out.println("Sending Packet! " + msgUpdatePacket.getNBTData());
+        }
         INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer), msg);
     }
 

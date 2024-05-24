@@ -45,9 +45,23 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-        renderBackground(guiGraphics);
-        super.render(guiGraphics, mouseX, mouseY, delta);
-        renderTooltip(guiGraphics, mouseX, mouseY);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        renderBackground(graphics);
+        super.render(graphics, mouseX, mouseY, delta);
+        renderTooltip(graphics, mouseX, mouseY);
+
+        graphics.drawString(this.font,
+                "Energy: %d".formatted(this.menu.getEnergy()),
+                this.leftPos + 8,
+                this.topPos + 8,
+                0x404040,
+                false);
+
+        graphics.drawString(this.font,
+                "Progress: %d".formatted(this.menu.getProgress()),
+                this.leftPos + 8,
+                this.topPos + 58,
+                0x404040,
+                false);
     }
 }

@@ -1,6 +1,7 @@
 package net.bigmangohead.crystalworks;
 
 import com.mojang.logging.LogUtils;
+import net.bigmangohead.crystalworks.event.ServerEvents;
 import net.bigmangohead.crystalworks.network.PacketHandler;
 import net.bigmangohead.crystalworks.network.packet.client.CWBlockEntityUpdateHandler;
 import net.bigmangohead.crystalworks.registery.*;
@@ -10,7 +11,6 @@ import net.bigmangohead.crystalworks.util.energy.flux.FluxUtils;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
@@ -60,6 +60,9 @@ public class CrystalWorksMod
         ModCreativeModTabs.register(modEventBus);
 
         ModCapabilities.register(modEventBus);
+
+        // Register server events listener
+        MinecraftForge.EVENT_BUS.register(ServerEvents.class);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)
@@ -87,7 +90,13 @@ public class CrystalWorksMod
 
     @SubscribeEvent
     public void onClientLogin(EntityJoinLevelEvent event) {
-        CWBlockEntityUpdateHandler.onLogin(event);
+        CWBlockEntityUpdateHandler.updateLevel(event.getLevel());
+    }
+
+    @SubscribeEvent
+    public void onDimensionSwitch(PlayerEvent.PlayerChangedDimensionEvent event) {
+        // TODO: Check this actually works
+        CWBlockEntityUpdateHandler.updateLevel(event.getEntity().level());
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call

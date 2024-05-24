@@ -2,17 +2,17 @@ package net.bigmangohead.crystalworks.util.serialization.trackedobject.implement
 
 import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedObject;
 import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedType;
-import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.level.Level;
-
-import java.util.function.Supplier;
 
 public class TrackedEnum<T extends Enum<T>> extends TrackedObject<T> {
 
-    public TrackedEnum(T obj, String key, TrackedType trackedType, Supplier<Level> level, BlockPos blockPos) {
-        super(obj, key, trackedType, level, blockPos, false);
+    public TrackedEnum(T obj, String key, TrackedType trackedType, int ticksBetweenCheckForSync) {
+        super(obj, key, trackedType, ticksBetweenCheckForSync, false);
+    }
+
+    public TrackedEnum(T obj, String key, TrackedType trackedType) {
+        super(obj, key, trackedType, 1, false);
     }
 
     @Override

@@ -1,11 +1,9 @@
-package net.bigmangohead.crystalworks.block.entity;
+package net.bigmangohead.crystalworks.block.entity.machine;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
 import net.bigmangohead.crystalworks.block.entity.abstraction.AbstractInventoryBlockEntity;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
 import net.bigmangohead.crystalworks.registery.ModCapabilities;
-import net.bigmangohead.crystalworks.registery.ModFluxTypes;
-import net.bigmangohead.crystalworks.registery.ModRegistries;
 import net.bigmangohead.crystalworks.screen.menu.BasicGeneratorMenu;
 import net.bigmangohead.crystalworks.util.energy.CustomEnergyStorage;
 import net.bigmangohead.crystalworks.util.energy.flux.FluxStorage;
@@ -14,7 +12,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -44,32 +41,33 @@ public class BasicGeneratorBlockEntity extends AbstractInventoryBlockEntity {
 
     public BasicGeneratorBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.BASIC_GENERATOR_BE.get(), pos, blockState);
+        finishCreation();
     }
 
     @Override
-    public int getData(int index) {
+    public int getMenuData(int index) {
         return switch (index) {
             case DataIndex.ENERGY -> BasicGeneratorBlockEntity.this.energy.getEnergyStored();
             case DataIndex.MAX_ENERGY -> BasicGeneratorBlockEntity.this.energy.getMaxEnergyStored();
             case DataIndex.BURN_TIME -> BasicGeneratorBlockEntity.this.burnTime;
             case DataIndex.MAX_BURN_TIME -> BasicGeneratorBlockEntity.this.maxBurnTime;
-            default -> super.getData(index);
+            default -> super.getMenuData(index);
         };
     }
 
     @Override
-    public void setData(int index, int value) {
+    public void setMenuData(int index, int value) {
         switch (index) {
             case DataIndex.ENERGY -> BasicGeneratorBlockEntity.this.energy.setEnergy(value);
             case DataIndex.MAX_ENERGY -> BasicGeneratorBlockEntity.this.energy.setMaxEnergyStored(value);
             case DataIndex.BURN_TIME -> BasicGeneratorBlockEntity.this.burnTime = value;
             case DataIndex.MAX_BURN_TIME -> BasicGeneratorBlockEntity.this.maxBurnTime = value;
         }
-        super.setData(index, value);
+        super.setMenuData(index, value);
     }
 
     @Override
-    public int getDataCount() {
+    public int getMenuDataCount() {
         return DataIndex.AMOUNT_OF_VALUES;
     }
 
@@ -129,6 +127,8 @@ public class BasicGeneratorBlockEntity extends AbstractInventoryBlockEntity {
         if(this.energy.getEnergyStored() > 0) {
             attemptPushEnergyAll();
         }
+
+        super.onServerTick(level, blockPos, blockState);
     }
 
     private void attemptGenerateEnergy() {

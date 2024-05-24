@@ -6,13 +6,14 @@ import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedTyp
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.level.Level;
-
-import java.util.function.Supplier;
 
 public class TrackedPosition extends TrackedObject<BlockPos>  {
-    public TrackedPosition(BlockPos obj, String key, TrackedType trackedType, Supplier<Level> level, BlockPos blockPos) {
-        super(obj, key, trackedType, level, blockPos, false);
+    public TrackedPosition(BlockPos obj, String key, TrackedType trackedType, int ticksBetweenCheckForSync) {
+        super(obj, key, trackedType, ticksBetweenCheckForSync, false);
+    }
+
+    public TrackedPosition(BlockPos obj, String key, TrackedType trackedType) {
+        super(obj, key, trackedType, 1, false);
     }
 
     @Override

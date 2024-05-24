@@ -22,7 +22,6 @@ public abstract class CWBlock extends BaseEntityBlock {
     @Override
     public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
         CWBlockEntity blockEntity = getNewBlockEntity(blockPos, blockState);
-        blockEntity.finishCreation();
         return blockEntity;
     }
 

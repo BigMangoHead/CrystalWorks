@@ -34,7 +34,8 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
                 .add(ModBlocks.SAPPHIRE_BLOCK.get(),
                         ModBlocks.JADE_BLOCK.get(),
                         ModBlocks.SAPPHIRE_ORE.get(),
-                        ModBlocks.CRUSHER.get());
+                        ModBlocks.CRUSHER.get(),
+                        ModBlocks.PLATE_FORMER.get());
 
         this.tag(BlockTags.NEEDS_DIAMOND_TOOL)
                 .add(ModBlocks.DEEPSLATE_SAPPHIRE_ORE.get());
@@ -45,6 +46,10 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
         this.tag(BlockTags.MINEABLE_WITH_PICKAXE)
                 .add(ModBlocks.SAPPHIRE_BLOCK.get(),
                         ModBlocks.SAPPHIRE_ORE.get(),
-                        ModBlocks.DEEPSLATE_SAPPHIRE_ORE.get());
+                        ModBlocks.DEEPSLATE_SAPPHIRE_ORE.get(),
+                        ModBlocks.JADE_BLOCK.get(),
+                        ModBlocks.BASIC_GENERATOR.get(),
+                        ModBlocks.CRUSHER.get(),
+                        ModBlocks.PLATE_FORMER.get());
     }
 }

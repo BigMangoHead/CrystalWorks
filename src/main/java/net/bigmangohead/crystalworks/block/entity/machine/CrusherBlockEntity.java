@@ -1,14 +1,11 @@
-package net.bigmangohead.crystalworks.block.entity;
+package net.bigmangohead.crystalworks.block.entity.machine;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.block.entity.abstraction.AbstractInventoryBlockEntity;
-import net.bigmangohead.crystalworks.block.entity.abstraction.SmallMachineEntity;
+import net.bigmangohead.crystalworks.block.entity.abstraction.SmallMachineBlockEntity;
 import net.bigmangohead.crystalworks.recipe.CrusherRecipe;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
 import net.bigmangohead.crystalworks.screen.menu.CrusherMenu;
-import net.bigmangohead.crystalworks.util.energy.CustomEnergyStorage;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -18,16 +15,14 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.Set;
 
-public class CrusherBlockEntity extends SmallMachineEntity implements MenuProvider {
+public class CrusherBlockEntity extends SmallMachineBlockEntity implements MenuProvider {
 
     private static final int INPUT_SLOT = 0;
     private static final int OUTPUT_SLOT = 1;
@@ -35,6 +30,8 @@ public class CrusherBlockEntity extends SmallMachineEntity implements MenuProvid
 
     public CrusherBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntities.CRUSHER_BE.get(), pPos, pBlockState);
+
+        finishCreation();
     }
 
     public int getSlotCount() {
@@ -68,16 +65,21 @@ public class CrusherBlockEntity extends SmallMachineEntity implements MenuProvid
 
         if(hasRecipe()) {
             progress.obj ++;
-            progress.sendUpdate();
+            progress.queueUpdate();
 
             if(hasProgressFinished()) {
                 craftItem();
-                inventory.sendUpdate();
+                inventory.queueUpdate();
                 progress.obj = 0;
             }
         } else {
-            progress.obj = 0;
+            if (progress.obj > 0) {
+                progress.obj = 0;
+                progress.queueUpdate();
+            }
         }
+
+        super.onServerTick(level, blockPos, blockState);
     }
 
     private void craftItem() {
@@ -132,5 +134,10 @@ public class CrusherBlockEntity extends SmallMachineEntity implements MenuProvid
         }
 
         return this.level.getRecipeManager().getRecipeFor(CrusherRecipe.Type.INSTANCE, inventory, level); //Can be optimized by also sending in the last recipe
+    }
+
+    // TODO: TEMP, switch to general way to get data
+    public int getProgress() {
+        return this.progress.obj;
     }
 }
