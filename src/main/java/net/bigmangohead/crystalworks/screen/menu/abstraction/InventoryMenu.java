@@ -1,6 +1,7 @@
 package net.bigmangohead.crystalworks.screen.menu.abstraction;
 
 import net.bigmangohead.crystalworks.block.entity.abstraction.CWBlockEntity;
+import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedObject;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
@@ -118,5 +119,9 @@ public abstract class InventoryMenu extends AbstractContainerMenu implements ICW
     @Override
     public CWBlockEntity getBlockEntity() {
         return blockEntity;
+    }
+
+    public TrackedObject<?> getTrackedValue(String key) {
+        return this.blockEntity.getTrackedObject(key);
     }
 }

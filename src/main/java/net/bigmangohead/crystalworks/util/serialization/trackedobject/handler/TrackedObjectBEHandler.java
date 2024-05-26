@@ -19,8 +19,9 @@ public class TrackedObjectBEHandler extends TrackedObjectHandler {
     protected final BlockPos blockPos;
     protected final ArrayList<TrackedObject<?>> trackedObjects = new ArrayList<>();
 
-
-    protected ArrayList<TrackedObject<?>> queuedTrackedObjectUpdates;
+    // Will be the same length as the tracked objects, storing whether
+    // each object is awaiting an update.
+    protected ArrayList<HandlerProcessState> queuedTrackedObjectUpdates;
     public boolean queuedUpdate = false;
 
     protected ArrayList<Player> playersInMenu = new ArrayList<>();
@@ -32,14 +33,17 @@ public class TrackedObjectBEHandler extends TrackedObjectHandler {
     }
 
 
-
+    // Register tracked objects and then store them in flaggable tracked objects if flaggable.
     public void register(TrackedObject<?> trackedObject) {
-        trackedObject.declareHandler(this);
+        trackedObject.declareHandler(this, trackedObjects.size());
         trackedObjects.add(trackedObject);
     }
 
     public void finishRegistration() {
         this.queuedTrackedObjectUpdates = new ArrayList<>(trackedObjects.size());
+        for (int i = 0; i < trackedObjects.size(); i++) {
+            this.queuedTrackedObjectUpdates.add(HandlerProcessState.NONE);
+        }
     }
 
     public void playerOpenedMenu(Player player) {
@@ -91,59 +95,66 @@ public class TrackedObjectBEHandler extends TrackedObjectHandler {
 
     @Override
     public void queueUpdate(TrackedObject<?> trackedObject) {
-        this.queuedTrackedObjectUpdates.add(trackedObject);
+        this.queuedTrackedObjectUpdates.set(trackedObject.getHandlerIndex(), HandlerProcessState.ALL);
         this.queuedUpdate = true;
     }
 
-    // TODO: Check that the syncing data stuff is working fully.
+    // TODO: Check that the syncing data stuff is working fully (currently most worried about the on-update things)
     public void sendQueuedUpdates() {
         CompoundTag tagForUpdateSync = new CompoundTag();
         CompoundTag tagForMenuSync = new CompoundTag();
         boolean queueBlockUpdate = false;
         boolean queueBlockUpdateWithoutRedstone = false;
-        ArrayList<TrackedObject<?>> newQueuedTrackedObjectUpdates = new ArrayList<>(trackedObjects.size());
+        boolean doProcessesRemain = false;
 
 
         // Iterate through tracked objects and see if they should be updated based on time in tick
         // Note that this currently just sends the update periodically in the tick -
         // this means a new update after a long delay could still be pushed back, rather than being
         // sent immediately. This might be nice to change, though it means packets will be lined up together
-        for (TrackedObject<?> queuedTrackedObject : queuedTrackedObjectUpdates) {
-            boolean processed = false;
-            //System.out.println(queuedTrackedObject.getKey());
+        for (int i = 0; i < trackedObjects.size(); i++) {
+            if (queuedTrackedObjectUpdates.get(i) == HandlerProcessState.NONE) {
+                continue;
+            }
 
-            if (queuedTrackedObject.getTrackedType().shouldSave()) {
+            TrackedObject<?> queuedTrackedObject = trackedObjects.get(i);
+            HandlerProcessState newProcessState = HandlerProcessState.ALL;
+
+            if (queuedTrackedObjectUpdates.get(i) == HandlerProcessState.ALL && queuedTrackedObject.getTrackedType().shouldSave()) {
                 if (queuedTrackedObject.shouldUpdateRedstone()) {
                     queueBlockUpdate = true;
                 } else {
                     queueBlockUpdateWithoutRedstone = true;
                 }
-                processed = true;
+                newProcessState = HandlerProcessState.NONE;
+            }
+
+            // Note that the processed tag must be removed if syncing has not occurred yet
+            // This means saving could occur multiple times over while waiting to sync - may want to fix this
+            if (queuedTrackedObject.getTrackedType().shouldSyncOnUpdate()) {
+                if (ServerEvents.tick % queuedTrackedObject.getTicksBetweenCheckForSync() == 0) {
+                    queuedTrackedObject.putInTag(tagForUpdateSync);
+                    newProcessState = HandlerProcessState.NONE;
+                } else {
+                    newProcessState = HandlerProcessState.TO_SYNC;
+                }
             }
 
             if (!playersInMenu.isEmpty() && queuedTrackedObject.getTrackedType().shouldSyncOnMenu()) {
                 queuedTrackedObject.putInTag(tagForMenuSync);
-                processed = true;
+                newProcessState = HandlerProcessState.NONE;
             }
 
-            if (queuedTrackedObject.getTrackedType().shouldSyncOnUpdate() && ServerEvents.tick % queuedTrackedObject.getTicksBetweenCheckForSync() == 0) {
-                queuedTrackedObject.putInTag(tagForUpdateSync);
-                processed = true;
+            if (newProcessState != HandlerProcessState.NONE) {
+                doProcessesRemain = true;
             }
-
-            if (!processed) {
-                newQueuedTrackedObjectUpdates.add(queuedTrackedObject);
-            }
+            queuedTrackedObjectUpdates.set(i, newProcessState);
         }
+        this.queuedUpdate = doProcessesRemain;
+
         // Add tags for syncing to the tags for menu
         if (!playersInMenu.isEmpty()) {
             tagForMenuSync.merge(tagForUpdateSync);
-        }
-
-        // Update queuedTrackObjectUpdates to the new list
-        this.queuedTrackedObjectUpdates = newQueuedTrackedObjectUpdates;
-        if (newQueuedTrackedObjectUpdates.isEmpty()) {
-            this.queuedUpdate = false;
         }
 
         // Run block update if required

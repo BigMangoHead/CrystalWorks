@@ -1,11 +1,12 @@
 package net.bigmangohead.crystalworks.screen.menu;
 
 import net.bigmangohead.crystalworks.block.entity.abstraction.CWBlockEntity;
-import net.bigmangohead.crystalworks.block.entity.abstraction.SmallMachineBlockEntity;
 import net.bigmangohead.crystalworks.block.entity.machine.CrusherBlockEntity;
 import net.bigmangohead.crystalworks.registery.ModMenuTypes;
 import net.bigmangohead.crystalworks.screen.menu.abstraction.InventoryMenu;
 import net.bigmangohead.crystalworks.screen.menu.slot.CWSlotItemHandler;
+import net.bigmangohead.crystalworks.util.energy.flux.FluxStorage;
+import net.bigmangohead.crystalworks.util.energy.flux.FluxUtils;
 import net.bigmangohead.crystalworks.util.item.CWItemStackHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
@@ -27,25 +28,28 @@ public class CrusherMenu extends InventoryMenu {
         super(pContainerId, inv, entity, data, 2, ModMenuTypes.CRUSHER_MENU.get());
     }
 
-    //TODO: Add proper variable references
     public boolean isCrafting() {
-        return ((CrusherBlockEntity) this.level.getExistingBlockEntity(this.blockEntityPos)).getProgress() > 0;
+        return getProgress() > 0;
     }
 
     public int getScaledProgress() {
-        int progress = ((CrusherBlockEntity) this.level.getExistingBlockEntity(this.blockEntityPos)).getProgress();
-        int maxProgress = 78;
+        int progress = getProgress();
+        int maxProgress = getMaxProgress();
         int progressArrowSize = 22; // This is the height in pixels of your arrow
 
         return maxProgress != 0 && progress != 0 ? progress * progressArrowSize / maxProgress : 0;
     }
 
     public int getEnergy() {
-        return this.data.get(SmallMachineBlockEntity.DataIndex.ENERGY);
+        return ((FluxStorage) getTrackedValue("flux").obj).getFluxAmount(FluxUtils.getFluxType("redstone"));
     }
 
     public int getProgress() {
-        return ((CrusherBlockEntity) this.level.getExistingBlockEntity(this.blockEntityPos)).getProgress();
+        return (Integer) getTrackedValue("progress").obj;
+    }
+
+    public int getMaxProgress() {
+        return (Integer) getTrackedValue("maxprogress").obj;
     }
 
     protected void addBlockEntityInventory(BlockEntity blockEntity) {

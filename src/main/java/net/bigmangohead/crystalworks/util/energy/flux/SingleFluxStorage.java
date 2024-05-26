@@ -3,20 +3,25 @@ package net.bigmangohead.crystalworks.util.energy.flux;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.Tag;
 import net.minecraftforge.common.util.INBTSerializable;
+import org.apache.logging.log4j.util.TriConsumer;
 
 public class SingleFluxStorage implements INBTSerializable<Tag> {
 
-    protected FluxType fluxType;
+    protected final FluxType fluxType;
     protected int flux;
     protected int capacity;
     protected int maxReceive;
     protected int maxExtract;
+    // Parameters are the flux type, old flux amount, then new flux amount
+    private final TriConsumer<FluxType, Integer, Integer> onFluxChange;
 
-    public SingleFluxStorage(FluxType fluxType, int capacity, int maxReceive, int maxExtract, int flux) {
+
+    public SingleFluxStorage(FluxType fluxType, int capacity, int maxReceive, int maxExtract, int flux, TriConsumer<FluxType, Integer, Integer> onFluxChange) {
         this.fluxType = fluxType;
         this.capacity = capacity;
         this.maxReceive = maxReceive;
         this.maxExtract = maxExtract;
+        this.onFluxChange = onFluxChange;
 
         this.flux = Math.max(0, Math.min(capacity, flux));
     }
@@ -28,7 +33,8 @@ public class SingleFluxStorage implements INBTSerializable<Tag> {
             return 0;
         } else {
             int fluxReceived = Math.min(this.capacity - this.flux, Math.min(this.maxReceive, maxReceive));
-            if (!simulate) {
+            if (!simulate && fluxReceived != 0) {
+                onFluxChange(this.flux, this.flux - fluxReceived);
                 this.flux += fluxReceived;
             }
 
@@ -41,7 +47,8 @@ public class SingleFluxStorage implements INBTSerializable<Tag> {
             return 0;
         } else {
             int fluxExtracted = Math.min(this.flux, Math.min(this.maxExtract, maxExtract));
-            if (!simulate) {
+            if (!simulate && fluxExtracted != 0) {
+                onFluxChange(this.flux, this.flux - fluxExtracted);
                 this.flux -= fluxExtracted;
             }
 
@@ -50,6 +57,10 @@ public class SingleFluxStorage implements INBTSerializable<Tag> {
     }
 
     public void forceSetFlux(int amount) {
+        if (amount != this.flux) {
+            onFluxChange(this.flux, amount);
+        }
+
         if(amount < 0) {
             this.flux = 0;
         } else if (amount > this.capacity) {
@@ -79,9 +90,16 @@ public class SingleFluxStorage implements INBTSerializable<Tag> {
         if (amount >= 0) {
             this.capacity = amount;
             if (this.flux > this.capacity) {
+                onFluxChange(this.flux, this.capacity);
                 this.flux = this.capacity;
             }
         }
+    }
+
+
+
+    protected void onFluxChange(int oldFlux, int newFlux) {
+        this.onFluxChange.accept(this.fluxType, oldFlux, newFlux);
     }
 
 

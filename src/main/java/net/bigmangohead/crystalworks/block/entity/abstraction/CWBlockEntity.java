@@ -1,7 +1,7 @@
 package net.bigmangohead.crystalworks.block.entity.abstraction;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.util.network.NetworkUtils;
+import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedObject;
 import net.bigmangohead.crystalworks.util.serialization.trackedobject.handler.TrackedObjectBEHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -10,7 +10,6 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -92,6 +91,10 @@ public abstract class CWBlockEntity extends BlockEntity {
     public abstract void drops();
 
 
+
+    public TrackedObject<?> getTrackedObject(String key) {
+        return this.trackedObjectHandler.getTrackedObject(key);
+    }
 
     protected void registerTrackedObjects() {
 
@@ -216,25 +219,19 @@ public abstract class CWBlockEntity extends BlockEntity {
 
 
 
-    //Gives a default state for the tick function so that the function can be assumed to exist when a ticker is created
     public void tick(Level level, BlockPos blockPos, BlockState blockState) {
         if (this.level != null && !(this.level.isClientSide())) {
             onServerTick(level, blockPos, blockState);
         }
     }
 
+    // Checks for objects that can get flagged for updates (for instance, a flux
+    // network, which gets flagged for updates because other mods can change the
+    // network without queuing an update). Then, checks to see if there are any
+    // queued updates.
     public void onServerTick(Level level, BlockPos blockPos, BlockState blockState) {
         if (trackedObjectHandler.queuedUpdate) {
             trackedObjectHandler.sendQueuedUpdates();
         }
     }
-
-
-
-    public void openScreen(ServerPlayer player, MenuProvider containerSupplier, BlockPos pos) {
-        NetworkUtils.openScreen(player, containerSupplier, pos, (buf) -> {
-
-        });
-    }
-
 }

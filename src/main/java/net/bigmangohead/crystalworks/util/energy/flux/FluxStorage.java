@@ -1,13 +1,11 @@
 package net.bigmangohead.crystalworks.util.energy.flux;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.registery.ModFluxTypes;
-import net.bigmangohead.crystalworks.util.energy.CustomEnergyStorage;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.Tag;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,7 +39,7 @@ public class FluxStorage implements INBTSerializable<Tag> {
         }
     }
 
-    public FluxStorage(int maxFluxTypesCount, int globalCapacity, int globalMaxReceive, int globalMaxExtract, Set<FluxType> acceptableFluxTypes, Set<SingleFluxStorage> fluxStorageDataSet) {
+    public FluxStorage(int maxFluxTypesCount, int globalCapacity, int globalMaxReceive, int globalMaxExtract, Set<FluxType> acceptableFluxTypes, TriConsumer<FluxType, Integer, Integer> onFluxChange, Set<SingleFluxStorage> fluxStorageDataSet) {
         this.storedFlux = new HashMap<>();
         this.storedFluxTypes = new HashSet<>();
         this.acceptableFluxTypes = acceptableFluxTypes;
@@ -66,7 +64,7 @@ public class FluxStorage implements INBTSerializable<Tag> {
                 if (acceptedFluxType.getName().equals("redstone")) {
                     RedstoneFluxStorage newStorage = new RedstoneFluxStorage(acceptedFluxType.applyCapacityModifier(globalCapacity),
                             acceptedFluxType.applyMaxReceiveModifier(globalMaxReceive), acceptedFluxType.applyMaxExtractModifier(globalMaxExtract),
-                            acceptedFluxType.applyFluxModifier(0));
+                            acceptedFluxType.applyFluxModifier(0), onFluxChange);
 
                     this.forgeEnergyStorage = newStorage;
                     this.containsForgeEnergy = true;
@@ -75,7 +73,7 @@ public class FluxStorage implements INBTSerializable<Tag> {
                 } else {
                     newFluxStorage = new SingleFluxStorage(acceptedFluxType, acceptedFluxType.applyCapacityModifier(globalCapacity),
                             acceptedFluxType.applyMaxReceiveModifier(globalMaxReceive), acceptedFluxType.applyMaxExtractModifier(globalMaxExtract),
-                            acceptedFluxType.applyFluxModifier(0));
+                            acceptedFluxType.applyFluxModifier(0), onFluxChange);
                 }
 
 
@@ -88,8 +86,8 @@ public class FluxStorage implements INBTSerializable<Tag> {
         }
     }
 
-    public FluxStorage(int maxFluxTypesCount, int globalCapacity, int globalMaxReceive, int globalMaxExtract, Set<FluxType> acceptableFluxTypes) {
-        this(maxFluxTypesCount, globalCapacity, globalMaxReceive, globalMaxExtract, acceptableFluxTypes, Set.of());
+    public FluxStorage(int maxFluxTypesCount, int globalCapacity, int globalMaxReceive, int globalMaxExtract, Set<FluxType> acceptableFluxTypes, TriConsumer<FluxType, Integer, Integer> onFluxChange) {
+        this(maxFluxTypesCount, globalCapacity, globalMaxReceive, globalMaxExtract, acceptableFluxTypes, onFluxChange, Set.of());
     }
 
 
@@ -147,12 +145,11 @@ public class FluxStorage implements INBTSerializable<Tag> {
     }
 
 
-
-    public void addFluxType(FluxType fluxType, int globalCapacity, int globalMaxReceive, int globalMaxExtract, int flux) {
+    public void addFluxType(FluxType fluxType, int globalCapacity, int globalMaxReceive, int globalMaxExtract, TriConsumer<FluxType, Integer, Integer> onFluxChange, int flux) {
         this.acceptableFluxTypes.add(fluxType);
         SingleFluxStorage newFluxStorage = new SingleFluxStorage(fluxType, fluxType.applyCapacityModifier(globalCapacity),
                 fluxType.applyMaxReceiveModifier(globalMaxReceive), fluxType.applyMaxExtractModifier(globalMaxExtract),
-                fluxType.applyFluxModifier(flux));
+                fluxType.applyFluxModifier(flux), onFluxChange);
 
         this.storedFlux.put(fluxType, newFluxStorage);
 
@@ -161,8 +158,8 @@ public class FluxStorage implements INBTSerializable<Tag> {
         }
     }
 
-    public void addFluxType(FluxType fluxType, int globalCapacity, int globalMaxReceive, int globalMaxExtract) {
-        this.addFluxType(fluxType, globalCapacity, globalMaxReceive, globalMaxExtract, 0);
+    public void addFluxType(FluxType fluxType, int globalCapacity, int globalMaxReceive, int globalMaxExtract, TriConsumer<FluxType, Integer, Integer> onFluxChange) {
+        this.addFluxType(fluxType, globalCapacity, globalMaxReceive, globalMaxExtract, onFluxChange, 0);
     }
 
     public void removeFluxType(FluxType fluxType) {

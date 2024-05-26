@@ -3,10 +3,10 @@ package net.bigmangohead.crystalworks.block.entity.abstraction;
 import net.bigmangohead.crystalworks.util.energy.flux.FluxStorage;
 import net.bigmangohead.crystalworks.util.energy.flux.FluxUtils;
 import net.bigmangohead.crystalworks.util.energy.flux.RedstoneFluxStorage;
-import net.bigmangohead.crystalworks.util.serialization.trackedobject.implementations.TrackedInteger;
 import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedObject;
-import net.bigmangohead.crystalworks.util.serialization.trackedobject.implementations.TrackedSerializable;
 import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedType;
+import net.bigmangohead.crystalworks.util.serialization.trackedobject.implementations.TrackedInteger;
+import net.bigmangohead.crystalworks.util.serialization.trackedobject.implementations.TrackedSerializable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,16 +19,17 @@ public abstract class SmallMachineBlockEntity extends AbstractInventoryBlockEnti
 
     protected TrackedInteger progress = new TrackedInteger(0, "progress", TrackedType.SAVE_AND_SYNC_ON_MENU);
     protected final int defaultMaxProgress = 78; //Represents total amount of ticks per recipe by default
-    protected int maxProgress = 78; //Represents total amount of ticks in a recipe after recipe modifier is applied
+    protected TrackedInteger maxProgress = new TrackedInteger(defaultMaxProgress, "maxprogress", TrackedType.SYNC_ON_MENU);
 
-    protected final TrackedObject<FluxStorage> flux;
+    protected TrackedObject<FluxStorage> flux;
     protected final LazyOptional<FluxStorage> fluxOptional;
 
     public SmallMachineBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
 
-        FluxStorage flux = new FluxStorage(1, 1000000, 100, 0, FluxUtils.getFluxTypes());
-        this.flux = new TrackedSerializable<>(flux, "flux", TrackedType.SAVE);
+        FluxStorage flux = new FluxStorage(1, 1000000, 100, 0, FluxUtils.getFluxTypes(),
+                (a, b, c) -> this.flux.queueUpdate());
+        this.flux = new TrackedSerializable<>(flux, "flux", TrackedType.SAVE_AND_SYNC_ALL_UPDATES, 10);
         this.fluxOptional = LazyOptional.of(() -> this.flux.obj);
     }
 
@@ -38,44 +39,7 @@ public abstract class SmallMachineBlockEntity extends AbstractInventoryBlockEnti
 
         this.trackedObjectHandler.register(this.flux);
         this.trackedObjectHandler.register(this.progress);
-    }
-
-    @Override
-    public int getMenuData(int index) {
-        return switch (index) {
-            case DataIndex.ENERGY -> SmallMachineBlockEntity.this.flux.obj.getForgeEnergyStorage().getEnergyStored();
-            case DataIndex.MAX_ENERGY -> SmallMachineBlockEntity.this.flux.obj.getForgeEnergyStorage().getMaxEnergyStored();
-            //case DataIndex.PROGRESS -> SmallMachineBlockEntity.this.progress.obj;
-            //case DataIndex.MAX_PROGRESS -> SmallMachineBlockEntity.this.maxProgress;
-            default -> super.getMenuData(index);
-        };
-    }
-
-    @Override
-    public void setMenuData(int index, int value) {
-        switch (index) {
-            case DataIndex.ENERGY -> SmallMachineBlockEntity.this.flux.obj.getForgeEnergyStorage().forceSetFlux(value);
-            case DataIndex.MAX_ENERGY -> SmallMachineBlockEntity.this.flux.obj.getForgeEnergyStorage().forceSetCapacity(value);
-            //case DataIndex.PROGRESS -> SmallMachineBlockEntity.this.progress.obj = value;
-            //case DataIndex.MAX_PROGRESS -> SmallMachineBlockEntity.this.maxProgress = value;
-        }
-        super.setMenuData(index, value);
-    }
-
-    @Override
-    public int getMenuDataCount() {
-        return DataIndex.AMOUNT_OF_VALUES;
-    }
-
-    public static class DataIndex {
-        public static final int AMOUNT_OF_VALUES = 2 + AbstractInventoryBlockEntity.DataIndex.AMOUNT_OF_VALUES;
-
-        // Data index starts at previous final index
-        public static final int ENERGY = AbstractInventoryBlockEntity.DataIndex.AMOUNT_OF_VALUES;
-        public static final int MAX_ENERGY = AbstractInventoryBlockEntity.DataIndex.AMOUNT_OF_VALUES + 1;
-        public static final int ENERGY_TYPE = AbstractInventoryBlockEntity.DataIndex.AMOUNT_OF_VALUES + 2;
-        //public static final int PROGRESS = AbstractInventoryBlockEntity.DataIndex.AMOUNT_OF_VALUES + 3;
-        //public static final int MAX_PROGRESS = AbstractInventoryBlockEntity.DataIndex.AMOUNT_OF_VALUES + 4;
+        this.trackedObjectHandler.register(this.maxProgress);
     }
 
     public LazyOptional<RedstoneFluxStorage> getEnergyOptional() {

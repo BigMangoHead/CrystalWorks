@@ -21,6 +21,7 @@ public abstract class TrackedObject<T> {
     private final int ticksBetweenCheckForSync;
 
     protected TrackedObjectHandler handler;
+    protected int handlerIndex;
 
     // Used for block entity updates
     protected final boolean updateRedstone;
@@ -37,8 +38,9 @@ public abstract class TrackedObject<T> {
         this.updateRedstone = updateRedstone;
     }
 
-    public void declareHandler(TrackedObjectHandler handler) {
+    public void declareHandler(TrackedObjectHandler handler, int index) {
         this.handler = handler;
+        this.handlerIndex = index;
     }
 
     public abstract void putInTag(CompoundTag nbt);
@@ -63,6 +65,10 @@ public abstract class TrackedObject<T> {
 
     public TrackedType getTrackedType() {
         return this.trackedType;
+    }
+
+    public int getHandlerIndex() {
+        return this.handlerIndex;
     }
 
     public int getTicksBetweenCheckForSync() {

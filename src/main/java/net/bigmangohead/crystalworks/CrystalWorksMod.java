@@ -7,6 +7,7 @@ import net.bigmangohead.crystalworks.network.packet.client.CWBlockEntityUpdateHa
 import net.bigmangohead.crystalworks.registery.*;
 import net.bigmangohead.crystalworks.screen.screen.BasicGeneratorScreen;
 import net.bigmangohead.crystalworks.screen.screen.CrusherScreen;
+import net.bigmangohead.crystalworks.screen.screen.PlateFormerScreen;
 import net.bigmangohead.crystalworks.util.energy.flux.FluxUtils;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -94,7 +95,7 @@ public class CrystalWorksMod
 
     @SubscribeEvent
     public void onDimensionSwitch(PlayerEvent.PlayerChangedDimensionEvent event) {
-        // TODO: Check this actually works
+        // TODO: This doesn't work, need to fix it.
         CWBlockEntityUpdateHandler.updateLevel(event.getEntity().level());
     }
 
@@ -107,6 +108,7 @@ public class CrystalWorksMod
         {
             MenuScreens.register(ModMenuTypes.CRUSHER_MENU.get(), CrusherScreen::new);
             MenuScreens.register(ModMenuTypes.BASIC_GENERATOR_MENU.get(), BasicGeneratorScreen::new);
+            MenuScreens.register(ModMenuTypes.PLATE_FORMER_MENU.get(), PlateFormerScreen::new);
         }
     }
 }

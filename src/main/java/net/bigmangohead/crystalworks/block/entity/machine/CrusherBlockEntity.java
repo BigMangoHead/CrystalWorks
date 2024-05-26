@@ -108,7 +108,7 @@ public class CrusherBlockEntity extends SmallMachineBlockEntity implements MenuP
     }
 
     private boolean hasProgressFinished() {
-        return progress.obj >= maxProgress;
+        return progress.obj >= maxProgress.obj;
     }
 
     private boolean hasRecipe() {
@@ -122,7 +122,7 @@ public class CrusherBlockEntity extends SmallMachineBlockEntity implements MenuP
 
         // Note for max progress: Always rounds recipe progress up
         // This makes it harder to get a 1 tick machine
-        this.maxProgress = (int) Math.ceil(recipe.get().getRecipeTimeModifier() * defaultMaxProgress);
+        this.maxProgress.obj = (int) Math.ceil(recipe.get().getRecipeTimeModifier() * defaultMaxProgress);
 
         return enoughInputItems(recipe.get(), this.getStackInSlot(INPUT_SLOT).getCount()) && canInsertAmountIntoOutputSlot(result.getCount()) && canInsertItemIntoOutputSlot(result.getItem());
     }
@@ -134,10 +134,5 @@ public class CrusherBlockEntity extends SmallMachineBlockEntity implements MenuP
         }
 
         return this.level.getRecipeManager().getRecipeFor(CrusherRecipe.Type.INSTANCE, inventory, level); //Can be optimized by also sending in the last recipe
-    }
-
-    // TODO: TEMP, switch to general way to get data
-    public int getProgress() {
-        return this.progress.obj;
     }
 }

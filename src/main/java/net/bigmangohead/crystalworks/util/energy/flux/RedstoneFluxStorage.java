@@ -1,13 +1,12 @@
 package net.bigmangohead.crystalworks.util.energy.flux;
 
-import net.bigmangohead.crystalworks.registery.ModRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.energy.IEnergyStorage;
+import org.apache.logging.log4j.util.TriConsumer;
 
 public class RedstoneFluxStorage extends SingleFluxStorage implements IEnergyStorage {
 
-    public RedstoneFluxStorage(int capacity, int maxReceive, int maxExtract, int flux) {
-        super(FluxUtils.getFluxType("redstone"), capacity, maxReceive, maxExtract, flux);
+    public RedstoneFluxStorage(int capacity, int maxReceive, int maxExtract, int flux, TriConsumer<FluxType, Integer, Integer> onFluxChange) {
+        super(FluxUtils.getFluxType("redstone"), capacity, maxReceive, maxExtract, flux, onFluxChange);
     }
 
     @Override
