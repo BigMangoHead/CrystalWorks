@@ -1,8 +1,10 @@
 package net.bigmangohead.crystalworks.block.entity.machine;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.block.entity.abstraction.SmallMachineBlockEntity;
+import net.bigmangohead.crystalworks.block.entity.abstraction.SimpleProcessBlockEntity;
+import net.bigmangohead.crystalworks.recipe.SimpleProcessingRecipe;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
+import net.bigmangohead.crystalworks.screen.menu.PlateFormerMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -13,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
-public class PlateFormerBlockEntity extends SmallMachineBlockEntity {
+public class PlateFormerBlockEntity extends SimpleProcessBlockEntity {
 
     public static class SlotIndex {
         public static final int INPUT_SLOT = 0;
@@ -49,6 +51,11 @@ public class PlateFormerBlockEntity extends SmallMachineBlockEntity {
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        return null;
+        return new PlateFormerMenu(i, inventory, this, this.data);
+    }
+
+    @Override
+    protected SimpleProcessingRecipe.Type getRecipeType() {
+        return SimpleProcessingRecipe.Type.getType("plate_forming");
     }
 }

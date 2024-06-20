@@ -14,7 +14,7 @@ import net.minecraftforge.common.util.LazyOptional;
 
 // Small Machine refers to any machine (takes an input to produce an output)
 // That requires a crystal block below it.
-public abstract class SmallMachineBlockEntity extends AbstractInventoryBlockEntity {
+public abstract class SmallMachineBlockEntity extends AbstractInventoryBlockEntity implements ISmallAttachableToCrystal {
     private static final int DEFAULT_PROCESS_COUNT = 2;
 
     protected TrackedInteger progress = new TrackedInteger(0, "progress", TrackedType.SAVE_AND_SYNC_ON_MENU);
@@ -31,6 +31,13 @@ public abstract class SmallMachineBlockEntity extends AbstractInventoryBlockEnti
                 (a, b, c) -> this.flux.queueUpdate());
         this.flux = new TrackedSerializable<>(flux, "flux", TrackedType.SAVE_AND_SYNC_ALL_UPDATES, 10);
         this.fluxOptional = LazyOptional.of(() -> this.flux.obj);
+    }
+
+    @Override
+    public void invalidateCaps() {
+        getFluxOptional().invalidate();
+        getEnergyOptional().invalidate();
+        super.invalidateCaps();
     }
 
     @Override
@@ -52,5 +59,9 @@ public abstract class SmallMachineBlockEntity extends AbstractInventoryBlockEnti
 
     public RedstoneFluxStorage getEnergy() {
         return this.flux.obj.getForgeEnergyStorage();
+    }
+
+    protected boolean hasProgressFinished() {
+        return progress.obj >= maxProgress.obj;
     }
 }

@@ -37,6 +37,7 @@ public class CrusherRecipe implements Recipe<SimpleContainer> {
 
         return inputItem.get(0).test(simpleContainer.getItem(0));
     }
+
     @Override
     public ItemStack assemble(SimpleContainer simpleContainer, RegistryAccess registryAccess) {
         return output.copy();

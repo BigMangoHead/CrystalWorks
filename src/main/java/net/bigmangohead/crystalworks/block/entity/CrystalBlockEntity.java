@@ -1,8 +1,7 @@
 package net.bigmangohead.crystalworks.block.entity;
 
-import net.bigmangohead.crystalworks.block.block.CrusherBlock;
 import net.bigmangohead.crystalworks.block.entity.abstraction.CWBlockEntity;
-import net.bigmangohead.crystalworks.block.entity.machine.CrusherBlockEntity;
+import net.bigmangohead.crystalworks.block.entity.abstraction.ISmallAttachableToCrystal;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
 import net.bigmangohead.crystalworks.registery.ModCapabilities;
 import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedType;
@@ -12,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
@@ -34,9 +34,17 @@ public class CrystalBlockEntity extends CWBlockEntity {
     // While the supplier object will never be null, the attached block entity can be.
     // The supplier is used so that the attached block entity never has to be tracked,
     // it can just be grabbed whenever necessary, and any checks for grabbing it can be done on the fly.
-    protected Supplier<CrusherBlockEntity> attachedBlockEntity = () -> {
+    protected Supplier<BlockEntity> attachedBlockEntity = () -> {
         if (this.level != null && this.attachedBlockPosition.obj != null) {
-            return (CrusherBlockEntity) this.level.getExistingBlockEntity(attachedBlockPosition.obj);
+            return (BlockEntity) this.level.getExistingBlockEntity(attachedBlockPosition.obj);
+        } else {
+            return null;
+        }
+    };
+
+    protected Supplier<ISmallAttachableToCrystal> attachedBlockEntityCapabilities = () -> {
+        if (this.level != null && this.attachedBlockPosition.obj != null) {
+            return (ISmallAttachableToCrystal) this.level.getExistingBlockEntity(attachedBlockPosition.obj);
         } else {
             return null;
         }
@@ -65,24 +73,9 @@ public class CrystalBlockEntity extends CWBlockEntity {
     }
 
     @Override
-    public void invalidateCaps() {
-        super.invalidateCaps();
-
-        if(attachmentState.obj == AttachmentState.SINGLE_MACHINE) {
-            CrusherBlockEntity blockEntity = this.attachedBlockEntity.get();
-            System.out.println(attachedBlockEntity);
-            if(blockEntity != null) {
-                blockEntity.getEnergyOptional().invalidate();
-                blockEntity.getFluxOptional().invalidate();
-            }
-        }
-
-    }
-
-    @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         if ((cap == ForgeCapabilities.ENERGY || cap == ModCapabilities.FLUX) && attachmentState.obj == AttachmentState.SINGLE_MACHINE) {
-            CrusherBlockEntity attachedBlockEntity = this.attachedBlockEntity.get();
+            ISmallAttachableToCrystal attachedBlockEntity = this.attachedBlockEntityCapabilities.get();
             if (attachedBlockEntity == null) return super.getCapability(cap, side);
 
             if (cap == ForgeCapabilities.ENERGY) {
@@ -99,16 +92,16 @@ public class CrystalBlockEntity extends CWBlockEntity {
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
         if (level.isClientSide()) return;
 
-        Block resultingBlock = level.getBlockState(neighborPos).getBlock();
+        BlockEntity resultingBlockEntity = level.getBlockEntity(neighborPos);
 
         // Note: this could cause an issue if changing from attached -> attached in the same tick.
-        if (attachmentState.obj == AttachmentState.UNATTACHED && neighborPos.equals(this.worldPosition.above()) && (resultingBlock instanceof CrusherBlock)) {
+        if (attachmentState.obj == AttachmentState.UNATTACHED && neighborPos.equals(this.worldPosition.above()) && (resultingBlockEntity instanceof ISmallAttachableToCrystal)) {
             this.attachmentState.obj = AttachmentState.SINGLE_MACHINE;
             this.attachedBlockPosition.obj = neighborPos;
             setChangedWithoutRedstoneCheck();
         }
 
-        if (attachmentState.obj == AttachmentState.SINGLE_MACHINE && neighborPos.equals(attachedBlockPosition.obj) && !(resultingBlock instanceof CrusherBlock)) {
+        if (attachmentState.obj == AttachmentState.SINGLE_MACHINE && neighborPos.equals(attachedBlockPosition.obj) && !(resultingBlockEntity instanceof ISmallAttachableToCrystal)) {
             this.attachmentState.obj = AttachmentState.UNATTACHED;
             this.attachedBlockPosition.obj = null;
             setChangedWithoutRedstoneCheck();
@@ -118,9 +111,9 @@ public class CrystalBlockEntity extends CWBlockEntity {
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         if (level.isClientSide()) return;
 
-        Block attachableBlock = level.getBlockState(pos.above()).getBlock();
+        BlockEntity attachableBlockEntity = level.getBlockEntity(pos.above());
 
-        if (attachableBlock instanceof CrusherBlock) {
+        if (attachableBlockEntity instanceof ISmallAttachableToCrystal) {
             this.attachmentState.obj = AttachmentState.SINGLE_MACHINE;
             this.attachedBlockPosition.obj = pos.above();
             setChangedWithoutRedstoneCheck();

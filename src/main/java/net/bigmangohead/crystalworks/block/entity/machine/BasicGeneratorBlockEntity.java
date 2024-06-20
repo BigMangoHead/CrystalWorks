@@ -147,6 +147,8 @@ public class BasicGeneratorBlockEntity extends AbstractInventoryBlockEntity {
 
     // Note: each side will push the maximum amount of energy possibly extracted per tick
     // This means the maximum extract per tick is 6 * maxExtract
+    // Additionally, the generator will not evenly distribute energy if it has less than its extract amount
+    // It will simply push to whichever direction it checks first
     private void attemptPushEnergyAll() {
         for (Direction direction : Direction.values()) {
             BlockEntity receivingBlockEntity = this.level.getBlockEntity(this.getBlockPos().relative(direction));

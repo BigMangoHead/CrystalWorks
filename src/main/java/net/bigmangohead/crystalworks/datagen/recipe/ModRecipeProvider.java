@@ -1,13 +1,17 @@
 package net.bigmangohead.crystalworks.datagen.recipe;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.registery.ModBlocks;
 import net.bigmangohead.crystalworks.datagen.recipe.builder.CrushingRecipeBuilder;
-import net.bigmangohead.crystalworks.registery.ModItems;
+import net.bigmangohead.crystalworks.datagen.recipe.builder.ProcessingRecipeBuilder;
 import net.bigmangohead.crystalworks.recipe.CrusherRecipe;
+import net.bigmangohead.crystalworks.recipe.SimpleProcessingRecipe;
+import net.bigmangohead.crystalworks.registery.ModBlocks;
+import net.bigmangohead.crystalworks.registery.ModItems;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.AbstractCookingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -41,6 +45,8 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         crusherRecipe(recipeOutput, Items.IRON_INGOT, 1, ModItems.IRON_DUST.get(), 1, 1, "dust");
         crusherRecipe(recipeOutput, Items.GOLD_INGOT, 2, ModItems.GOLD_DUST.get(), 3, 2, "dust");
 
+        simpleProcessingRecipe(recipeOutput, "plate_former", Items.STICK, 2, Items.GLOW_ITEM_FRAME, 3, 0.5, 1, "weird");
+        simpleProcessingRecipe(recipeOutput, "plate_former", Items.STONE, 1, Items.GRANITE, 2, 2, 0.5, "weird");
 
     }
 
@@ -65,8 +71,20 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 
     }
 
-    protected static void crusherRecipe(Consumer<FinishedRecipe> pRecipeOutput, ItemLike itemLike, int ingredientCount, ItemLike pResult, int resultCount, double pRecipeTimeModifier, String pGroup) {
-        CrushingRecipeBuilder.create(Ingredient.of(itemLike), ingredientCount, pResult, resultCount, pRecipeTimeModifier, CrusherRecipe.CrushingRecipeSerializer.INSTANCE).group(pGroup).unlockedBy(getHasName(itemLike), has(itemLike)).save(pRecipeOutput, CrystalWorksMod.MOD_ID + ":" + getItemName(pResult) + "_from_crushing_" + getItemName(itemLike));
+    protected static void crusherRecipe(Consumer<FinishedRecipe> pRecipeOutput, ItemLike inputItem, int ingredientCount, ItemLike pResult, int resultCount, double pRecipeTimeModifier, String pGroup) {
+        CrushingRecipeBuilder.create(Ingredient.of(inputItem), ingredientCount, pResult, resultCount, pRecipeTimeModifier, CrusherRecipe.CrushingRecipeSerializer.INSTANCE)
+                .group(pGroup).unlockedBy(getHasName(inputItem), has(inputItem)).save(pRecipeOutput, CrystalWorksMod.MOD_ID + ":" + getItemName(pResult) + "_from_crushing_" + getItemName(inputItem));
+    }
+
+    protected static void simpleProcessingRecipe(Consumer<FinishedRecipe> recipeConsumer, String machineName, ItemLike inputItem, int inputCount, ItemLike resultItem, int resultCount, double recipeTimeMultiplier, double energyMultiplier, String group) {
+        RecipeSerializer<SimpleProcessingRecipe> serializer = SimpleProcessingRecipe.SimpleProcessingRecipeSerializer.getSerializerFromName(machineName);
+
+        ProcessingRecipeBuilder.create(machineName, new ItemStack(resultItem, resultCount), new ItemStack(inputItem, inputCount), recipeTimeMultiplier, energyMultiplier, serializer)
+                .group(group).unlockedBy(getHasName(inputItem), has(inputItem)).save(recipeConsumer, CrystalWorksMod.MOD_ID + ":" + getItemName(resultItem) + "_from_" + BuiltInRegistries.RECIPE_SERIALIZER.getKey(serializer).getPath() + "_" + getItemName(inputItem));
+    }
+
+    protected static void simpleProcessingRecipe(Consumer<FinishedRecipe> recipeConsumer, String machineName, ItemLike inputItem, int inputCount, ItemLike resultItem, int resultCount, String group) {
+        simpleProcessingRecipe(recipeConsumer, machineName, inputItem, inputCount, resultItem, resultCount, 1.0, 1.0, group);
     }
 
     private static void blockRecipe(Consumer<FinishedRecipe> recipeOutput, Item item, Block block) {

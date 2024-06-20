@@ -107,11 +107,11 @@ public class CrusherBlockEntity extends SmallMachineBlockEntity implements MenuP
         return (recipe.getInputCount() <= inputCount);
     }
 
-    private boolean hasProgressFinished() {
-        return progress.obj >= maxProgress.obj;
-    }
-
     private boolean hasRecipe() {
+        if (this.getStackInSlot(INPUT_SLOT).getCount() == 0) {
+            return false;
+        }
+
         Optional<CrusherRecipe> recipe = getCurrentRecipe();
 
         if (recipe.isEmpty()) {

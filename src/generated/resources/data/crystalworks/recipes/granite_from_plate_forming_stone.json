@@ -1,0 +1,14 @@
+{
+  "type": "crystalworks:plate_forming",
+  "energymultiplier": 2.0,
+  "group": "weird",
+  "input": {
+    "count": 1,
+    "item": "minecraft:stone"
+  },
+  "recipetimemultiplier": 2.0,
+  "result": {
+    "count": 2,
+    "item": "minecraft:granite"
+  }
+}

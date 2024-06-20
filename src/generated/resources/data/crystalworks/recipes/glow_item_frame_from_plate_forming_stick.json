@@ -1,0 +1,14 @@
+{
+  "type": "crystalworks:plate_forming",
+  "energymultiplier": 0.5,
+  "group": "weird",
+  "input": {
+    "count": 2,
+    "item": "minecraft:stick"
+  },
+  "recipetimemultiplier": 0.5,
+  "result": {
+    "count": 3,
+    "item": "minecraft:glow_item_frame"
+  }
+}

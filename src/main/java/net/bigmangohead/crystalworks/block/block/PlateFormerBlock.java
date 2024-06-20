@@ -3,7 +3,6 @@ package net.bigmangohead.crystalworks.block.block;
 import net.bigmangohead.crystalworks.block.block.abstraction.CWFunctionalBlock;
 import net.bigmangohead.crystalworks.block.entity.abstraction.CWBlockEntity;
 import net.bigmangohead.crystalworks.block.entity.machine.PlateFormerBlockEntity;
-import net.bigmangohead.crystalworks.block.entity.properties.IMenuProvider;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
 import net.bigmangohead.crystalworks.util.block.BlockUtils;
 import net.minecraft.core.BlockPos;
@@ -69,7 +68,7 @@ public class PlateFormerBlock extends CWFunctionalBlock {
         if(!(blockEntity instanceof PlateFormerBlockEntity)) {
             throw new IllegalStateException("Container provider is missing!");
         }
-        NetworkHooks.openScreen((ServerPlayer) player, (IMenuProvider) blockEntity, pos);
+        NetworkHooks.openScreen((ServerPlayer) player, (PlateFormerBlockEntity) blockEntity, pos);
         return InteractionResult.sidedSuccess(level.isClientSide());
     }
 
