@@ -27,7 +27,7 @@ public abstract class SmallMachineBlockEntity extends AbstractInventoryBlockEnti
     public SmallMachineBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
 
-        FluxStorage flux = new FluxStorage(1, 1000000, 100, 0, FluxUtils.getFluxTypes(),
+        FluxStorage flux = new FluxStorage(3, 10000, 100, 0, FluxUtils.getFluxTypes(),
                 (a, b, c) -> this.flux.queueUpdate());
         this.flux = new TrackedSerializable<>(flux, "flux", TrackedType.SAVE_AND_SYNC_ALL_UPDATES, 10);
         this.fluxOptional = LazyOptional.of(() -> this.flux.obj);

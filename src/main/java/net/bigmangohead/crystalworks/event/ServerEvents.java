@@ -1,6 +1,6 @@
 package net.bigmangohead.crystalworks.event;
 
-import net.bigmangohead.crystalworks.screen.menu.abstraction.ICWBlockEntityMenu;
+import net.bigmangohead.crystalworks.menu.abstraction.ICWBlockEntityMenu;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerContainerEvent;

@@ -5,6 +5,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraftforge.common.util.INBTSerializable;
 import org.apache.logging.log4j.util.TriConsumer;
 
+// TODO: deserializeNBT needs to also take in the flux capacity
 public class SingleFluxStorage implements INBTSerializable<Tag> {
 
     protected final FluxType fluxType;
@@ -132,7 +133,7 @@ public class SingleFluxStorage implements INBTSerializable<Tag> {
         if (nbt instanceof IntTag intNbt) {
             this.flux = intNbt.getAsInt();
         } else {
-            throw new IllegalArgumentException("Can not deserialize to an instance that isn't the default implementation");
+            throw new IllegalArgumentException("Cannot deserialize to an instance that isn't the default implementation");
         }
     }
 }

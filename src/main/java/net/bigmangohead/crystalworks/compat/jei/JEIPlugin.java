@@ -7,7 +7,7 @@ import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.bigmangohead.crystalworks.CrystalWorksMod;
 import net.bigmangohead.crystalworks.recipe.CrusherRecipe;
-import net.bigmangohead.crystalworks.screen.screen.CrusherScreen;
+import net.bigmangohead.crystalworks.screen.blockentity.CrusherScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeManager;

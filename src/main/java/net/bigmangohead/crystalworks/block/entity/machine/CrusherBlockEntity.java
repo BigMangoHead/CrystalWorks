@@ -4,7 +4,7 @@ import net.bigmangohead.crystalworks.CrystalWorksMod;
 import net.bigmangohead.crystalworks.block.entity.abstraction.SmallMachineBlockEntity;
 import net.bigmangohead.crystalworks.recipe.CrusherRecipe;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
-import net.bigmangohead.crystalworks.screen.menu.CrusherMenu;
+import net.bigmangohead.crystalworks.menu.CrusherMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;

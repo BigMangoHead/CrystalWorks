@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+// TODO: Max flux types does not work properly
 public class FluxStorage implements INBTSerializable<Tag> {
 
     protected HashMap<FluxType, SingleFluxStorage> storedFlux;
@@ -246,14 +247,15 @@ public class FluxStorage implements INBTSerializable<Tag> {
     @Override
     public void deserializeNBT(Tag tag) {
         CompoundTag nbt = (CompoundTag) tag;
+        this.storedFluxTypes = new HashSet<>();
 
-        //Use FluxType Directory to convert string back to object
-        for (String name : FluxUtils.getFluxNames()) {
-            if (nbt.contains(name)) {
-                SingleFluxStorage fluxStorage = this.storedFlux.get(FluxUtils.getFluxType(name));
-                fluxStorage.deserializeNBT(nbt.get(name));
+        // Update each key that has an update to run
+        for (String name : nbt.getAllKeys()) {
+            SingleFluxStorage fluxStorage = this.storedFlux.get(FluxUtils.getFluxType(name));
+            fluxStorage.deserializeNBT(nbt.get(name));
+            if (fluxStorage.flux > 0) {
+                this.storedFluxTypes.add(FluxUtils.getFluxType(name));
             }
         }
-
     }
 }

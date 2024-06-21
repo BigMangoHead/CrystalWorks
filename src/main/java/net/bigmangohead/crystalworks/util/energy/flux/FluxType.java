@@ -1,6 +1,6 @@
 package net.bigmangohead.crystalworks.util.energy.flux;
 
-import java.util.HashMap;
+import java.awt.*;
 
 public class FluxType {
 
@@ -9,18 +9,24 @@ public class FluxType {
     private final float maxExtractModifier;
     private final float maxReceiveModifier;
     private final String name;
+    private final Color color;
 
-    public FluxType(float fluxModifier, float capacityModifier, float maxExtractModifier, float maxReceiveModifier, String name) {
+    public FluxType(float fluxModifier, float capacityModifier, float maxExtractModifier, float maxReceiveModifier, String name, Color color) {
         this.fluxModifier = fluxModifier;
         this.capacityModifier = capacityModifier;
         this.maxExtractModifier = maxExtractModifier;
         this.maxReceiveModifier = maxReceiveModifier;
         this.name = name;
+        this.color = color;
     }
 
 
     public String getName() {
         return this.name;
+    }
+
+    public Color getColor() {
+        return color;
     }
 
     public int applyFluxModifier(int globalFlux) {

@@ -1,10 +1,10 @@
-package net.bigmangohead.crystalworks.screen.menu;
+package net.bigmangohead.crystalworks.menu;
 
 import net.bigmangohead.crystalworks.block.entity.abstraction.CWBlockEntity;
 import net.bigmangohead.crystalworks.block.entity.machine.BasicGeneratorBlockEntity;
 import net.bigmangohead.crystalworks.registery.ModMenuTypes;
-import net.bigmangohead.crystalworks.screen.menu.abstraction.InventoryMenu;
-import net.bigmangohead.crystalworks.screen.menu.slot.CustomFuelSlot;
+import net.bigmangohead.crystalworks.menu.abstraction.InventoryMenu;
+import net.bigmangohead.crystalworks.menu.slot.CustomFuelSlot;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ContainerData;

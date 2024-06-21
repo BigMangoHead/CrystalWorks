@@ -1,4 +1,4 @@
-package net.bigmangohead.crystalworks.screen.menu.slot;
+package net.bigmangohead.crystalworks.menu.slot;
 
 import net.bigmangohead.crystalworks.util.item.ItemUtils;
 import net.minecraft.world.item.ItemStack;

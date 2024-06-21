@@ -1,10 +1,10 @@
-package net.bigmangohead.crystalworks.screen.menu;
+package net.bigmangohead.crystalworks.menu;
 
 import net.bigmangohead.crystalworks.block.entity.abstraction.CWBlockEntity;
 import net.bigmangohead.crystalworks.block.entity.machine.CrusherBlockEntity;
+import net.bigmangohead.crystalworks.menu.slot.CWSlotItemHandler;
 import net.bigmangohead.crystalworks.registery.ModMenuTypes;
-import net.bigmangohead.crystalworks.screen.menu.abstraction.InventoryMenu;
-import net.bigmangohead.crystalworks.screen.menu.slot.CWSlotItemHandler;
+import net.bigmangohead.crystalworks.menu.abstraction.InventoryMenu;
 import net.bigmangohead.crystalworks.util.energy.flux.FluxStorage;
 import net.bigmangohead.crystalworks.util.energy.flux.FluxUtils;
 import net.bigmangohead.crystalworks.util.item.CWItemStackHandler;

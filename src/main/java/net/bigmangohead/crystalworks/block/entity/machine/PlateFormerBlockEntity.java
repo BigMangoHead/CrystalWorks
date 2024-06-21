@@ -4,7 +4,7 @@ import net.bigmangohead.crystalworks.CrystalWorksMod;
 import net.bigmangohead.crystalworks.block.entity.abstraction.SimpleProcessBlockEntity;
 import net.bigmangohead.crystalworks.recipe.SimpleProcessingRecipe;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
-import net.bigmangohead.crystalworks.screen.menu.PlateFormerMenu;
+import net.bigmangohead.crystalworks.menu.PlateFormerMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;

@@ -1,8 +1,9 @@
-package net.bigmangohead.crystalworks.screen.screen;
+package net.bigmangohead.crystalworks.screen.blockentity;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.screen.menu.PlateFormerMenu;
+import net.bigmangohead.crystalworks.menu.PlateFormerMenu;
+import net.bigmangohead.crystalworks.screen.component.FluxBars;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -49,12 +50,13 @@ public class PlateFormerScreen extends AbstractContainerScreen<PlateFormerMenu> 
         renderBackground(graphics);
         super.render(graphics, mouseX, mouseY, delta);
         renderTooltip(graphics, mouseX, mouseY);
+        FluxBars.createFluxBars(graphics, menu.getFluxStorage(), this.leftPos + 8, this.leftPos + 42, this.topPos + 8, this.topPos  + 80);
 
-        graphics.drawString(this.font,
-                "Energy: %d".formatted(this.menu.getEnergy()),
-                this.leftPos + 8,
-                this.topPos + 8,
-                0x404040,
-                false);
+//        graphics.drawString(this.font,
+//                "Energy: %d".formatted(this.menu.getEnergy()),
+//                this.leftPos + 8,
+//                this.topPos + 8,
+//                0x404040,
+//                false);
     }
 }

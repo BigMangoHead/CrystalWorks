@@ -1,9 +1,9 @@
 package net.bigmangohead.crystalworks.registery;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
-import net.bigmangohead.crystalworks.screen.menu.BasicGeneratorMenu;
-import net.bigmangohead.crystalworks.screen.menu.CrusherMenu;
-import net.bigmangohead.crystalworks.screen.menu.PlateFormerMenu;
+import net.bigmangohead.crystalworks.menu.BasicGeneratorMenu;
+import net.bigmangohead.crystalworks.menu.CrusherMenu;
+import net.bigmangohead.crystalworks.menu.PlateFormerMenu;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.common.extensions.IForgeMenuType;

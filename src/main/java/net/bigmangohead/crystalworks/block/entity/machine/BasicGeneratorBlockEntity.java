@@ -4,7 +4,7 @@ import net.bigmangohead.crystalworks.CrystalWorksMod;
 import net.bigmangohead.crystalworks.block.entity.abstraction.AbstractInventoryBlockEntity;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
 import net.bigmangohead.crystalworks.registery.ModCapabilities;
-import net.bigmangohead.crystalworks.screen.menu.BasicGeneratorMenu;
+import net.bigmangohead.crystalworks.menu.BasicGeneratorMenu;
 import net.bigmangohead.crystalworks.util.energy.CustomEnergyStorage;
 import net.bigmangohead.crystalworks.util.energy.flux.FluxStorage;
 import net.bigmangohead.crystalworks.util.energy.flux.FluxUtils;
@@ -162,7 +162,7 @@ public class BasicGeneratorBlockEntity extends AbstractInventoryBlockEntity {
 
                 FluxStorage receivingBlockEntityFlux = receivingBlockEntity.getCapability(ModCapabilities.FLUX, direction.getOpposite()).orElse(null);
                 if (receivingBlockEntityFlux != null) {
-                    receivingBlockEntityFlux.forceAddFlux(FluxUtils.getFluxType("gold"), 2);
+                    receivingBlockEntityFlux.receiveFlux(2, FluxUtils.getFluxType("gold"), false);
                 }
             }
         }

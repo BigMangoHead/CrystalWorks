@@ -1,4 +1,4 @@
-package net.bigmangohead.crystalworks.screen.menu.abstraction;
+package net.bigmangohead.crystalworks.menu.abstraction;
 
 import net.bigmangohead.crystalworks.block.entity.abstraction.CWBlockEntity;
 import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedObject;
