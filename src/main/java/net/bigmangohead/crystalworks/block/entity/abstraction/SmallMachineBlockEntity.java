@@ -2,6 +2,7 @@ package net.bigmangohead.crystalworks.block.entity.abstraction;
 
 import net.bigmangohead.crystalworks.util.energy.flux.FluxStorage;
 import net.bigmangohead.crystalworks.util.energy.flux.FluxUtils;
+import net.bigmangohead.crystalworks.util.energy.flux.IFluxStorage;
 import net.bigmangohead.crystalworks.util.energy.flux.RedstoneFluxStorage;
 import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedObject;
 import net.bigmangohead.crystalworks.util.serialization.trackedobject.TrackedType;
@@ -11,6 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.IEnergyStorage;
 
 // Small Machine refers to any machine (takes an input to produce an output)
 // That requires a crystal block below it.
@@ -22,7 +24,7 @@ public abstract class SmallMachineBlockEntity extends AbstractInventoryBlockEnti
     protected TrackedInteger maxProgress = new TrackedInteger(defaultMaxProgress, "maxprogress", TrackedType.SYNC_ON_MENU);
 
     protected TrackedObject<FluxStorage> flux;
-    protected final LazyOptional<FluxStorage> fluxOptional;
+    protected final LazyOptional<IFluxStorage> fluxOptional;
 
     public SmallMachineBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
@@ -49,11 +51,11 @@ public abstract class SmallMachineBlockEntity extends AbstractInventoryBlockEnti
         this.trackedObjectHandler.register(this.maxProgress);
     }
 
-    public LazyOptional<RedstoneFluxStorage> getEnergyOptional() {
+    public LazyOptional<IEnergyStorage> getEnergyOptional() {
         return this.flux.obj.getOptionalForgeEnergyStorage();
     }
 
-    public LazyOptional<FluxStorage> getFluxOptional() {
+    public LazyOptional<IFluxStorage> getFluxOptional() {
         return this.fluxOptional;
     }
 

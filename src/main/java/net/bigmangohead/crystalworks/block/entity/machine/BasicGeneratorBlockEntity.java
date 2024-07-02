@@ -2,12 +2,12 @@ package net.bigmangohead.crystalworks.block.entity.machine;
 
 import net.bigmangohead.crystalworks.CrystalWorksMod;
 import net.bigmangohead.crystalworks.block.entity.abstraction.AbstractInventoryBlockEntity;
+import net.bigmangohead.crystalworks.menu.BasicGeneratorMenu;
 import net.bigmangohead.crystalworks.registery.ModBlockEntities;
 import net.bigmangohead.crystalworks.registery.ModCapabilities;
-import net.bigmangohead.crystalworks.menu.BasicGeneratorMenu;
 import net.bigmangohead.crystalworks.util.energy.CustomEnergyStorage;
-import net.bigmangohead.crystalworks.util.energy.flux.FluxStorage;
 import net.bigmangohead.crystalworks.util.energy.flux.FluxUtils;
+import net.bigmangohead.crystalworks.util.energy.flux.IFluxStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -160,9 +160,10 @@ public class BasicGeneratorBlockEntity extends AbstractInventoryBlockEntity {
                     this.energy.extractEnergy(receivingBlockEntityEnergy.receiveEnergy(amountPushed, false), false);
                 }
 
-                FluxStorage receivingBlockEntityFlux = receivingBlockEntity.getCapability(ModCapabilities.FLUX, direction.getOpposite()).orElse(null);
+                IFluxStorage receivingBlockEntityFlux = receivingBlockEntity.getCapability(ModCapabilities.FLUX, direction.getOpposite()).orElse(null);
                 if (receivingBlockEntityFlux != null) {
                     receivingBlockEntityFlux.receiveFlux(2, FluxUtils.getFluxType("gold"), false);
+                    receivingBlockEntityFlux.receiveFlux(2, FluxUtils.getFluxType("diamond"), false);
                 }
             }
         }

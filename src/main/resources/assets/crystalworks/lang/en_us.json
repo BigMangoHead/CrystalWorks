@@ -29,5 +29,12 @@
 
     "tooltip.crystalworks.metal_detector.tooltip": "Detects valuables underground.",
 
+    "tooltip.crystalworks.no_flux_bar": "No Flux",
+
+    "flux.crystalworks.flux": "Flux",
+    "flux.crystalworks.gold": "Gold",
+    "flux.crystalworks.diamond": "Diamond",
+    "flux.crystalworks.redstone": "Redstone",
+
     "creativetab.crystalworks_tab": "CrystalWorks Gems"
 }

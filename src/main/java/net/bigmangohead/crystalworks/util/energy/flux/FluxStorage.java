@@ -5,6 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.IEnergyStorage;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.HashMap;
@@ -12,8 +13,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 // TODO: Max flux types does not work properly
-public class FluxStorage implements INBTSerializable<Tag> {
+public class FluxStorage implements INBTSerializable<Tag>, IFluxStorage {
 
+    // Note: I could make the hashmaps/sets here start with an initial capacity
+    // so that they don't have to be recreated at any point. I doubt this optimization
+    // matters though.
     protected HashMap<FluxType, SingleFluxStorage> storedFlux;
     protected Set<FluxType> acceptableFluxTypes;
     protected Set<FluxType> storedFluxTypes; // Only includes types with more than 0 flux
@@ -23,7 +27,7 @@ public class FluxStorage implements INBTSerializable<Tag> {
 
     protected boolean containsForgeEnergy = false;
     protected RedstoneFluxStorage forgeEnergyStorage = null;
-    protected LazyOptional<RedstoneFluxStorage> optionalForgeEnergyStorage = LazyOptional.of(() -> this.forgeEnergyStorage);
+    protected LazyOptional<IEnergyStorage> optionalForgeEnergyStorage = LazyOptional.of(() -> this.forgeEnergyStorage);
 
     public FluxStorage(Set<SingleFluxStorage> fluxStorageDataSet) {
         this.storedFlux = new HashMap<>();
@@ -176,7 +180,19 @@ public class FluxStorage implements INBTSerializable<Tag> {
     }
 
     public int getFluxAmount(FluxType fluxType) {
-        return this.storedFlux.get(fluxType).getFluxStored();
+        if (this.storedFlux.containsKey(fluxType)) {
+            return this.storedFlux.get(fluxType).getFluxStored();
+        } else {
+            return 0;
+        }
+    }
+
+    public int getMaxFluxAmount(FluxType fluxType) {
+        if (this.storedFlux.containsKey(fluxType)) {
+            return this.storedFlux.get(fluxType).getMaxFluxStored();
+        } else {
+            return 0;
+        }
     }
 
     public Set<FluxType> getStoredFluxTypes() {
@@ -191,8 +207,16 @@ public class FluxStorage implements INBTSerializable<Tag> {
         return forgeEnergyStorage;
     }
 
-    public LazyOptional<RedstoneFluxStorage> getOptionalForgeEnergyStorage() {
+    public LazyOptional<IEnergyStorage> getOptionalForgeEnergyStorage() {
         return optionalForgeEnergyStorage;
+    }
+
+    public Long getLastTimeFluxChanged(FluxType fluxType) {
+        if (storedFlux.containsKey(fluxType)) {
+            return storedFlux.get(fluxType).getLastTimeChanged();
+        } else {
+            return null;
+        }
     }
 
 
@@ -238,8 +262,8 @@ public class FluxStorage implements INBTSerializable<Tag> {
     @Override
     public Tag serializeNBT() {
         CompoundTag nbtData = new CompoundTag();
-        this.storedFlux.forEach(((fluxType, singleFluxStorage) ->
-                nbtData.put(fluxType.getName(), singleFluxStorage.serializeNBT())));
+        this.storedFlux.forEach((fluxType, singleFluxStorage) ->
+                nbtData.put(fluxType.getName(), singleFluxStorage.serializeNBT()));
 
         return nbtData;
     }

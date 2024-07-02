@@ -1,16 +1,19 @@
 package net.bigmangohead.crystalworks.util.energy.flux;
 
-import net.minecraft.nbt.IntTag;
+import net.minecraft.nbt.LongArrayTag;
 import net.minecraft.nbt.Tag;
 import net.minecraftforge.common.util.INBTSerializable;
 import org.apache.logging.log4j.util.TriConsumer;
 
+import java.util.Date;
+
 // TODO: deserializeNBT needs to also take in the flux capacity
-public class SingleFluxStorage implements INBTSerializable<Tag> {
+public class SingleFluxStorage implements INBTSerializable<Tag>, ISingleFluxStorage {
 
     protected final FluxType fluxType;
     protected int flux;
     protected int capacity;
+    protected long lastTimeChanged = 0;
     protected int maxReceive;
     protected int maxExtract;
     // Parameters are the flux type, old flux amount, then new flux amount
@@ -101,6 +104,7 @@ public class SingleFluxStorage implements INBTSerializable<Tag> {
 
     protected void onFluxChange(int oldFlux, int newFlux) {
         this.onFluxChange.accept(this.fluxType, oldFlux, newFlux);
+        this.lastTimeChanged = new Date().getTime();
     }
 
 
@@ -117,6 +121,10 @@ public class SingleFluxStorage implements INBTSerializable<Tag> {
         return this.capacity;
     }
 
+    public long getLastTimeChanged() {
+        return lastTimeChanged;
+    }
+
     public boolean canExtract() {
         return this.maxExtract > 0;
     }
@@ -125,13 +133,19 @@ public class SingleFluxStorage implements INBTSerializable<Tag> {
         return this.maxReceive > 0;
     }
 
+    // TODO: Make FluxStorage send lastTimeFluxChanged data only on menu
     public Tag serializeNBT() {
-        return IntTag.valueOf(this.getFluxStored());
+        long[] data = new long[2];
+        data[0] = getFluxStored();
+        data[1] = lastTimeChanged;
+
+        return new LongArrayTag(data);
     }
 
     public void deserializeNBT(Tag nbt) {
-        if (nbt instanceof IntTag intNbt) {
-            this.flux = intNbt.getAsInt();
+        if (nbt instanceof LongArrayTag arrayTag) {
+            this.flux = arrayTag.get(0).getAsInt();
+            this.lastTimeChanged = arrayTag.get(1).getAsLong();
         } else {
             throw new IllegalArgumentException("Cannot deserialize to an instance that isn't the default implementation");
         }

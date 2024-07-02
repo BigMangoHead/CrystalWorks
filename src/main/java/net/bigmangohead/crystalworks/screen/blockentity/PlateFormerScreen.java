@@ -15,8 +15,10 @@ public class PlateFormerScreen extends AbstractContainerScreen<PlateFormerMenu> 
     private static final ResourceLocation TEXTURE =
             new ResourceLocation(CrystalWorksMod.MOD_ID, "textures/gui/crusher_gui.png");
 
-    public PlateFormerScreen(PlateFormerMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
-        super(pMenu, pPlayerInventory, pTitle);
+    protected FluxBars fluxBars;
+
+    public PlateFormerScreen(PlateFormerMenu menu, Inventory pPlayerInventory, Component pTitle) {
+        super(menu, pPlayerInventory, pTitle);
     }
 
     @Override
@@ -24,6 +26,8 @@ public class PlateFormerScreen extends AbstractContainerScreen<PlateFormerMenu> 
         super.init();
         this.inventoryLabelY = 100000;
         this.titleLabelX = 100000;
+
+        this.fluxBars = new FluxBars(menu.getFluxStorage(), this.leftPos + 8, this.leftPos + 38, this.topPos + 8, this.topPos + 80, this.font);
     }
 
     @Override
@@ -50,7 +54,9 @@ public class PlateFormerScreen extends AbstractContainerScreen<PlateFormerMenu> 
         renderBackground(graphics);
         super.render(graphics, mouseX, mouseY, delta);
         renderTooltip(graphics, mouseX, mouseY);
-        FluxBars.createFluxBars(graphics, menu.getFluxStorage(), this.leftPos + 8, this.leftPos + 42, this.topPos + 8, this.topPos  + 80);
+
+        this.fluxBars.updateFluxStorage(menu.getFluxStorage());
+        this.fluxBars.handleFluxBars(graphics, mouseX, mouseY);
 
 //        graphics.drawString(this.font,
 //                "Energy: %d".formatted(this.menu.getEnergy()),
